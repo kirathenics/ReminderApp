@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ReminderActivity">
+
+    <EditText
+        android:id="@+id/editText_title_reminder"
+        android:hint="@string/title_reminder_form"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:singleLine="true"
+        android:padding="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <EditText
+        android:id="@+id/editText_description_reminder"
+        android:hint="@string/description_reminder_form"
+        android:textSize="16sp"
+        android:padding="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <DatePicker
+        android:id="@+id/datePicker_reminder"
+        android:layout_width="275dp"
+        android:layout_height="288dp" />
+
+    <TimePicker
+        android:id="@+id/timePicker_reminder"
+        android:layout_width="351dp"
+        android:layout_height="251dp" />
+
+    <Button
+        android:id="@+id/set_reminder_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Set reminder" />
+
+</LinearLayout>

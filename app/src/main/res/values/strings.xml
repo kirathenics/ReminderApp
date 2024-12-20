@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">ReminderApp</string>
+    <string name="add_reminder_content_description">add_reminder</string>
+    <string name="title_reminder_form">Title</string>
+    <string name="description_reminder_form">Description</string>
+    <string name="time_reminder_form">Time</string>
+    <string name="date_reminder_form">Date</string>
+</resources>
