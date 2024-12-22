@@ -2,7 +2,11 @@ package com.example.reminderapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -14,6 +18,7 @@ import android.widget.Toast;
 
 import com.example.reminderapp.Entities.Reminder;
 
+import java.util.Calendar;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -91,11 +96,58 @@ public class ReminderActivity extends AppCompatActivity {
                 reminder.setDate(date);
                 reminder.setCategory("default");
 
+                if (isOldReminder) {
+                    cancelReminderAlarm(reminder);
+                }
+
+                setReminderAlarm(reminder);
+
                 Intent intent = new Intent();
                 intent.putExtra("reminder", reminder);
                 setResult(Activity.RESULT_OK, intent);
                 finish();
             }
         });
+    }
+
+    @SuppressLint("ScheduleExactAlarm")
+    private void setReminderAlarm(Reminder reminder) {
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(this, NotificationReceiver.class);
+        intent.putExtra("title", reminder.getTitle());
+        intent.putExtra("description", reminder.getDescription());
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                this,
+                reminder.getId(),
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
+
+        Calendar calendar = Calendar.getInstance();
+        String[] dateParts = reminder.getDate().split("-");
+        String[] timeParts = reminder.getTime().split(":");
+        calendar.set(Calendar.YEAR, Integer.parseInt(dateParts[0]));
+        calendar.set(Calendar.MONTH, Integer.parseInt(dateParts[1]) - 1);
+        calendar.set(Calendar.DAY_OF_MONTH, Integer.parseInt(dateParts[2]));
+        calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(timeParts[0]));
+        calendar.set(Calendar.MINUTE, Integer.parseInt(timeParts[1]));
+        calendar.set(Calendar.SECOND, 0);
+
+        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+    }
+
+    private void cancelReminderAlarm(Reminder reminder) {
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(this, NotificationReceiver.class);
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                this,
+                reminder.getId(),
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
+
+        alarmManager.cancel(pendingIntent);
     }
 }
