@@ -5,4 +5,5 @@
     <color name="light_primary_color">#2475B0</color>
     <color name="dark_primary_color">#2475B0</color>
     <color name="action_button_color">#0A79DF</color>
+    <color name="gray">#D1D1D1</color>
 </resources>

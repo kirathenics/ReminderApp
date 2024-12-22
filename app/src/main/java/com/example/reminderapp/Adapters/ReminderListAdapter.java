@@ -1,5 +1,6 @@
 package com.example.reminderapp.Adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -61,6 +62,12 @@ public class ReminderListAdapter extends RecyclerView.Adapter<ReminderViewHolder
     @Override
     public int getItemCount() {
         return list.size();
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    public void filterList(List<Reminder> filteredList) {
+        list = filteredList;
+        notifyDataSetChanged();
     }
 }
 
