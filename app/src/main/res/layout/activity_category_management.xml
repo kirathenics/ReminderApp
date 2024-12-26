@@ -13,7 +13,8 @@
         android:layout_height="wrap_content"
         android:background="@color/lavender_medium"
         app:title="@string/title_categories_management"
-        app:titleTextAppearance="@style/ToolbarTitleTextStyle" />
+        app:titleTextAppearance="@style/ToolbarTitleTextStyle"
+        app:theme="@style/ToolbarTheme" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/category_recycler_view"

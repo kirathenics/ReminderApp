@@ -44,7 +44,7 @@ public class CategoryListAdapter extends RecyclerView.Adapter<CategoryListAdapte
     @NonNull
     @Override
     public CategoryListAdapter.CategoryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.category_card_view, parent,false);
+        View view = LayoutInflater.from(context).inflate(R.layout.card_view_category, parent,false);
         return new CategoryViewHolder(view);
     }
 
@@ -74,7 +74,7 @@ public class CategoryListAdapter extends RecyclerView.Adapter<CategoryListAdapte
         });
 
         holder.optionsImageButton.setOnClickListener(v -> {
-            PopupMenu popupMenu = new PopupMenu(context, holder.categoryCardView, Gravity.END, 0, R.style.CustomPopupMenu);
+            PopupMenu popupMenu = new PopupMenu(context, holder.categoryCardView, Gravity.END);
             popupMenu.setOnMenuItemClickListener(item -> {
                 int itemId = item.getItemId();
                 if (itemId == R.id.edit_category) {

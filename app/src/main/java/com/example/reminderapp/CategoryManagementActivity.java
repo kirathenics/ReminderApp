@@ -1,6 +1,8 @@
 package com.example.reminderapp;
 
 import android.annotation.SuppressLint;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -53,7 +55,7 @@ public class CategoryManagementActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
-            getSupportActionBar().setTitle("Categories Editing");
+            getSupportActionBar().setTitle(R.string.title_categories_editing);
         }
 
         categoryRecyclerView = findViewById(R.id.category_recycler_view);

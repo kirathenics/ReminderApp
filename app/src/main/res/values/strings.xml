@@ -49,4 +49,6 @@
     <string name="title_name_ascending">Name Ascending</string>
     <string name="title_name_descending">Name Descending</string>
     <string name="description_add_reminder_button">Add Reminder</string>
+    <string name="title_reminder_name">Reminder name\n</string>
+    <string name="title_categories_editing">Categories Editing</string>
 </resources>
