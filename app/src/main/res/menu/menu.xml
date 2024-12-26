@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <item
+        android:id="@+id/CategoriesMenu"
+        android:icon="@drawable/ic_category"
+        android:title="@string/title_categories">
+
+        <menu>
+            <group android:id="@+id/categories_group" android:checkableBehavior="single">
+                <item
+                    android:id="@+id/all_categories"
+                    android:icon="@drawable/ic_list"
+                    android:title="@string/title_all_categories"
+                    android:checked="true"/>
+            </group>
+        </menu>
+    </item>
+
+    <group android:id="@+id/menu_group" android:checkableBehavior="single">
+        <item
+            android:id="@+id/CategoriesManagement"
+            android:icon="@drawable/ic_categories_management"
+            android:title="@string/title_categories_management"/>
+
+        <item
+            android:id="@+id/Settings"
+            android:icon="@drawable/ic_settings"
+            android:title="@string/title_settings"/>
+
+        <item
+            android:id="@+id/Info"
+            android:icon="@drawable/ic_info"
+            android:title="@string/title_info"/>
+
+        <item
+            android:id="@+id/Exit"
+            android:icon="@drawable/ic_exit"
+            android:title="@string/title_exit"/>
+    </group>
+
+</menu>

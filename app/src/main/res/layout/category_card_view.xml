@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardBackgroundColor="@color/white"
+    android:id="@+id/category_card_view"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="8dp"
+    android:layout_margin="8dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded_corner">
+
+        <View
+            android:id="@+id/category_card_view_color_circle"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="13dp"
+            android:background="@drawable/circle_background" />
+
+        <TextView
+            android:id="@+id/category_card_view_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/category_card_view_color_circle"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:padding="8dp"
+            android:text="@string/title_category_name"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+<!--        <ImageButton-->
+<!--            android:id="@+id/category_card_view_drag_handler"-->
+<!--            android:layout_width="30dp"-->
+<!--            android:layout_height="30dp"-->
+<!--            android:layout_alignParentEnd="true"-->
+<!--            android:layout_marginTop="8dp"-->
+<!--            android:layout_marginEnd="0dp"-->
+<!--            android:background="@drawable/ic_drag_handle"-->
+<!--            android:backgroundTint="@color/gray"-->
+<!--            android:contentDescription="@string/category_drag_handler" />-->
+
+        <TextView
+            android:id="@+id/category_card_view_reminder_number"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/category_card_view_name"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:padding="8dp"
+            android:text="@string/title_reminders_number"
+            android:textSize="12sp" />
+
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/category_card_view_is_active"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/category_card_view_reminder_number"
+            android:layout_gravity="start"
+            android:checked="false"
+            android:elevation="20dp"
+            android:padding="10dp"
+            app:thumbTint="@color/switch_thumb_color"
+            app:trackTint="@color/switch_track_color" />
+
+        <ImageButton
+            android:id="@+id/category_card_view_options"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_below="@+id/category_card_view_reminder_number"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="0dp"
+            android:background="@drawable/ic_more_vert"
+            android:backgroundTint="@color/gray"
+            android:contentDescription="@string/title_category_options" />
+
+    </RelativeLayout>
+
+</androidx.cardview.widget.CardView>

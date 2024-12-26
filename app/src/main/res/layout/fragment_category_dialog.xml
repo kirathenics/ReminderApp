@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/category_dialog_fragment"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/rounded_corner"
+    tools:context=".CategoryDialogFragment">
+
+    <TextView
+        android:id="@+id/dialog_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8sp"
+        android:gravity="center"
+        android:textSize="18sp"
+        android:textColor="@color/lavender_dark"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/text_view_choose_color"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/dialog_title"
+        android:layout_marginTop="8sp"
+        android:gravity="center"
+        android:textSize="16sp"
+        android:textColor="@color/lavender_dark"
+        android:text="@string/title_choose_color" />
+
+    <LinearLayout
+        android:id="@+id/color_picker_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8sp"
+        android:layout_marginStart="24sp"
+        android:layout_marginEnd="24sp"
+        android:layout_below="@+id/text_view_choose_color"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <FrameLayout
+            android:layout_width="30sp"
+            android:layout_height="30sp"
+            android:layout_margin="8sp">
+
+            <View
+                android:id="@+id/circle_color_lavender_medium"
+                style="@style/ColorCircleStyle"
+                android:layout_gravity="center"
+                android:backgroundTint="@color/lavender_medium" />
+
+            <ImageView
+                android:id="@+id/check_color_lavender_medium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:contentDescription="@string/description_check_for_color"
+                android:visibility="gone"
+                android:src="@drawable/ic_check" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="30sp"
+            android:layout_height="30sp"
+            android:layout_margin="8sp">
+
+            <View
+                android:id="@+id/circle_color_blueberry"
+                style="@style/ColorCircleStyle"
+                android:layout_gravity="center"
+                android:backgroundTint="@color/blueberry" />
+
+            <ImageView
+                android:id="@+id/check_color_blueberry"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:contentDescription="@string/description_check_for_color"
+                android:visibility="gone"
+                android:src="@drawable/ic_check" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="30sp"
+            android:layout_height="30sp"
+            android:layout_margin="8sp">
+
+            <View
+                android:id="@+id/circle_color_sky_blue"
+                style="@style/ColorCircleStyle"
+                android:layout_gravity="center"
+                android:backgroundTint="@color/sky_blue" />
+
+            <ImageView
+                android:id="@+id/check_color_sky_blue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:contentDescription="@string/description_check_for_color"
+                android:visibility="gone"
+                android:src="@drawable/ic_check" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="30sp"
+            android:layout_height="30sp"
+            android:layout_margin="8sp">
+
+            <View
+                android:id="@+id/circle_color_mint_green"
+                style="@style/ColorCircleStyle"
+                android:layout_gravity="center"
+                android:backgroundTint="@color/mint_green" />
+
+            <ImageView
+                android:id="@+id/check_color_mint_green"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:contentDescription="@string/description_check_for_color"
+                android:visibility="gone"
+                android:src="@drawable/ic_check" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="30sp"
+            android:layout_height="30sp"
+            android:layout_margin="8sp">
+
+            <View
+                android:id="@+id/circle_color_sand"
+                style="@style/ColorCircleStyle"
+                android:layout_gravity="center"
+                android:backgroundTint="@color/sand" />
+
+            <ImageView
+                android:id="@+id/check_color_sand"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:contentDescription="@string/description_check_for_color"
+                android:visibility="gone"
+                android:src="@drawable/ic_check" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="30sp"
+            android:layout_height="30sp"
+            android:layout_margin="8sp">
+
+            <View
+                android:id="@+id/circle_color_pale_orange"
+                style="@style/ColorCircleStyle"
+                android:layout_gravity="center"
+                android:backgroundTint="@color/pale_orange" />
+
+            <ImageView
+                android:id="@+id/check_color_pale_orange"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:contentDescription="@string/description_check_for_color"
+                android:visibility="gone"
+                android:src="@drawable/ic_check" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="30sp"
+            android:layout_height="30sp"
+            android:layout_margin="8sp">
+
+            <View
+                android:id="@+id/circle_color_prismatic_red"
+                style="@style/ColorCircleStyle"
+                android:layout_gravity="center"
+                android:backgroundTint="@color/prismatic_red" />
+
+            <ImageView
+                android:id="@+id/check_color_prismatic_red"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:contentDescription="@string/description_check_for_color"
+                android:visibility="gone"
+                android:src="@drawable/ic_check" />
+        </FrameLayout>
+
+    </LinearLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/edit_text_category_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/color_picker_layout"
+        android:hint="@string/hint_category_name"
+        android:textColorHint="@color/lavender_dark"
+        app:boxStrokeColor="@color/lavender_dark"
+        android:layout_marginStart="24sp"
+        android:layout_marginEnd="24sp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/edit_text_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+<!--    <TextView-->
+<!--        android:id="@+id/text_view_error_message"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="8dp"-->
+<!--        android:layout_below="@+id/edit_text_category_name"-->
+<!--        android:gravity="center"-->
+<!--        android:textColor="@color/prismatic_red"-->
+<!--        android:textStyle="bold"-->
+<!--        android:visibility="gone"-->
+<!--        android:textSize="14sp"-->
+<!--        android:text="@string/error_category_exists" />-->
+
+    <LinearLayout
+        style="?android:attr/buttonBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8sp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="24sp"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/edit_text_category_name"
+        android:orientation="horizontal">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/cancel_category_button"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/lavender_dark"
+            android:layout_marginEnd="10dp"
+            android:text="@string/title_cancel" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/set_category_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:backgroundTint="@color/lavender_dark"
+            android:text="@string/title_ok" />
+
+    </LinearLayout>
+
+</RelativeLayout>

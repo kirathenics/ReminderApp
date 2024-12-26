@@ -1,0 +1,33 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.ReminderApp" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+<!--        <item name="android:statusBarColor">@android:color/transparent</item>-->
+        <item name="android:statusBarColor">@color/lavender_light</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="popupMenuStyle">@style/CustomPopupMenu</item>
+        <item name="android:itemTextAppearance">@style/TextAppearance</item>
+    </style>
+
+    <style name="Theme.ReminderApp" parent="Base.Theme.ReminderApp" />
+    
+    <style name="Theme.Navigation" parent="Base.Theme.ReminderApp">
+        <item name="android:colorControlHighlight">@android:color/transparent</item>
+    </style>
+
+    <style name="ToolbarTitleTextStyle" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">@color/lavender_dark</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="CustomPopupMenu" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:textColor">@color/lavender_medium</item>
+    </style>
+
+    <style name="TextAppearance">
+        <item name="android:textColor">@color/lavender_dark</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+</resources>
