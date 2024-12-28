@@ -35,7 +35,6 @@
     <string name="title_create_category">Create Category</string>
     <string name="hint_category_name">Category name…</string>
 
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_cancel">Cancel</string>
     <string name="title_ok">OK</string>
     <string name="title_grid_view">Grid View</string>
@@ -49,6 +48,14 @@
     <string name="title_name_ascending">Name Ascending</string>
     <string name="title_name_descending">Name Descending</string>
     <string name="description_add_reminder_button">Add Reminder</string>
-    <string name="title_reminder_name">Reminder name\n</string>
+    <string name="title_reminder_name">Reminder name</string>
     <string name="title_categories_editing">Categories Editing</string>
+    <string name="title_add_reminder">Add Reminder</string>
+    <string name="title_add_alarm">Add Alarm</string>
+    <string name="title_reminder_description">Reminder Description</string>
+    <string name="hint_add_description">Add description</string>
+    <string name="title_reminder_resume">Reminder Resume:</string>
+    <string name="title_add_to_category">Add to category</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

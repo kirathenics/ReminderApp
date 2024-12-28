@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/add_reminder_activity"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ReminderAddActivity">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/reminder_add_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/lavender_medium"
+        app:title="@string/title_add_reminder"
+        app:titleTextAppearance="@style/ToolbarTitleTextStyle"
+        app:theme="@style/ToolbarTheme" />
+
+    <TextView
+        android:id="@+id/reminder_summary_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16sp"
+        android:layout_marginEnd="16sp"
+        android:layout_marginTop="16sp"
+        android:layout_below="@id/reminder_add_toolbar"
+        android:text="@string/title_reminder_resume"
+        android:textStyle="bold"
+        android:textColor="@color/lavender_dark"
+        android:textSize="18sp"/>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/reminder_summary_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16sp"
+        android:layout_marginEnd="16sp"
+        android:layout_marginTop="8sp"
+        android:layout_below="@id/reminder_summary_text_view"
+        app:cardCornerRadius="8sp"
+        app:cardElevation="8sp"
+        style="@style/CardView.Background" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16sp">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/reminder_name_text_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/title_reminder_name"
+                android:textColorHint="@color/lavender_dark"
+                app:boxStrokeColor="@color/lavender_dark">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/reminder_name_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="text"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                android:id="@+id/reminder_description_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:padding="8dp"
+                android:text="@string/title_reminder_description"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:drawableEndCompat="@drawable/ic_add" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/reminder_description_text_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/title_reminder_name"
+                android:textColorHint="@color/lavender_dark"
+                app:boxStrokeColor="@color/lavender_dark"
+                android:visibility="gone" >
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/reminder_description_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textMultiLine"
+                    android:minLines="2"
+                    android:gravity="top|start"
+                    android:scrollbars="vertical"
+                    android:imeOptions="actionNone"
+                    android:overScrollMode="always"
+                    android:textSize="15sp"
+                    android:visibility="visible"/>
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/reminder_category_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16sp"
+        android:layout_marginEnd="16sp"
+        android:layout_marginTop="16sp"
+        android:layout_below="@id/reminder_summary_card"
+        android:text="@string/title_add_to_category"
+        android:textStyle="bold"
+        android:textColor="@color/lavender_dark"
+        android:textSize="18sp"/>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/reminder_category_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16sp"
+        android:layout_marginEnd="16sp"
+        android:layout_marginTop="8sp"
+        android:layout_below="@id/reminder_category_text_view"
+        app:cardCornerRadius="8sp"
+        app:cardElevation="8sp"
+        style="@style/CardView.Background" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="16sp">
+
+            <ImageButton
+                android:id="@+id/reminder_add_category_image_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/description_add_category_button"
+                android:padding="8sp"
+                android:src="@drawable/ic_add_to_list"
+                android:backgroundTint="@color/white"
+                app:tint="@color/lavender_dark"/>
+
+            <TextView
+                android:id="@+id/reminder_choose_category_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:padding="8dp"
+                android:text="@string/hint_category_name"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:drawableEndCompat="@drawable/ic_arrow_drop_down" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/add_alarm_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="24dp"
+        android:background="@color/lavender_medium"
+        android:contentDescription="@string/title_add_alarm"
+        android:src="@drawable/ic_add_alarm"
+        android:tint="@color/lavender_dark" />
+
+</RelativeLayout>

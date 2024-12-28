@@ -18,6 +18,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.reminderapp.Databases.AppDatabase;
 import com.example.reminderapp.Entities.Category;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
@@ -56,6 +57,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         lastCategory = null;
         addDefaultCategories();
         updateCategoriesMenu();
+
+        FloatingActionButton addReminderButton = findViewById(R.id.add_reminder_button);
+//        addReminderButton.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, ReminderAddActivity.class)));
+        addReminderButton.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, ReminderAddActivity.class);
+
+            if (lastCategory != null && !Objects.equals(lastCategory.getTitle(), "All")) {
+                String selectedCategory = Objects.requireNonNull(lastCategory.getTitle()).toString();
+                intent.putExtra("selected_category", selectedCategory);
+            }
+
+            startActivity(intent);
+        });
     }
 
     @Override
