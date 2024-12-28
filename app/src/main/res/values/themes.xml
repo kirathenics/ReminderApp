@@ -28,6 +28,8 @@
 
     <style name="CardView.Background">
         <item name="android:background">@color/white</item>
+        <item name="strokeColor">@color/white</item>
+        <item name="strokeWidth">2sp</item>
     </style>
 
     <style name="CustomPopupMenu" parent="Widget.AppCompat.PopupMenu">
