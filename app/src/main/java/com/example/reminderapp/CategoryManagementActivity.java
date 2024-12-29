@@ -1,8 +1,6 @@
 package com.example.reminderapp;
 
 import android.annotation.SuppressLint;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,7 +19,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import com.example.reminderapp.Adapters.CategoryListAdapter;
 import com.example.reminderapp.Databases.AppDatabase;
 import com.example.reminderapp.Entities.Category;
-import com.example.reminderapp.Listeners.CategoryOnClickListener;
+import com.example.reminderapp.Listeners.OnCategoryClickListener;
 import com.example.reminderapp.Listeners.OnCategoryChangeListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -36,7 +34,7 @@ public class CategoryManagementActivity extends AppCompatActivity {
     private List<Category> categoryList = new ArrayList<>();
 
     private CategoryListAdapter categoryListAdapter;
-    private CategoryOnClickListener categoryOnClickListener;
+    private OnCategoryClickListener onCategoryClickListener;
 
     private final int ROW_SPAN_COUNT = 1;
     private final int GRID_SPAN_COUNT = 2;
@@ -64,7 +62,7 @@ public class CategoryManagementActivity extends AppCompatActivity {
         new Thread(() -> {
             categoryList = appDatabase.categoryDAO().getAll();
             runOnUiThread(() -> {
-                categoryListAdapter = new CategoryListAdapter(CategoryManagementActivity.this, categoryList, categoryOnClickListener, new OnCategoryChangeListener() {
+                categoryListAdapter = new CategoryListAdapter(CategoryManagementActivity.this, categoryList, onCategoryClickListener, new OnCategoryChangeListener() {
                     @Override
                     public void onCategoryUpdated(int position, Category updatedCategory) {
                         appDatabase.categoryDAO().update(updatedCategory);
@@ -102,7 +100,7 @@ public class CategoryManagementActivity extends AppCompatActivity {
             }
         });
 
-        categoryOnClickListener = new CategoryOnClickListener() {
+        onCategoryClickListener = new OnCategoryClickListener() {
             @Override
             public void onCategoryClick(Category category) {}
 
@@ -113,10 +111,10 @@ public class CategoryManagementActivity extends AppCompatActivity {
         };
     }
 
-    private void filterCategories(String newText) {
+    private void filterCategories(String query) {
         List<Category> filteredList = new ArrayList<>();
         for (Category reminder : categoryList) {
-            if (reminder.getName().toLowerCase().contains(newText.toLowerCase())) {
+            if (reminder.getName().toLowerCase().contains(query.toLowerCase())) {
                 filteredList.add(reminder);
             }
         }

@@ -46,9 +46,12 @@ public class ReminderAddActivity extends AppCompatActivity {
 
         String selectedCategory = getIntent().getStringExtra("selected_category");
 
+        TextView chooseCategoryTextView = findViewById(R.id.reminder_choose_category_text_view);
         if (selectedCategory != null) {
-            TextView categoryTextView = findViewById(R.id.reminder_choose_category_text_view);
-            categoryTextView.setText(selectedCategory);
+            chooseCategoryTextView.setText(selectedCategory);
+        }
+        if (selectedCategory != null && selectedCategory.equals(getString(R.string.category_name_all))) {
+            chooseCategoryTextView.setText(R.string.category_name_by_default);
         }
 
         appDatabase = AppDatabase.getInstance(this);
@@ -86,6 +89,12 @@ public class ReminderAddActivity extends AppCompatActivity {
         addCategoryImageButton.setOnClickListener(v -> {
             CategoryDialogFragment dialogFragment = CategoryDialogFragment.newInstance();
             dialogFragment.setOnCategoryUpdatedListener(newCategory -> new Thread(() -> appDatabase.categoryDAO().insert(newCategory)).start());
+            dialogFragment.show(getSupportFragmentManager(), CategoryDialogFragment.TAG);
+        });
+
+        chooseCategoryTextView.setOnClickListener(v -> {
+            ChooseCategoryDialogFragment dialogFragment = ChooseCategoryDialogFragment.newInstance();
+            dialogFragment.setOnCategoryChoseListener(chosenCategory -> chooseCategoryTextView.setText(chosenCategory.getName()));
             dialogFragment.show(getSupportFragmentManager(), CategoryDialogFragment.TAG);
         });
     }

@@ -22,19 +22,20 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.reminderapp.CategoryDialogFragment;
 import com.example.reminderapp.Databases.AppDatabase;
 import com.example.reminderapp.Entities.Category;
-import com.example.reminderapp.Listeners.CategoryOnClickListener;
+import com.example.reminderapp.Listeners.OnCategoryClickListener;
 import com.example.reminderapp.Listeners.OnCategoryChangeListener;
 import com.example.reminderapp.R;
 
 import java.util.List;
 
 public class CategoryListAdapter extends RecyclerView.Adapter<CategoryListAdapter.CategoryViewHolder> {
+
     private final Context context;
     private List<Category> categoryList;
-    private final CategoryOnClickListener clickListener;
+    private final OnCategoryClickListener clickListener;
     private final OnCategoryChangeListener changeListener;
 
-    public CategoryListAdapter(Context context, List<Category> categoryList, CategoryOnClickListener clickListener, OnCategoryChangeListener changeListener) {
+    public CategoryListAdapter(Context context, List<Category> categoryList, OnCategoryClickListener clickListener, OnCategoryChangeListener changeListener) {
         this.context = context;
         this.categoryList = categoryList;
         this.clickListener = clickListener;
@@ -44,7 +45,7 @@ public class CategoryListAdapter extends RecyclerView.Adapter<CategoryListAdapte
     @NonNull
     @Override
     public CategoryListAdapter.CategoryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.card_view_category, parent,false);
+        View view = LayoutInflater.from(context).inflate(R.layout.card_view_category_management, parent,false);
         return new CategoryViewHolder(view);
     }
 

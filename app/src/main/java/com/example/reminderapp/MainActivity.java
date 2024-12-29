@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         addReminderButton.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, ReminderAddActivity.class);
 
-            if (lastCategory != null && !Objects.equals(lastCategory.getTitle(), "All")) {
+            if (lastCategory != null) {
                 String selectedCategory = Objects.requireNonNull(lastCategory.getTitle()).toString();
                 intent.putExtra("selected_category", selectedCategory);
             }
