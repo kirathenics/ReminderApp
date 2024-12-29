@@ -14,6 +14,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.example.reminderapp.Databases.AppDatabase;
 import com.example.reminderapp.Entities.Category;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -95,6 +96,18 @@ public class ReminderAddActivity extends AppCompatActivity {
         chooseCategoryTextView.setOnClickListener(v -> {
             ChooseCategoryDialogFragment dialogFragment = ChooseCategoryDialogFragment.newInstance();
             dialogFragment.setOnCategoryChoseListener(chosenCategory -> chooseCategoryTextView.setText(chosenCategory.getName()));
+            dialogFragment.show(getSupportFragmentManager(), CategoryDialogFragment.TAG);
+        });
+
+        FloatingActionButton addAlarmButton = findViewById(R.id.add_alarm_button);
+        addAlarmButton.setOnClickListener(v -> {
+            ChooseTimeDateDialogFragment dialogFragment = ChooseTimeDateDialogFragment.newInstance();
+            dialogFragment.setOnDateTimeSelectedListener(new ChooseTimeDateDialogFragment.OnDateTimeSelectedListener() {
+                @Override
+                public void onDateTimeSelected(String dateTime) {
+
+                }
+            });
             dialogFragment.show(getSupportFragmentManager(), CategoryDialogFragment.TAG);
         });
     }

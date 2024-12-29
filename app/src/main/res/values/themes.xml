@@ -40,4 +40,26 @@
         <item name="android:textColor">@color/lavender_dark</item>
         <item name="android:textStyle">bold</item>
     </style>
+
+    <style name="CustomRadioButtonStyle" parent="Base.Theme.ReminderApp">
+        <item name="android:button">@null</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_margin">4sp</item>
+        <item name="android:paddingTop">8sp</item>
+        <item name="android:background">@drawable/radio_button_background</item>
+        <item name="android:drawableTint">@color/radio_button_drawable_color</item>
+    </style>
+
+    <style name="CustomDateTimePickerTheme" parent="Base.Theme.ReminderApp">
+        <item name="colorAccent">@color/lavender_dark</item>
+        <item name="android:colorAccent">@color/lavender_dark</item>
+<!--        <item name="android:buttonBarPositiveButtonStyle">@style/DialogButtonStyled</item>-->
+<!--        <item name="android:buttonBarNegativeButtonStyle">@style/DialogButtonStyled</item>-->
+<!--        <item name="android:buttonBarNeutralButtonStyle">@style/DialogButtonStyled</item>-->
+    </style>
+
+    <style name="DialogButtonStyled" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:textColor">@color/lavender_dark</item>
+    </style>
+
 </resources>

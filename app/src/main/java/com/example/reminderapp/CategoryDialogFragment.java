@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import com.example.reminderapp.Databases.AppDatabase;
 import com.example.reminderapp.Entities.Category;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -63,8 +64,8 @@ public class CategoryDialogFragment extends DialogFragment {
 
         TextView dialogTitle = view.findViewById(R.id.dialog_title);
         editTextName = view.findViewById(R.id.edit_text_name);
-        Button setCategoryButton = view.findViewById(R.id.set_category_button);
-        Button cancelCategoryButton = view.findViewById(R.id.cancel_category_button);
+        MaterialButton setCategoryButton = view.findViewById(R.id.set_category_button);
+        MaterialButton cancelCategoryButton = view.findViewById(R.id.cancel_category_button);
 
         setupColorPicker(view);
 
