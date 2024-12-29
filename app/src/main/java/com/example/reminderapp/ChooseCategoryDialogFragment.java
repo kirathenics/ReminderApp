@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
-import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -64,7 +63,7 @@ public class ChooseCategoryDialogFragment extends DialogFragment {
             }
         });
 
-        categoryRecyclerView = view.findViewById(R.id.category_recycler_view);
+        categoryRecyclerView = view.findViewById(R.id.choose_category_recycler_view);
 
         OnCategoryClickListener onCategoryClickListener = new OnCategoryClickListener() {
             @Override

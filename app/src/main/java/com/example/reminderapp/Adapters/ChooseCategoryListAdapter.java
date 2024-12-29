@@ -78,7 +78,7 @@ public class ChooseCategoryListAdapter extends RecyclerView.Adapter<ChooseCatego
 
         public CategoryViewHolder(@NonNull View itemView) {
             super(itemView);
-            categoryCardView = itemView.findViewById(R.id.category_card_view);
+            categoryCardView = itemView.findViewById(R.id.choose_category_card_view);
             nameTextView = itemView.findViewById(R.id.category_card_view_name);
             colorCircleView = itemView.findViewById(R.id.category_card_view_color_circle);
         }

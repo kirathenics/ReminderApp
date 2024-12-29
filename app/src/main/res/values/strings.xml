@@ -61,4 +61,5 @@
     <string name="title_search_for_category">Search for category…</string>
     <string name="category_name_all">All</string>
     <string name="category_name_by_default">By Default</string>
+    <string name="title_time_and_date">Time and Date:</string>
 </resources>
