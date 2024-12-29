@@ -6,7 +6,9 @@
     <color name="light_gray">#CCCCCC</color>
 
     <color name="lavender_dark">#734F96</color>
-    <color name="lavender_medium">#CAB9DC</color>
+<!--    <color name="lavender_medium">#CAB9DC</color>-->
+    <color name="lavender_medium">#EADDFF</color>
+<!--    <color name="lavender">#EADDFF</color>-->
     <color name="lavender_light">#F1E9F4</color>
 
     <color name="blueberry">#7685FA</color>

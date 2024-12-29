@@ -146,7 +146,8 @@ public class CategoryDialogFragment extends DialogFragment {
     }
 
     private boolean isCategoryNameUnique(String categoryName) {
-        return AppDatabase.getInstance(requireContext()).categoryDAO().findByName(categoryName) == null;
+        Category existingCategory = AppDatabase.getInstance(requireContext()).categoryDAO().findByName(categoryName);
+        return existingCategory == null || (category != null && existingCategory.getId() == category.getId());
     }
 
     private void setupColorPicker(View view) {

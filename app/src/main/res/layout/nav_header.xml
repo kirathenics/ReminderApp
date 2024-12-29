@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/nav_header_background"
+    android:backgroundTint="@color/lavender_medium"
     android:orientation="vertical">
 <!--    android:background="@color/lavender_medium"-->
 

@@ -117,7 +117,7 @@
         android:textStyle="bold"
         android:textColor="@color/lavender_dark"
         android:textSize="18sp"
-        android:visibility="gone" />
+        android:visibility="visible" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/time_date_card_view"
@@ -130,9 +130,37 @@
         app:cardCornerRadius="8sp"
         app:cardElevation="8sp"
         style="@style/CardView.Background"
-        android:visibility="gone">
+        android:visibility="visible">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16sp"
+            android:layout_marginEnd="16sp"
+            android:layout_marginTop="16sp"
+            android:layout_below="@id/reminder_summary_card_view"
+            android:text="@string/title_time_and_date"
+            android:textStyle="bold"
+            android:textColor="@color/lavender_dark"
+            android:textSize="18sp"
+            android:visibility="visible" />
 
     </androidx.cardview.widget.CardView>
+
+    <ImageButton
+        android:id="@+id/remove_button"
+        android:layout_width="40sp"
+        android:layout_height="40sp"
+        android:layout_alignEnd="@id/time_date_card_view"
+        android:layout_alignTop="@id/time_date_card_view"
+        android:layout_marginEnd="10sp"
+        android:layout_marginTop="-20sp"
+        android:src="@drawable/ic_close"
+        android:background="@drawable/round_button"
+        android:contentDescription="@string/remove_time_date"
+        android:scaleType="centerInside"
+        android:elevation="12sp"
+        app:tint="@color/white" />
 
     <TextView
         android:id="@+id/reminder_category_text_view"
@@ -198,7 +226,7 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:layout_margin="24dp"
-        android:background="@color/lavender_medium"
+        app:background="@color/lavender_medium"
         android:contentDescription="@string/title_add_alarm"
         android:src="@drawable/ic_add_alarm"
         android:tint="@color/lavender_dark" />
