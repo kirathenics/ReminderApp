@@ -28,7 +28,7 @@
             android:ellipsize="end"
             android:maxLines="1"
             android:padding="8sp"
-            android:text="@string/title_reminder_name"
+            android:text="@string/reminder_title"
             android:textSize="18sp"
             android:textStyle="bold" />
 

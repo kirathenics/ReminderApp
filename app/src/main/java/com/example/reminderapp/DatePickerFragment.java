@@ -14,6 +14,9 @@ import android.widget.DatePicker;
 public class DatePickerFragment extends Fragment {
 
     private DatePicker datePicker;
+    private Integer year;
+    private Integer month;
+    private Integer day;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -25,6 +28,11 @@ public class DatePickerFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         datePicker = new DatePicker(getContext());
+
+        if (year != null && month != null && day != null) {
+            datePicker.updateDate(year, month, day);
+        }
+
         return datePicker;
     }
 
@@ -38,5 +46,15 @@ public class DatePickerFragment extends Fragment {
 
     public int getDay() {
         return datePicker.getDayOfMonth();
+    }
+
+    public void setDate(int year, int month, int day) {
+        this.year = year;
+        this.month = month;
+        this.day = day;
+
+        if (datePicker != null) {
+            datePicker.updateDate(year, month, day);
+        }
     }
 }

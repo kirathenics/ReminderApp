@@ -48,7 +48,7 @@
     <string name="title_name_ascending">Name Ascending</string>
     <string name="title_name_descending">Name Descending</string>
     <string name="description_add_reminder_button">Add Reminder</string>
-    <string name="title_reminder_name">Reminder name</string>
+    <string name="reminder_title">Reminder title</string>
     <string name="title_categories_editing">Categories Editing</string>
     <string name="title_add_reminder">Add Reminder</string>
     <string name="title_add_alarm">Add Alarm</string>
@@ -61,7 +61,22 @@
     <string name="category_name_by_default">By Default</string>
     <string name="title_time_and_date">Time and Date:</string>
     <string name="no_time">No Time</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="remove_time_date">Remove time and date</string>
+    <string name="zero_time">00:00</string>
+    <string name="remove_time">Remove time</string>
+    <string name="zero_date">mon, 1 Jan, 0000</string>
+    <string name="tomorrow">Tomorrow</string>
+
+    <string name="repeat">Repeat:</string>
+    <string name="monday">Mon</string>
+    <string name="tuesday">Tue</string>
+    <string name="wednesday">Wed</string>
+    <string name="thursday">Thu</string>
+    <string name="friday">Fri</string>
+    <string name="saturday">Sat</string>
+    <string name="sunday">Sun</string>
+    <string name="stop_repeating">Stop repeating:</string>
+    <string name="no_date">No date</string>
+    <string name="selected_time_has_already_passed">Selected time has already passed</string>
+
 </resources>

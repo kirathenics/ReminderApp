@@ -11,24 +11,39 @@ import androidx.fragment.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.RadioGroup;
-import android.widget.Toast;
 
 import com.google.android.material.button.MaterialButton;
 
 
 public class ChooseTimeDateDialogFragment extends DialogFragment {
 
+    private static final String ARG_INITIAL_FRAGMENT = "initial_fragment";
+    private static final String ARG_INITIAL_TIME = "initial_time";
+    private static final String ARG_INITIAL_DATE = "initial_date";
+
     private OnDateTimeSelectedListener listener;
     SwitchCompat switchTimeOptional;
 
+    TimePickerFragment timeFragment;
+    DatePickerFragment dateFragment;
+
     public interface OnDateTimeSelectedListener {
-        void onDateTimeSelected(String dateTime);
+        void onDateTimeSelected(String time, String date);
     }
 
     public static ChooseTimeDateDialogFragment newInstance() {
         return new ChooseTimeDateDialogFragment();
+    }
+
+    public static ChooseTimeDateDialogFragment newInstance(boolean showTimeInitially, String initialTime, String initialDate) {
+        ChooseTimeDateDialogFragment fragment = new ChooseTimeDateDialogFragment();
+        Bundle args = new Bundle();
+        args.putBoolean(ARG_INITIAL_FRAGMENT, showTimeInitially);
+        args.putString(ARG_INITIAL_TIME, initialTime);
+        args.putString(ARG_INITIAL_DATE, initialDate);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     public void setOnDateTimeSelectedListener(OnDateTimeSelectedListener listener) {
@@ -38,6 +53,32 @@ public class ChooseTimeDateDialogFragment extends DialogFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        timeFragment = new TimePickerFragment();
+        dateFragment = new DatePickerFragment();
+
+        if (getArguments() != null) {
+            String initialDate = getArguments().getString(ARG_INITIAL_DATE, null);
+            String initialTime = getArguments().getString(ARG_INITIAL_TIME, null);
+
+            if (initialTime != null) {
+                String[] timeParts = initialTime.split(":");
+                if (timeParts.length == 2) {
+                    int hour = Integer.parseInt(timeParts[0]);
+                    int minute = Integer.parseInt(timeParts[1]);
+                    timeFragment.setTime(hour, minute);
+                }
+            }
+
+            if (initialDate != null) {
+                String[] dateParts = initialDate.split("-");
+                if (dateParts.length == 3) {
+                    int year = Integer.parseInt(dateParts[0]);
+                    int month = Integer.parseInt(dateParts[1]) - 1;
+                    int day = Integer.parseInt(dateParts[2]);
+                    dateFragment.setDate(year, month, day);
+                }
+            }
+        }
     }
 
     @SuppressLint("DefaultLocale")
@@ -45,24 +86,21 @@ public class ChooseTimeDateDialogFragment extends DialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_choose_time_date_dialog, container, false);
 
-        FrameLayout frameContainer = view.findViewById(R.id.frame_picker_container);
         RadioGroup radioGroup = view.findViewById(R.id.time_date_group_picker);
         switchTimeOptional = view.findViewById(R.id.switch_time_optional);
 
-        showFragment(new DatePickerFragment());
+        boolean showTimeInitially = getArguments() != null && getArguments().getBoolean(ARG_INITIAL_FRAGMENT, false);
+        showFragment(showTimeInitially ? timeFragment : dateFragment);
 
         radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == R.id.radio_date) {
-                showFragment(new DatePickerFragment());
+                showFragment(dateFragment);
             } else if (checkedId == R.id.radio_time) {
-                TimePickerFragment timeFragment = new TimePickerFragment();
                 showFragment(timeFragment);
-//                configureTimePicker(timeFragment);
             }
         });
 
         switchTimeOptional.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            TimePickerFragment timeFragment = (TimePickerFragment) getChildFragmentManager().findFragmentByTag("TimePicker");
             if (timeFragment != null) {
                 configureTimePicker(timeFragment);
             }
@@ -73,27 +111,26 @@ public class ChooseTimeDateDialogFragment extends DialogFragment {
 
         MaterialButton okButton = view.findViewById(R.id.ok_date_time_button);
         okButton.setOnClickListener(v -> {
-            DatePickerFragment dateFragment = (DatePickerFragment) getChildFragmentManager().findFragmentByTag("DatePicker");
-            TimePickerFragment timeFragment = (TimePickerFragment) getChildFragmentManager().findFragmentByTag("TimePicker");
-
-            int year = dateFragment != null ? dateFragment.getYear() : 0;
-            int month = dateFragment != null ? dateFragment.getMonth() + 1 : 0;
-            int day = dateFragment != null ? dateFragment.getDay() : 0;
-
             String time = "";
-//            if (timeFragment != null && !switchTimeOptional.isChecked()) {
-//                time = " 00:00";
-//            } else
             if (timeFragment != null) {
                 int hour = timeFragment.getHour();
                 int minute = timeFragment.getMinute();
-                time = String.format(" %02d:%02d", hour, minute);
+                time = String.format("%02d:%02d", hour, minute);
             }
 
-            String dateTime = String.format("%04d-%02d-%02d%s", year, month, day, time);
-            if (listener != null) {
-                listener.onDateTimeSelected(dateTime);
+            int year = 0, month = 0, day = 0;
+            if (dateFragment != null) {
+                year = dateFragment.getYear();
+                month = dateFragment.getMonth() + 1;
+                day = dateFragment.getDay();
             }
+            String date = String.format("%04d-%02d-%02d", year, month, day);
+
+            if (listener != null) {
+                listener.onDateTimeSelected(time, date);
+            }
+
+            dismiss();
         });
 
         return view;
@@ -101,10 +138,23 @@ public class ChooseTimeDateDialogFragment extends DialogFragment {
 
     private void showFragment(Fragment fragment) {
         FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-        transaction.replace(R.id.frame_picker_container, fragment,
-                fragment instanceof DatePickerFragment ? "DatePicker" : "TimePicker");
-        transaction.commit();
 
+        if (fragment == dateFragment) {
+            transaction.show(dateFragment);
+            transaction.hide(timeFragment);
+        } else {
+            transaction.show(timeFragment);
+            transaction.hide(dateFragment);
+        }
+
+        if (!dateFragment.isAdded()) {
+            transaction.add(R.id.frame_picker_container, dateFragment, "DatePicker");
+        }
+        if (!timeFragment.isAdded()) {
+            transaction.add(R.id.frame_picker_container, timeFragment, "TimePicker");
+        }
+
+        transaction.commit();
         getChildFragmentManager().executePendingTransactions();
 
         if (fragment instanceof TimePickerFragment) {

@@ -48,15 +48,15 @@
             android:padding="16sp">
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/reminder_name_text_layout"
+                android:id="@+id/reminder_title_text_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/title_reminder_name"
+                android:hint="@string/reminder_title"
                 android:textColorHint="@color/lavender_dark"
                 app:boxStrokeColor="@color/lavender_dark">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/reminder_name_edit_text"
+                    android:id="@+id/reminder_title_edit_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="text"
@@ -81,7 +81,7 @@
                 android:id="@+id/reminder_description_text_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/title_reminder_name"
+                android:hint="@string/reminder_title"
                 android:textColorHint="@color/lavender_dark"
                 app:boxStrokeColor="@color/lavender_dark"
                 android:visibility="gone" >
@@ -132,34 +132,240 @@
         style="@style/CardView.Background"
         android:visibility="visible">
 
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16sp"
-            android:layout_marginEnd="16sp"
-            android:layout_marginTop="16sp"
-            android:layout_below="@id/reminder_summary_card_view"
-            android:text="@string/title_time_and_date"
-            android:textStyle="bold"
-            android:textColor="@color/lavender_dark"
-            android:textSize="18sp"
-            android:visibility="visible" />
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/time_linear_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16sp"
+                android:layout_marginTop="20sp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/time_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16sp"
+                    android:layout_gravity="center"
+                    android:text="@string/zero_time"
+                    android:textColor="@color/lavender_dark"
+                    android:textSize="26sp" />
+
+                <ImageButton
+                    android:id="@+id/remove_time_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:backgroundTint="@color/white"
+                    android:src="@drawable/ic_remove_circle_outline"
+                    android:contentDescription="@string/remove_time"
+                    app:tint="@color/lavender_dark" />
+
+                <Space
+                    android:layout_width="0sp"
+                    android:layout_height="0sp"
+                    android:layout_weight="1" />
+
+                <ImageButton
+                    android:id="@+id/remove_alarm_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:layout_gravity="center"
+                    android:backgroundTint="@color/white"
+                    android:contentDescription="@string/remove_time"
+                    android:src="@drawable/ic_notification"
+                    app:tint="@color/lavender_dark" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/date_linear_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16sp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/date_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16sp"
+                    android:layout_gravity="center"
+                    android:padding="4sp"
+                    android:background="@color/lavender_dark"
+                    android:text="@string/zero_date"
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/how_many_date_text_view"
+                    android:layout_width="150sp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:maxLines="2"
+                    android:text="@string/tomorrow"
+                    android:textColor="@color/gray"
+                    android:textSize="16sp" />
+
+                <Space
+                    android:layout_width="0sp"
+                    android:layout_height="0sp"
+                    android:layout_weight="1" />
+
+                <ImageButton
+                    android:id="@+id/change_date_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:backgroundTint="@color/white"
+                    android:contentDescription="@string/remove_time"
+                    android:src="@drawable/ic_calendar"
+                    app:tint="@color/lavender_dark" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16sp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/repeat_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16sp"
+                    android:layout_gravity="center"
+                    android:text="@string/repeat"
+                    android:textSize="14sp"
+                    android:textColor="@color/lavender_dark" />
+
+                <Space
+                    android:layout_width="0sp"
+                    android:layout_height="0sp"
+                    android:layout_weight="1" />
+
+                <ImageButton
+                    android:id="@+id/add_repeat_alarm_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:backgroundTint="@color/white"
+                    android:contentDescription="@string/remove_time"
+                    android:src="@drawable/ic_add"
+                    app:tint="@color/lavender_dark" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16sp"
+                android:layout_marginEnd="16sp"
+                android:orientation="horizontal">
+
+                <CheckBox
+                    android:id="@+id/monday_checkbox"
+                    style="@style/DayOfWeekCheckBox"
+                    android:text="@string/monday" />
+
+                <CheckBox
+                    android:id="@+id/tuesday_checkbox"
+                    style="@style/DayOfWeekCheckBox"
+                    android:text="@string/tuesday" />
+
+                <CheckBox
+                    android:id="@+id/wednesday_checkbox"
+                    style="@style/DayOfWeekCheckBox"
+                    android:text="@string/wednesday" />
+
+                <CheckBox
+                    android:id="@+id/thursday_checkbox"
+                    style="@style/DayOfWeekCheckBox"
+                    android:text="@string/thursday" />
+
+                <CheckBox
+                    android:id="@+id/friday_checkbox"
+                    style="@style/DayOfWeekCheckBox"
+                    android:text="@string/friday" />
+
+                <CheckBox
+                    android:id="@+id/saturday_checkbox"
+                    style="@style/DayOfWeekCheckBox"
+                    android:text="@string/saturday" />
+
+                <CheckBox
+                    android:id="@+id/sunday_checkbox"
+                    style="@style/DayOfWeekCheckBox"
+                    android:text="@string/sunday" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16sp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/stop_repeat_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16sp"
+                    android:layout_gravity="center"
+                    android:text="@string/stop_repeating"
+                    android:textSize="14sp"
+                    android:textColor="@color/lavender_dark" />
+
+                <TextView
+                    android:id="@+id/stop_repeat_date_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="@string/no_date"
+                    android:textSize="13sp"
+                    android:textColor="@color/gray" />
+
+                <Space
+                    android:layout_width="0sp"
+                    android:layout_height="0sp"
+                    android:layout_weight="1" />
+
+                <ImageButton
+                    android:id="@+id/add_stop_repeat_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:backgroundTint="@color/white"
+                    android:contentDescription="@string/remove_time"
+                    android:src="@drawable/ic_edit_calendar"
+                    app:tint="@color/lavender_dark" />
+
+            </LinearLayout>
+
+        </LinearLayout>
 
     </androidx.cardview.widget.CardView>
 
     <ImageButton
-        android:id="@+id/remove_button"
+        android:id="@+id/remove_date_time_button"
         android:layout_width="40sp"
         android:layout_height="40sp"
         android:layout_alignEnd="@id/time_date_card_view"
         android:layout_alignTop="@id/time_date_card_view"
-        android:layout_marginEnd="10sp"
+        android:layout_marginEnd="15sp"
         android:layout_marginTop="-20sp"
-        android:src="@drawable/ic_close"
+        android:src="@drawable/ic_remove_circle_outline"
         android:background="@drawable/round_button"
         android:contentDescription="@string/remove_time_date"
         android:scaleType="centerInside"
         android:elevation="12sp"
+        android:visibility="visible"
         app:tint="@color/white" />
 
     <TextView
@@ -201,7 +407,7 @@
                 android:padding="8sp"
                 android:src="@drawable/ic_add_to_list"
                 android:backgroundTint="@color/white"
-                app:tint="@color/lavender_dark"/>
+                app:tint="@color/lavender_dark" />
 
             <TextView
                 android:id="@+id/reminder_choose_category_text_view"
