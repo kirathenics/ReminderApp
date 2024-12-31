@@ -6,6 +6,9 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 @Entity(tableName = "reminders")
 public class Reminder implements Serializable {
@@ -19,11 +22,11 @@ public class Reminder implements Serializable {
     @ColumnInfo(name = "description")
     private String description;
 
-    @ColumnInfo(name = "date")
-    private String date;
-
     @ColumnInfo(name = "time")
-    private String time;
+    private long time;
+
+    @ColumnInfo(name = "date")
+    private long date;
 
     @ColumnInfo(name = "is_completed")
     private boolean isCompleted;
@@ -67,20 +70,20 @@ public class Reminder implements Serializable {
         this.description = description;
     }
 
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
-    }
-
-    public String getTime() {
+    public long getTime() {
         return time;
     }
 
-    public void setTime(String time) {
+    public void setTime(long time) {
         this.time = time;
+    }
+
+    public long getDate() {
+        return date;
+    }
+
+    public void setDate(long date) {
+        this.date = date;
     }
 
     public boolean isCompleted() {
@@ -134,12 +137,16 @@ public class Reminder implements Serializable {
     @NonNull
     @Override
     public String toString() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+        String formattedDate = dateFormat.format(new Date(date));
+        String formattedTime = dateFormat.format(new Date(time));
+
         return "Reminder{" +
                 "id=" + id +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
-                ", date='" + date + '\'' +
-                ", time='" + time + '\'' +
+                ", date=" + formattedDate +
+                ", time=" + formattedTime +
                 ", isCompleted=" + isCompleted +
                 ", priority=" + priority +
                 ", repeat='" + repeat + '\'' +

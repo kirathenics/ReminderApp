@@ -64,7 +64,7 @@
     <string name="remove_time_date">Remove time and date</string>
     <string name="zero_time">00:00</string>
     <string name="remove_time">Remove time</string>
-    <string name="zero_date">mon, 1 Jan, 0000</string>
+    <string name="zero_date">Thu, 1 Jan 1970</string>
     <string name="tomorrow">Tomorrow</string>
 
     <string name="repeat">Repeat:</string>
@@ -78,5 +78,6 @@
     <string name="stop_repeating">Stop repeating:</string>
     <string name="no_date">No date</string>
     <string name="selected_time_has_already_passed">Selected time has already passed</string>
+    <string name="description_notification_icon">Notification icon</string>
 
 </resources>

@@ -174,11 +174,10 @@
                     android:id="@+id/remove_alarm_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-
                     android:layout_gravity="center"
                     android:backgroundTint="@color/white"
                     android:contentDescription="@string/remove_time"
-                    android:src="@drawable/ic_notification"
+                    android:src="@drawable/ic_alarm"
                     app:tint="@color/lavender_dark" />
 
             </LinearLayout>
@@ -203,7 +202,7 @@
                     android:textSize="16sp" />
 
                 <TextView
-                    android:id="@+id/how_many_date_text_view"
+                    android:id="@+id/how_many_time_difference_text_view"
                     android:layout_width="150sp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"

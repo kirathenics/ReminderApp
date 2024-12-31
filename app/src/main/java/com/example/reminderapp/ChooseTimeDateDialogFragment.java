@@ -15,6 +15,8 @@ import android.widget.RadioGroup;
 
 import com.google.android.material.button.MaterialButton;
 
+import java.util.Calendar;
+
 
 public class ChooseTimeDateDialogFragment extends DialogFragment {
 
@@ -36,12 +38,12 @@ public class ChooseTimeDateDialogFragment extends DialogFragment {
         return new ChooseTimeDateDialogFragment();
     }
 
-    public static ChooseTimeDateDialogFragment newInstance(boolean showTimeInitially, String initialTime, String initialDate) {
+    public static ChooseTimeDateDialogFragment newInstance(boolean showTimeInitially, long initialTimeMillis, long initialDateMillis) {
         ChooseTimeDateDialogFragment fragment = new ChooseTimeDateDialogFragment();
         Bundle args = new Bundle();
         args.putBoolean(ARG_INITIAL_FRAGMENT, showTimeInitially);
-        args.putString(ARG_INITIAL_TIME, initialTime);
-        args.putString(ARG_INITIAL_DATE, initialDate);
+        args.putLong(ARG_INITIAL_TIME, initialTimeMillis);
+        args.putLong(ARG_INITIAL_DATE, initialDateMillis);
         fragment.setArguments(args);
         return fragment;
     }
@@ -57,26 +59,19 @@ public class ChooseTimeDateDialogFragment extends DialogFragment {
         dateFragment = new DatePickerFragment();
 
         if (getArguments() != null) {
-            String initialDate = getArguments().getString(ARG_INITIAL_DATE, null);
-            String initialTime = getArguments().getString(ARG_INITIAL_TIME, null);
+            long initialTimeMillis = getArguments().getLong(ARG_INITIAL_TIME, 0);
+            long initialDateMillis = getArguments().getLong(ARG_INITIAL_DATE, 0);
 
-            if (initialTime != null) {
-                String[] timeParts = initialTime.split(":");
-                if (timeParts.length == 2) {
-                    int hour = Integer.parseInt(timeParts[0]);
-                    int minute = Integer.parseInt(timeParts[1]);
-                    timeFragment.setTime(hour, minute);
-                }
+            if (initialTimeMillis > 0) {
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTimeInMillis(initialTimeMillis);
+                timeFragment.setTime(calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE));
             }
 
-            if (initialDate != null) {
-                String[] dateParts = initialDate.split("-");
-                if (dateParts.length == 3) {
-                    int year = Integer.parseInt(dateParts[0]);
-                    int month = Integer.parseInt(dateParts[1]) - 1;
-                    int day = Integer.parseInt(dateParts[2]);
-                    dateFragment.setDate(year, month, day);
-                }
+            if (initialDateMillis > 0) {
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTimeInMillis(initialDateMillis);
+                dateFragment.setDate(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
             }
         }
     }

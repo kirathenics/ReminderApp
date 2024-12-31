@@ -1,23 +1,33 @@
 package com.example.reminderapp;
 
+import android.app.AlarmManager;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.widget.Toast;
+import android.Manifest;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.reminderapp.Databases.AppDatabase;
 import com.example.reminderapp.Entities.Category;
+import com.example.reminderapp.Entities.Reminder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
@@ -39,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        createNotificationChannel();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -48,7 +59,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView.setNavigationItemSelectedListener(this);
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.Open, R.string.Close);
-        toggle.getDrawerArrowDrawable().setColor(getResources().getColor(R.color.lavender_dark));
+        int color = ContextCompat.getColor(this, R.color.lavender_dark);
+        toggle.getDrawerArrowDrawable().setColor(color);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
@@ -59,8 +71,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         updateCategoriesMenu();
 
         FloatingActionButton addReminderButton = findViewById(R.id.add_reminder_button);
-//        addReminderButton.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, ReminderAddActivity.class)));
         addReminderButton.setOnClickListener(v -> {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, 1);
+                }
+            }
+
             Intent intent = new Intent(MainActivity.this, ReminderAddActivity.class);
 
             if (lastCategory != null) {
@@ -68,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 intent.putExtra("selected_category", selectedCategory);
             }
 
-            startActivity(intent);
+            startActivityForResult(intent, 1);
         });
     }
 
@@ -105,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 subMenu.clear();
 
-                MenuItem allCategoryItem  = subMenu.add(R.id.categories_group, Menu.FIRST, Menu.NONE, "All")
+                MenuItem allCategoryItem  = subMenu.add(R.id.categories_group, Menu.FIRST, Menu.NONE, R.string.category_name_all)
                         .setIcon(R.drawable.ic_list)
                         .setCheckable(true);
 
@@ -186,6 +204,66 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             drawerLayout.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
+        }
+    }
+
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            String channelId = "reminder_channel";
+            CharSequence name = "Reminder Notifications";
+            String description = "Reminder";
+            NotificationChannel channel = new NotificationChannel(
+                    channelId,
+                    name,
+                    NotificationManager.IMPORTANCE_DEFAULT
+            );
+            channel.setDescription(description);
+
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && resultCode == RESULT_OK && data != null) {
+            Reminder resultReminder = (Reminder) data.getSerializableExtra("new_reminder");
+            if (resultReminder != null) {
+                long triggerTime = resultReminder.getDate() + resultReminder.getTime();
+
+
+
+                if (triggerTime <= System.currentTimeMillis()) {
+//                    Toast.makeText(this, "Cannot set notification in the past!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                Intent intent = new Intent(MainActivity.this, ReminderNotificationReceiver.class);
+                intent.putExtra("title", R.string.app_name);
+                intent.putExtra("message", resultReminder.getTitle());
+
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this,
+                        (int) triggerTime,
+                        intent,
+                        PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+                AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+                alarmManager.set(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent);
+                Toast.makeText(this, "Notification set for: " + triggerTime, Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 1) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                Toast.makeText(this, "Permission granted!", Toast.LENGTH_SHORT).show();
+            } else {
+//                Toast.makeText(this, "Permission denied!", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 }
