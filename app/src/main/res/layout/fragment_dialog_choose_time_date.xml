@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/choose_date_time_fragment"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/choose_time_date_dialog_fragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/rounded_corner"
@@ -62,7 +62,7 @@
                 android:layout_height="wrap_content"
                 style="@style/CustomRadioButtonStyle"
                 android:drawableTop="@drawable/ic_calendar"
-                android:buttonTint="@color/white"
+                android:buttonTint="@android:color/transparent"
                 android:checked="true" />
 
         </RadioGroup>

@@ -46,7 +46,7 @@ public class ChooseCategoryDialogFragment extends DialogFragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view =  inflater.inflate(R.layout.fragment_choose_category, container, false);
+        View view =  inflater.inflate(R.layout.fragment_dialog_choose_category, container, false);
 
         SearchView categorySearchView = view.findViewById(R.id.category_search_view);
         categorySearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {

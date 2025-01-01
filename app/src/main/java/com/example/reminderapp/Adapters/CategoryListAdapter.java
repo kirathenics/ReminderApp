@@ -117,7 +117,7 @@ public class CategoryListAdapter extends RecyclerView.Adapter<CategoryListAdapte
     }
 
     private void updateCardColor(CardView cardView, boolean isActive) {
-        int color = isActive ? cardView.getContext().getColor(R.color.white) : cardView.getContext().getColor(R.color.light_gray);
+        int color = isActive ? cardView.getContext().getColor(android.R.color.transparent) : cardView.getContext().getColor(R.color.light_gray);
         cardView.setCardBackgroundColor(color);
     }
 

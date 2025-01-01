@@ -59,7 +59,7 @@ public class CategoryEditDialogFragment extends DialogFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_category_edit, container, false);
+        View view = inflater.inflate(R.layout.fragment_dialog_category_edit, container, false);
 
         TextView dialogTitle = view.findViewById(R.id.dialog_title);
         editTextName = view.findViewById(R.id.edit_text_name);

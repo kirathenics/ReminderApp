@@ -78,4 +78,8 @@
         <item name="buttonTint">@color/checkbox_color_selector</item>
     </style>
 
+    <style name="CustomDialogFragment" parent="Base.Theme.ReminderApp">
+        <item name="background">@drawable/rounded_corner</item>
+    </style>
+
 </resources>

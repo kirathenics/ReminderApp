@@ -79,7 +79,7 @@ public class ChooseTimeDateDialogFragment extends DialogFragment {
     @SuppressLint("DefaultLocale")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_choose_time_date_dialog, container, false);
+        View view = inflater.inflate(R.layout.fragment_dialog_choose_time_date, container, false);
 
         RadioGroup radioGroup = view.findViewById(R.id.time_date_group_picker);
         switchTimeOptional = view.findViewById(R.id.switch_time_optional);

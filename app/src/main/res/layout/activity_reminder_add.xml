@@ -161,7 +161,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:backgroundTint="@color/white"
+                    android:backgroundTint="@android:color/transparent"
                     android:contentDescription="@string/remove_time"
                     android:src="@drawable/ic_remove_circle_outline"
                     app:tint="@color/lavender_dark"
@@ -177,7 +177,7 @@
 <!--                    android:layout_width="wrap_content"-->
 <!--                    android:layout_height="wrap_content"-->
 <!--                    android:layout_gravity="center"-->
-<!--                    android:backgroundTint="@color/white"-->
+<!--                    android:backgroundTint="@android:color/transparent"-->
 <!--                    android:contentDescription="@string/remove_time"-->
 <!--                    android:src="@drawable/ic_alarm"-->
 <!--                    app:tint="@color/lavender_dark" />-->
@@ -209,9 +209,12 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:maxLines="2"
+                    android:ellipsize="marquee"
+                    android:marqueeRepeatLimit="marquee_forever"
+                    android:scrollHorizontally="true"
                     android:text="@string/tomorrow"
                     android:textColor="@color/gray"
-                    android:textSize="16sp" />
+                    android:textSize="15sp" />
 
                 <Space
                     android:layout_width="0sp"
@@ -223,7 +226,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:backgroundTint="@color/white"
+                    android:backgroundTint="@android:color/transparent"
                     android:contentDescription="@string/remove_time"
                     android:src="@drawable/ic_calendar"
                     app:tint="@color/lavender_dark"
@@ -252,15 +255,25 @@
                     android:layout_height="0sp"
                     android:layout_weight="1" />
 
-<!--                <ImageButton-->
-<!--                    android:id="@+id/add_repeat_alarm_button"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_gravity="center"-->
-<!--                    android:backgroundTint="@color/white"-->
-<!--                    android:contentDescription="@string/remove_time"-->
-<!--                    android:src="@drawable/ic_add"-->
-<!--                    app:tint="@color/lavender_dark" />-->
+                <ImageButton
+                    android:id="@+id/delete_repeat_reminder_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:backgroundTint="@android:color/transparent"
+                    android:contentDescription="@string/remove_time"
+                    android:src="@drawable/ic_add"
+                    app:tint="@color/lavender_dark" />
+
+                <ImageButton
+                    android:id="@+id/add_repeat_reminder_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:backgroundTint="@android:color/transparent"
+                    android:contentDescription="@string/remove_time"
+                    android:src="@drawable/ic_delete"
+                    app:tint="@color/prismatic_red" />
 
             </LinearLayout>
 
@@ -319,7 +332,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16sp"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:visibility="visible">
 
                 <TextView
                     android:id="@+id/stop_repeat_text_view"
@@ -332,11 +346,11 @@
                     android:textColor="@color/lavender_dark" />
 
                 <TextView
-                    android:id="@+id/stop_repeat_date_text_view"
+                    android:id="@+id/info_stop_repeat_text_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:text="@string/no_date"
+                    android:text="@string/no_end_time_date"
                     android:textSize="13sp"
                     android:textColor="@color/gray" />
 
@@ -350,7 +364,81 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:backgroundTint="@color/white"
+                    android:backgroundTint="@android:color/transparent"
+                    android:contentDescription="@string/remove_time"
+                    android:src="@drawable/ic_calendar"
+                    app:tint="@color/lavender_dark"
+                    android:visibility="visible"
+                    tools:ignore="TouchTargetSizeCheck" />
+
+                <ImageButton
+                    android:id="@+id/delete_stop_repeat_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:backgroundTint="@android:color/transparent"
+                    android:contentDescription="@string/remove_time"
+                    android:src="@drawable/ic_delete"
+                    app:tint="@color/prismatic_red"
+                    android:visibility="gone"
+                    tools:ignore="TouchTargetSizeCheck" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/repeat_reminder_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16sp"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/stop_repeat_time_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8sp"
+                    android:layout_gravity="center"
+                    android:text="@string/zero_time"
+                    android:textSize="13sp"
+                    android:textColor="@color/lavender_dark" />
+
+                <TextView
+                    android:id="@+id/stop_repeat_date_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8sp"
+                    android:layout_gravity="center"
+                    android:padding="2sp"
+                    android:background="@color/lavender_dark"
+                    android:text="@string/zero_date"
+                    android:textSize="13sp"
+                    android:textColor="@android:color/transparent" />
+
+                <TextView
+                    android:id="@+id/stop_repeat_time_difference_text_view"
+                    android:layout_width="150sp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:maxLines="2"
+                    android:ellipsize="marquee"
+                    android:marqueeRepeatLimit="marquee_forever"
+                    android:scrollHorizontally="true"
+                    android:text="@string/tomorrow"
+                    android:textColor="@color/gray"
+                    android:textSize="13sp" />
+
+                <Space
+                    android:layout_width="0sp"
+                    android:layout_height="0sp"
+                    android:layout_weight="1" />
+
+                <ImageButton
+                    android:id="@+id/edit_stop_repeat_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:backgroundTint="@android:color/transparent"
                     android:contentDescription="@string/remove_time"
                     android:src="@drawable/ic_edit_calendar"
                     app:tint="@color/lavender_dark"
@@ -414,7 +502,7 @@
                 android:id="@+id/reminder_add_category_image_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:backgroundTint="@color/white"
+                android:backgroundTint="@android:color/transparent"
                 android:contentDescription="@string/description_add_category_button"
                 android:padding="8sp"
                 android:src="@drawable/ic_add_to_list"

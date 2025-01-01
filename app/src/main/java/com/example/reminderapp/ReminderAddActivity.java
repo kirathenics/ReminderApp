@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -55,6 +56,19 @@ public class ReminderAddActivity extends AppCompatActivity {
     private TextView dateTextView;
     private long selectedTime = 0;
     private long selectedDate = 0;
+
+    LinearLayout repeatReminderLayout;
+    TextView infoTextView;
+    ImageButton addStopRepeatButton;
+    ImageButton deleteStopRepeatButton;
+    ImageButton editStopRepeatButton;
+
+    private TextView stopRepeatTimeTextView;
+    private TextView stopRepeatDateTextView;
+    private TextView stopRepeatTimeDifferenceTextView;
+
+    private long selectedStopRepeatTime = 0;
+    private long selectedStopRepeatDate = 0;
 
     private TextView chooseCategoryTextView;
     FloatingActionButton addAlarmButton;
@@ -156,9 +170,35 @@ public class ReminderAddActivity extends AppCompatActivity {
             dialogFragment.show(getSupportFragmentManager(), CategoryEditDialogFragment.TAG);
         });
 
-        ImageButton addStopRepeatButton = findViewById(R.id.add_stop_repeat_button);
-        addStopRepeatButton.setOnClickListener(v -> {
+        repeatReminderLayout = findViewById(R.id.repeat_reminder_layout);
+        infoTextView = findViewById(R.id.info_stop_repeat_text_view);
+        stopRepeatTimeTextView = findViewById(R.id.stop_repeat_time_text_view);
+        stopRepeatDateTextView = findViewById(R.id.stop_repeat_date_text_view);
+        stopRepeatTimeDifferenceTextView = findViewById(R.id.stop_repeat_time_difference_text_view);
 
+        addStopRepeatButton = findViewById(R.id.add_stop_repeat_button);
+        addStopRepeatButton.setOnClickListener(v -> {
+            ChooseTimeDateDialogFragment dialogFragment = ChooseTimeDateDialogFragment.newInstance(false, selectedStopRepeatTime, selectedStopRepeatDate);
+            dialogFragment.setOnDateTimeSelectedListener(onStopRepeatDateTimeSelectedListener);
+            dialogFragment.show(getSupportFragmentManager(), CategoryEditDialogFragment.TAG);
+        });
+
+        deleteStopRepeatButton = findViewById(R.id.delete_stop_repeat_button);
+        deleteStopRepeatButton.setOnClickListener(v -> {
+            addStopRepeatButton.setVisibility(View.VISIBLE);
+            infoTextView.setVisibility(View.VISIBLE);
+            deleteStopRepeatButton.setVisibility(View.GONE);
+            repeatReminderLayout.setVisibility(View.GONE);
+
+            selectedStopRepeatTime = 0;
+            selectedStopRepeatDate = 0;
+        });
+
+        editStopRepeatButton = findViewById(R.id.edit_stop_repeat_button);
+        editStopRepeatButton.setOnClickListener(v -> {
+            ChooseTimeDateDialogFragment dialogFragment = ChooseTimeDateDialogFragment.newInstance(false, selectedStopRepeatTime, selectedStopRepeatDate);
+            dialogFragment.setOnDateTimeSelectedListener(onStopRepeatDateTimeSelectedListener);
+            dialogFragment.show(getSupportFragmentManager(), CategoryEditDialogFragment.TAG);
         });
 
         selectedCategory = (Category) getIntent().getSerializableExtra("selected_category");
@@ -382,12 +422,44 @@ public class ReminderAddActivity extends AppCompatActivity {
                 DateFormat dateFormatView = new SimpleDateFormat("EEE, d MMM yyyy", Locale.getDefault());
                 dateTextView.setText(dateFormatView.format(parsedDate));
 
+                howManyDateTextView.setText(Utils.calculateTimeDifference(selectedTime, selectedDate, ReminderAddActivity.this));
+
                 addAlarmButton.setVisibility(View.GONE);
                 timeDateTextView.setVisibility(View.VISIBLE);
                 removeDateTimeButton.setVisibility(View.VISIBLE);
                 timeDateCardView.setVisibility(View.VISIBLE);
+            } catch (ParseException e) {
+                Log.e("ChooseTimeDateDialog", "Error parsing date or time", e);
+            }
+        }
+    };
 
-                howManyDateTextView.setText(Utils.calculateTimeDifference(selectedTime, selectedDate, ReminderAddActivity.this));
+    private final ChooseTimeDateDialogFragment.OnDateTimeSelectedListener onStopRepeatDateTimeSelectedListener = new ChooseTimeDateDialogFragment.OnDateTimeSelectedListener() {
+        @Override
+        public void onDateTimeSelected(String time, String date) {
+            try {
+                DateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                Date parsedTime = timeFormat.parse(time);
+                if (parsedTime != null) {
+                    selectedStopRepeatTime = parsedTime.getTime();
+                }
+                stopRepeatTimeTextView.setText(time);
+
+                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                Date parsedDate = dateFormat.parse(date);
+                if (parsedDate != null) {
+                    selectedStopRepeatDate = parsedDate.getTime();
+                }
+
+                DateFormat dateFormatView = new SimpleDateFormat("d MMM yyyy", Locale.getDefault());
+                stopRepeatDateTextView.setText(dateFormatView.format(parsedDate));
+
+                stopRepeatTimeDifferenceTextView.setText(Utils.calculateTimeDifference(selectedStopRepeatTime, selectedStopRepeatDate, selectedTime + selectedDate, ReminderAddActivity.this));
+
+                addStopRepeatButton.setVisibility(View.GONE);
+                infoTextView.setVisibility(View.GONE);
+                deleteStopRepeatButton.setVisibility(View.VISIBLE);
+                repeatReminderLayout.setVisibility(View.VISIBLE);
             } catch (ParseException e) {
                 Log.e("ChooseTimeDateDialog", "Error parsing date or time", e);
             }
