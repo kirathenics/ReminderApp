@@ -2,6 +2,7 @@ package com.example.reminderapp;
 
 import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -23,6 +24,7 @@ import androidx.core.content.ContextCompat;
 import com.example.reminderapp.Databases.AppDatabase;
 import com.example.reminderapp.Entities.Category;
 import com.example.reminderapp.Entities.Reminder;
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -48,7 +50,7 @@ public class ReminderAddActivity extends AppCompatActivity {
 
     private TextView timeDateTextView;
     private ImageButton removeDateTimeButton;
-    private CardView timeDateCardView;
+    private MaterialCardView timeDateCardView;
 
     private TextView timeTextView;
     private TextView dateTextView;
@@ -108,7 +110,10 @@ public class ReminderAddActivity extends AppCompatActivity {
 
         chooseCategoryTextView.setOnClickListener(v -> {
             ChooseCategoryDialogFragment dialogFragment = ChooseCategoryDialogFragment.newInstance();
-            dialogFragment.setOnCategoryChoseListener(chosenCategory -> chooseCategoryTextView.setText(chosenCategory.getName()));
+            dialogFragment.setOnCategoryChoseListener(chosenCategory -> {
+                        selectedCategory = chosenCategory;
+                        changeCategory();
+                    });
             dialogFragment.show(getSupportFragmentManager(), CategoryDialogFragment.TAG);
         });
 
@@ -155,7 +160,7 @@ public class ReminderAddActivity extends AppCompatActivity {
         selectedCategory = (Category) getIntent().getSerializableExtra("selected_category");
 
         if (selectedCategory != null) {
-            chooseCategoryTextView.setText(selectedCategory.getName());
+            changeCategory();
         } else {
             chooseCategoryTextView.setText(R.string.category_name_by_default);
         }
@@ -197,6 +202,14 @@ public class ReminderAddActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void changeCategory() {
+        chooseCategoryTextView.setText(selectedCategory.getName());
+        MaterialCardView reminderSummaryCardView = findViewById(R.id.reminder_summary_card_view);
+        String hexColor = selectedCategory.getColor();
+        int color = Color.parseColor(hexColor);
+        reminderSummaryCardView.setStrokeColor(color);
     }
 
     private void populateReminderData(Reminder reminder) {

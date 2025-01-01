@@ -29,7 +29,7 @@
         android:textColor="@color/lavender_dark"
         android:textSize="18sp"/>
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/reminder_summary_card_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -91,7 +91,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textMultiLine"
-                    android:minLines="2"
+                    android:minLines="1"
                     android:gravity="top|start"
                     android:scrollbars="vertical"
                     android:imeOptions="actionNone"
@@ -103,7 +103,7 @@
 
         </LinearLayout>
 
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
     <TextView
         android:id="@+id/time_date_text_view"
@@ -119,7 +119,7 @@
         android:textSize="18sp"
         android:visibility="visible" />
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/time_date_card_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -170,15 +170,15 @@
                     android:layout_height="0sp"
                     android:layout_weight="1" />
 
-                <ImageButton
-                    android:id="@+id/remove_alarm_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:backgroundTint="@color/white"
-                    android:contentDescription="@string/remove_time"
-                    android:src="@drawable/ic_alarm"
-                    app:tint="@color/lavender_dark" />
+<!--                <ImageButton-->
+<!--                    android:id="@+id/remove_alarm_button"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_gravity="center"-->
+<!--                    android:backgroundTint="@color/white"-->
+<!--                    android:contentDescription="@string/remove_time"-->
+<!--                    android:src="@drawable/ic_alarm"-->
+<!--                    app:tint="@color/lavender_dark" />-->
 
             </LinearLayout>
 
@@ -249,15 +249,15 @@
                     android:layout_height="0sp"
                     android:layout_weight="1" />
 
-                <ImageButton
-                    android:id="@+id/add_repeat_alarm_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:backgroundTint="@color/white"
-                    android:contentDescription="@string/remove_time"
-                    android:src="@drawable/ic_add"
-                    app:tint="@color/lavender_dark" />
+<!--                <ImageButton-->
+<!--                    android:id="@+id/add_repeat_alarm_button"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_gravity="center"-->
+<!--                    android:backgroundTint="@color/white"-->
+<!--                    android:contentDescription="@string/remove_time"-->
+<!--                    android:src="@drawable/ic_add"-->
+<!--                    app:tint="@color/lavender_dark" />-->
 
             </LinearLayout>
 
@@ -349,7 +349,7 @@
 
         </LinearLayout>
 
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
     <ImageButton
         android:id="@+id/remove_date_time_button"
@@ -380,7 +380,7 @@
         android:textColor="@color/lavender_dark"
         android:textSize="18sp"/>
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/reminder_category_card_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -422,7 +422,7 @@
 
         </LinearLayout>
 
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/add_alarm_button"

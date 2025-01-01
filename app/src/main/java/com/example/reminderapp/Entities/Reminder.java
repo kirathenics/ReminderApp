@@ -34,8 +34,14 @@ public class Reminder implements Serializable {
     @ColumnInfo(name = "priority")
     private int priority;
 
-    @ColumnInfo(name = "repeat")
-    private String repeat;
+    @ColumnInfo(name = "repeat_pattern")
+    private String repeatPattern;
+
+    @ColumnInfo(name = "days_of_week")
+    private String daysOfWeek;
+
+    @ColumnInfo(name = "end_date")
+    private long endDate;
 
     @ColumnInfo(name = "category_id")
     private int categoryId;
@@ -102,12 +108,28 @@ public class Reminder implements Serializable {
         this.priority = priority;
     }
 
-    public String getRepeat() {
-        return repeat;
+    public String getRepeatPattern() {
+        return repeatPattern;
     }
 
-    public void setRepeat(String repeat) {
-        this.repeat = repeat;
+    public void setRepeatPattern(String repeatPattern) {
+        this.repeatPattern = repeatPattern;
+    }
+
+    public String getDaysOfWeek() {
+        return daysOfWeek;
+    }
+
+    public void setDaysOfWeek(String daysOfWeek) {
+        this.daysOfWeek = daysOfWeek;
+    }
+
+    public long getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(long endDate) {
+        this.endDate = endDate;
     }
 
     public int getCategoryId() {
@@ -138,18 +160,21 @@ public class Reminder implements Serializable {
     @Override
     public String toString() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
-        String formattedDate = dateFormat.format(new Date(date));
         String formattedTime = dateFormat.format(new Date(time));
+        String formattedDate = dateFormat.format(new Date(date));
+        String formattedEndDate = dateFormat.format(new Date(endDate));
 
         return "Reminder{" +
                 "id=" + id +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
-                ", date=" + formattedDate +
                 ", time=" + formattedTime +
+                ", date=" + formattedDate +
                 ", isCompleted=" + isCompleted +
                 ", priority=" + priority +
-                ", repeat='" + repeat + '\'' +
+                ", repeatPattern='" + repeatPattern + '\'' +
+                ", daysOfWeek='" + daysOfWeek + '\'' +
+                ", endDate=" + formattedEndDate +
                 ", categoryId=" + categoryId +
                 ", createdAt='" + createdAt + '\'' +
                 ", updatedAt='" + updatedAt + '\'' +
