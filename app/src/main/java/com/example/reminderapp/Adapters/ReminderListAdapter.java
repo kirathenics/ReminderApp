@@ -24,7 +24,7 @@ import com.example.reminderapp.Databases.AppDatabase;
 import com.example.reminderapp.Entities.Category;
 import com.example.reminderapp.Entities.Reminder;
 import com.example.reminderapp.Listeners.OnItemClickListener;
-import com.example.reminderapp.Listeners.OnReminderChangeListener;
+import com.example.reminderapp.Listeners.OnItemDeletedListener;
 import com.example.reminderapp.R;
 import com.example.reminderapp.ReminderAddActivity;
 import com.example.reminderapp.Utils;
@@ -38,16 +38,15 @@ public class ReminderListAdapter extends RecyclerView.Adapter<ReminderListAdapte
     private final Context context;
     private List<Reminder> reminderList;
     private final OnItemClickListener<Reminder> clickListener;
-    private final OnReminderChangeListener changeListener;
-
     private final ActivityResultLauncher<Intent> reminderActivityLauncher;
+    private final OnItemDeletedListener<Reminder> itemDeletedListener;
 
-    public ReminderListAdapter(Context context, List<Reminder> reminderList, OnItemClickListener<Reminder> clickListener, OnReminderChangeListener changeListener, ActivityResultLauncher<Intent> reminderActivityLauncher) {
+    public ReminderListAdapter(Context context, List<Reminder> reminderList, OnItemClickListener<Reminder> clickListener, ActivityResultLauncher<Intent> reminderActivityLauncher, OnItemDeletedListener<Reminder> itemDeletedListener) {
         this.context = context;
         this.reminderList = reminderList;
         this.clickListener = clickListener;
-        this.changeListener = changeListener;
         this.reminderActivityLauncher = reminderActivityLauncher;
+        this.itemDeletedListener = itemDeletedListener;
     }
 
     @NonNull
@@ -96,11 +95,7 @@ public class ReminderListAdapter extends RecyclerView.Adapter<ReminderListAdapte
                     new AlertDialog.Builder(context)
                             .setTitle("Delete reminder")
                             .setMessage("Are you sure you want to delete reminder?")
-                            .setPositiveButton("Yes", (dialog, which) -> {
-                                if (changeListener != null) {
-                                    changeListener.onReminderDeleted(position);
-                                }
-                            })
+                            .setPositiveButton("Yes", (dialog, which) -> itemDeletedListener.onItemDeleted(position, reminder))
                             .setNegativeButton("No", null)
                             .show();
                 }

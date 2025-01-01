@@ -14,6 +14,7 @@ import android.view.SubMenu;
 import android.widget.Toast;
 import android.Manifest;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -36,7 +37,6 @@ import com.example.reminderapp.Databases.AppDatabase;
 import com.example.reminderapp.Entities.Category;
 import com.example.reminderapp.Entities.Reminder;
 import com.example.reminderapp.Listeners.OnItemClickListener;
-import com.example.reminderapp.Listeners.OnReminderChangeListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
@@ -55,8 +55,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private RecyclerView reminderRecyclerView;
     private ReminderListAdapter reminderListAdapter;
-//    private OnReminderClickListener onReminderClickListener;
-    private OnItemClickListener<Reminder> onReminderClickListener;
 
     private MenuItem lastCategory;
     private Menu toolbarMenu;
@@ -84,6 +82,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                } else {
+                    finish();
+                }
+            }
+        });
+
         appDatabase = AppDatabase.getInstance(this);
 
         lastCategory = null;
@@ -91,14 +100,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         updateCategoriesMenu();
 
         reminderRecyclerView = findViewById(R.id.reminder_recycler_view);
-
-        onReminderClickListener = new OnItemClickListener<>() {
-            @Override
-            public void onItemClick(Reminder item) {}
-
-            @Override
-            public void onItemLongClick(Reminder item, CardView cardView) {}
-        };
 
         ActivityResultLauncher<Intent> changeReminderActivityLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -119,18 +120,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         new Thread(() -> {
             reminderList = appDatabase.reminderDAO().getAll();
             runOnUiThread(() -> {
-                reminderListAdapter = new ReminderListAdapter(MainActivity.this, reminderList, onReminderClickListener, new OnReminderChangeListener() {
-                    @Override
-                    public void onReminderUpdated(int position, Reminder updatedReminder) {}
+                reminderListAdapter = new ReminderListAdapter(MainActivity.this, reminderList,
+                        new OnItemClickListener<>() {
+                            @Override
+                            public void onItemClick(Reminder item) {
+                            }
 
-                    @Override
-                    public void onReminderDeleted(int position) {
-                        Reminder reminder = reminderList.get(position);
-                        appDatabase.reminderDAO().delete(reminder);
-                        reminderList.remove(position);
-                        reminderListAdapter.notifyItemRemoved(position);
-                    }
-                }, changeReminderActivityLauncher);
+                            @Override
+                            public void onItemLongClick(Reminder item, CardView cardView) {
+                            }
+                        },
+                        changeReminderActivityLauncher,
+                        (position, deletedItem) -> {
+                            appDatabase.reminderDAO().delete(deletedItem);
+                            reminderList.remove(position);
+                            reminderListAdapter.notifyItemRemoved(position);
+                        });
                 updateReminderRecyclerView(GRID_SPAN_COUNT);
             });
         }).start();
@@ -401,15 +406,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return false;
     }
 
-    @Override
-    public void onBackPressed() {
-        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            drawerLayout.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
-
+    @SuppressLint("ObsoleteSdkInt")
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             String channelId = "reminder_channel";
@@ -478,12 +475,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 1) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//        if (requestCode == 1) {
+//            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 //                Toast.makeText(this, "Permission granted!", Toast.LENGTH_SHORT).show();
-            } else {
+//            } else {
 //                Toast.makeText(this, "Permission denied!", Toast.LENGTH_SHORT).show();
-            }
-        }
+//            }
+//        }
     }
 }

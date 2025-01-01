@@ -19,7 +19,6 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import com.example.reminderapp.Adapters.CategoryListAdapter;
 import com.example.reminderapp.Databases.AppDatabase;
 import com.example.reminderapp.Entities.Category;
-import com.example.reminderapp.Listeners.OnCategoryChangeListener;
 import com.example.reminderapp.Listeners.OnItemClickListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -34,7 +33,6 @@ public class CategoryManagementActivity extends AppCompatActivity {
     private List<Category> categoryList = new ArrayList<>();
 
     private CategoryListAdapter categoryListAdapter;
-    private OnItemClickListener<Category> onCategoryClickListener;
 
     private final int ROW_SPAN_COUNT = 1;
     private final int GRID_SPAN_COUNT = 2;
@@ -62,23 +60,26 @@ public class CategoryManagementActivity extends AppCompatActivity {
         new Thread(() -> {
             categoryList = appDatabase.categoryDAO().getAll();
             runOnUiThread(() -> {
-                categoryListAdapter = new CategoryListAdapter(CategoryManagementActivity.this, categoryList, onCategoryClickListener, new OnCategoryChangeListener() {
-                    @Override
-                    public void onCategoryUpdated(int position, Category updatedCategory) {
-                        appDatabase.categoryDAO().update(updatedCategory);
-                        categoryList.set(position, updatedCategory);
-                        categoryListAdapter.notifyItemChanged(position);
-                    }
+                categoryListAdapter = new CategoryListAdapter(CategoryManagementActivity.this, categoryList,
+                        new OnItemClickListener<>() {
+                            @Override
+                            public void onItemClick(Category item) {}
 
-                    @Override
-                    public void onCategoryDeleted(int position) {
-//                        new Thread(() -> AppDatabase.getInstance(context).categoryDAO().delete(category)).start();
-                        Category category = categoryList.get(position);
-                        appDatabase.categoryDAO().delete(category);
-                        categoryList.remove(position);
-                        categoryListAdapter.notifyItemRemoved(position);
-                    }
-                });
+                            @Override
+                            public void onItemLongClick(Category item, CardView cardView) {
+                                // TODO: move category
+                            }
+                        },
+                        (position, updatedItem) -> {
+                            appDatabase.categoryDAO().update(updatedItem);
+                            categoryList.set(position, updatedItem);
+                            categoryListAdapter.notifyItemChanged(position);
+                        },
+                        (position, deletedItem) -> {
+                            appDatabase.categoryDAO().delete(deletedItem);
+                            categoryList.remove(position);
+                            categoryListAdapter.notifyItemRemoved(position);
+                        });
                 updateCategoryRecyclerView(GRID_SPAN_COUNT);
             });
         }).start();
@@ -99,16 +100,6 @@ public class CategoryManagementActivity extends AppCompatActivity {
                 dialogFragment.show(getSupportFragmentManager(), CategoryDialogFragment.TAG);
             }
         });
-
-        onCategoryClickListener = new OnItemClickListener<>() {
-            @Override
-            public void onItemClick(Category item) {}
-
-            @Override
-            public void onItemLongClick(Category item, CardView cardView) {
-                // TODO: move category
-            }
-        };
     }
 
     private void filterCategories(String query) {

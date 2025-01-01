@@ -22,8 +22,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.reminderapp.CategoryDialogFragment;
 import com.example.reminderapp.Databases.AppDatabase;
 import com.example.reminderapp.Entities.Category;
-import com.example.reminderapp.Listeners.OnCategoryChangeListener;
 import com.example.reminderapp.Listeners.OnItemClickListener;
+import com.example.reminderapp.Listeners.OnItemDeletedListener;
+import com.example.reminderapp.Listeners.OnItemUpdatedListener;
 import com.example.reminderapp.R;
 
 import java.util.List;
@@ -33,13 +34,15 @@ public class CategoryListAdapter extends RecyclerView.Adapter<CategoryListAdapte
     private final Context context;
     private List<Category> categoryList;
     private final OnItemClickListener<Category> clickListener;
-    private final OnCategoryChangeListener changeListener;
+    private final OnItemUpdatedListener<Category> itemUpdatedListener;
+    private final OnItemDeletedListener<Category> itemDeletedListener;
 
-    public CategoryListAdapter(Context context, List<Category> categoryList, OnItemClickListener<Category> clickListener, OnCategoryChangeListener changeListener) {
+    public CategoryListAdapter(Context context, List<Category> categoryList, OnItemClickListener<Category> clickListener, OnItemUpdatedListener<Category> itemUpdatedListener, OnItemDeletedListener<Category> itemDeletedListener) {
         this.context = context;
         this.categoryList = categoryList;
         this.clickListener = clickListener;
-        this.changeListener = changeListener;
+        this.itemUpdatedListener = itemUpdatedListener;
+        this.itemDeletedListener = itemDeletedListener;
     }
 
     @NonNull
@@ -85,11 +88,7 @@ public class CategoryListAdapter extends RecyclerView.Adapter<CategoryListAdapte
                     new AlertDialog.Builder(context)
                             .setTitle("Delete category")
                             .setMessage("Are you sure you want to delete category?")
-                            .setPositiveButton("Yes", (dialog, which) -> {
-                                if (changeListener != null) {
-                                    changeListener.onCategoryDeleted(position);
-                                }
-                            })
+                            .setPositiveButton("Yes", (dialog, which) -> itemDeletedListener.onItemDeleted(position, category))
                             .setNegativeButton("No", null)
                             .show();
                 }
@@ -112,11 +111,7 @@ public class CategoryListAdapter extends RecyclerView.Adapter<CategoryListAdapte
         CategoryDialogFragment dialogFragment = CategoryDialogFragment.newInstance(category);
         if (context instanceof AppCompatActivity) {
             AppCompatActivity activity = (AppCompatActivity) context;
-            dialogFragment.setOnCategoryUpdatedListener(updatedCategory -> {
-                if (changeListener != null) {
-                    changeListener.onCategoryUpdated(position, updatedCategory);
-                }
-            });
+            dialogFragment.setOnCategoryUpdatedListener(updatedCategory -> itemUpdatedListener.onItemUpdated(position, updatedCategory));
             dialogFragment.show(activity.getSupportFragmentManager(), CategoryDialogFragment.TAG);
         }
     }
