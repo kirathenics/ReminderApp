@@ -22,8 +22,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.reminderapp.CategoryDialogFragment;
 import com.example.reminderapp.Databases.AppDatabase;
 import com.example.reminderapp.Entities.Category;
-import com.example.reminderapp.Listeners.OnCategoryClickListener;
 import com.example.reminderapp.Listeners.OnCategoryChangeListener;
+import com.example.reminderapp.Listeners.OnItemClickListener;
 import com.example.reminderapp.R;
 
 import java.util.List;
@@ -32,10 +32,10 @@ public class CategoryListAdapter extends RecyclerView.Adapter<CategoryListAdapte
 
     private final Context context;
     private List<Category> categoryList;
-    private final OnCategoryClickListener clickListener;
+    private final OnItemClickListener<Category> clickListener;
     private final OnCategoryChangeListener changeListener;
 
-    public CategoryListAdapter(Context context, List<Category> categoryList, OnCategoryClickListener clickListener, OnCategoryChangeListener changeListener) {
+    public CategoryListAdapter(Context context, List<Category> categoryList, OnItemClickListener<Category> clickListener, OnCategoryChangeListener changeListener) {
         this.context = context;
         this.categoryList = categoryList;
         this.clickListener = clickListener;
@@ -103,7 +103,7 @@ public class CategoryListAdapter extends RecyclerView.Adapter<CategoryListAdapte
         holder.itemView.setOnClickListener(view -> createEditDialog(position, category));
 
         holder.itemView.setOnLongClickListener(view -> {
-            clickListener.onCategoryLongClick(category, holder.categoryCardView);
+            clickListener.onItemLongClick(category, holder.categoryCardView);
             return true;
         });
     }

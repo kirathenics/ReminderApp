@@ -18,7 +18,7 @@ import android.widget.SearchView;
 import com.example.reminderapp.Adapters.ChooseCategoryListAdapter;
 import com.example.reminderapp.Databases.AppDatabase;
 import com.example.reminderapp.Entities.Category;
-import com.example.reminderapp.Listeners.OnCategoryClickListener;
+import com.example.reminderapp.Listeners.OnItemClickListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,17 +65,17 @@ public class ChooseCategoryDialogFragment extends DialogFragment {
 
         categoryRecyclerView = view.findViewById(R.id.choose_category_recycler_view);
 
-        OnCategoryClickListener onCategoryClickListener = new OnCategoryClickListener() {
+        OnItemClickListener<Category> onCategoryClickListener = new OnItemClickListener<>() {
             @Override
-            public void onCategoryClick(Category category) {
+            public void onItemClick(Category item) {
                 if (onCategoryChoseListener != null) {
-                    onCategoryChoseListener.onCategoryChose(category);
+                    onCategoryChoseListener.onCategoryChose(item);
                     dismiss();
                 }
             }
 
             @Override
-            public void onCategoryLongClick(Category category, CardView cardView) {}
+            public void onItemLongClick(Category item, CardView cardView) {}
         };
 
         appDatabase = AppDatabase.getInstance(requireContext());

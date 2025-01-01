@@ -14,7 +14,7 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.reminderapp.Entities.Category;
-import com.example.reminderapp.Listeners.OnCategoryClickListener;
+import com.example.reminderapp.Listeners.OnItemClickListener;
 import com.example.reminderapp.R;
 
 import java.util.List;
@@ -23,9 +23,9 @@ public class ChooseCategoryListAdapter extends RecyclerView.Adapter<ChooseCatego
 
     private final Context context;
     private List<Category> categoryList;
-    private final OnCategoryClickListener clickListener;
+    private final OnItemClickListener<Category> clickListener;
 
-    public ChooseCategoryListAdapter(Context context, List<Category> categoryList, OnCategoryClickListener clickListener) {
+    public ChooseCategoryListAdapter(Context context, List<Category> categoryList, OnItemClickListener<Category> clickListener) {
         this.context = context;
         this.categoryList = categoryList;
         this.clickListener = clickListener;
@@ -52,10 +52,10 @@ public class ChooseCategoryListAdapter extends RecyclerView.Adapter<ChooseCatego
             holder.colorCircleView.setBackgroundTintList(ColorStateList.valueOf(Color.GRAY));
         }
 
-        holder.itemView.setOnClickListener(view -> clickListener.onCategoryClick(categoryList.get(holder.getAdapterPosition())));
+        holder.itemView.setOnClickListener(view -> clickListener.onItemClick(categoryList.get(holder.getAdapterPosition())));
 
         holder.itemView.setOnLongClickListener(view -> {
-            clickListener.onCategoryLongClick(category, holder.categoryCardView);
+            clickListener.onItemLongClick(category, holder.categoryCardView);
             return true;
         });
     }

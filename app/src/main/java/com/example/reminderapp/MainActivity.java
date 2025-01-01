@@ -35,8 +35,8 @@ import com.example.reminderapp.Adapters.ReminderListAdapter;
 import com.example.reminderapp.Databases.AppDatabase;
 import com.example.reminderapp.Entities.Category;
 import com.example.reminderapp.Entities.Reminder;
+import com.example.reminderapp.Listeners.OnItemClickListener;
 import com.example.reminderapp.Listeners.OnReminderChangeListener;
-import com.example.reminderapp.Listeners.OnReminderClickListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
@@ -55,7 +55,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private RecyclerView reminderRecyclerView;
     private ReminderListAdapter reminderListAdapter;
-    private OnReminderClickListener onReminderClickListener;
+//    private OnReminderClickListener onReminderClickListener;
+    private OnItemClickListener<Reminder> onReminderClickListener;
 
     private MenuItem lastCategory;
     private Menu toolbarMenu;
@@ -91,12 +92,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         reminderRecyclerView = findViewById(R.id.reminder_recycler_view);
 
-        onReminderClickListener = new OnReminderClickListener() {
+        onReminderClickListener = new OnItemClickListener<>() {
             @Override
-            public void onReminderClick(Reminder reminder) {}
+            public void onItemClick(Reminder item) {}
 
             @Override
-            public void onReminderLongClick(Reminder reminder, CardView cardView) {}
+            public void onItemLongClick(Reminder item, CardView cardView) {}
         };
 
         ActivityResultLauncher<Intent> changeReminderActivityLauncher = registerForActivityResult(

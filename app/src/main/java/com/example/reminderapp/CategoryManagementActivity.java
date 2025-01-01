@@ -19,8 +19,8 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import com.example.reminderapp.Adapters.CategoryListAdapter;
 import com.example.reminderapp.Databases.AppDatabase;
 import com.example.reminderapp.Entities.Category;
-import com.example.reminderapp.Listeners.OnCategoryClickListener;
 import com.example.reminderapp.Listeners.OnCategoryChangeListener;
+import com.example.reminderapp.Listeners.OnItemClickListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -34,7 +34,7 @@ public class CategoryManagementActivity extends AppCompatActivity {
     private List<Category> categoryList = new ArrayList<>();
 
     private CategoryListAdapter categoryListAdapter;
-    private OnCategoryClickListener onCategoryClickListener;
+    private OnItemClickListener<Category> onCategoryClickListener;
 
     private final int ROW_SPAN_COUNT = 1;
     private final int GRID_SPAN_COUNT = 2;
@@ -100,12 +100,12 @@ public class CategoryManagementActivity extends AppCompatActivity {
             }
         });
 
-        onCategoryClickListener = new OnCategoryClickListener() {
+        onCategoryClickListener = new OnItemClickListener<>() {
             @Override
-            public void onCategoryClick(Category category) {}
+            public void onItemClick(Category item) {}
 
             @Override
-            public void onCategoryLongClick(Category category, CardView cardView) {
+            public void onItemLongClick(Category item, CardView cardView) {
                 // TODO: move category
             }
         };

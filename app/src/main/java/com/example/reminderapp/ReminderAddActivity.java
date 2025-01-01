@@ -18,7 +18,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 
 import com.example.reminderapp.Databases.AppDatabase;
@@ -45,8 +44,7 @@ public class ReminderAddActivity extends AppCompatActivity {
     private TextView reminderDescriptionTextView;
     private TextInputEditText reminderDescriptionEditText;
     private TextInputLayout reminderDescriptionTextInputLayout;
-    private boolean isTitleChanged = false;
-    private boolean isDescriptionVisible = false;
+    private boolean isDescriptionNotVisible = false;
 
     private TextView timeDateTextView;
     private ImageButton removeDateTimeButton;
@@ -62,6 +60,7 @@ public class ReminderAddActivity extends AppCompatActivity {
 
     Reminder newReminder = null;
     int reminderPosition;
+    private boolean isReminderChanged = false;
     Category selectedCategory;
 
     @Override
@@ -88,10 +87,8 @@ public class ReminderAddActivity extends AppCompatActivity {
         reminderDescriptionTextView.setOnClickListener(view -> toggleDescriptionVisibility());
 
         timeDateTextView = findViewById(R.id.time_date_text_view);
-//        timeDateTextView.setVisibility(View.GONE);
 
         timeDateCardView = findViewById(R.id.time_date_card_view);
-//        timeDateCardView.setVisibility(View.GONE);
 
         timeTextView = findViewById(R.id.time_text_view);
         dateTextView = findViewById(R.id.date_text_view);
@@ -125,7 +122,6 @@ public class ReminderAddActivity extends AppCompatActivity {
         });
 
         removeDateTimeButton = findViewById(R.id.remove_date_time_button);
-//        removeDateTimeButton.setVisibility(View.GONE);
         removeDateTimeButton.setOnClickListener(v -> {
             timeTextView.setText(R.string.zero_time);
             dateTextView.setText(R.string.zero_date);
@@ -170,7 +166,6 @@ public class ReminderAddActivity extends AppCompatActivity {
             populateReminderData(newReminder);
         } else {
             newReminder = new Reminder();
-//            reminderDescriptionTextInputLayout.setVisibility(View.GONE);
             timeDateCardView.setVisibility(View.GONE);
             timeDateTextView.setVisibility(View.GONE);
             removeDateTimeButton.setVisibility(View.GONE);
@@ -187,7 +182,7 @@ public class ReminderAddActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                isTitleChanged = true;
+                isReminderChanged = true;
 
                 if (reminderTitleTextInputLayout != null) {
                     reminderTitleTextInputLayout.setError(null);
@@ -198,7 +193,7 @@ public class ReminderAddActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) {
                 if (s.toString().isEmpty()) {
-                    isTitleChanged = false;
+                    isReminderChanged = false;
                 }
             }
         });
@@ -215,22 +210,13 @@ public class ReminderAddActivity extends AppCompatActivity {
     private void populateReminderData(Reminder reminder) {
         reminderTitleEditText.setText(reminder.getTitle());
 
-//        if (!reminder.getDescription().isEmpty()) {
-//            reminderDescriptionEditText.setText(reminder.getDescription());
-//            isDescriptionVisible = true;
-//            toggleDescriptionVisibility();
-//        }
-
         if (!reminder.getDescription().isEmpty()) {
             reminderDescriptionEditText.setText(reminder.getDescription());
-            isDescriptionVisible = true;
-            reminderDescriptionTextInputLayout.setVisibility(View.VISIBLE);
-            reminderDescriptionTextView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_keyboard_arrow_down, 0);
+            isDescriptionNotVisible = false;
         } else {
-            isDescriptionVisible = false;
-            reminderDescriptionTextInputLayout.setVisibility(View.GONE);
-            reminderDescriptionTextView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_add, 0);
+            isDescriptionNotVisible = true;
         }
+        toggleDescriptionVisibility();
 
         selectedTime = reminder.getTime();
         selectedDate = reminder.getDate();
@@ -268,7 +254,7 @@ public class ReminderAddActivity extends AppCompatActivity {
     }
 
     private void toggleDescriptionVisibility() {
-        if (isDescriptionVisible) {
+        if (isDescriptionNotVisible) {
             if (TextUtils.isEmpty(reminderDescriptionEditText.getText())) {
                 reminderDescriptionTextInputLayout.setVisibility(View.GONE);
                 reminderDescriptionTextView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_add, 0);
@@ -281,7 +267,7 @@ public class ReminderAddActivity extends AppCompatActivity {
             reminderDescriptionTextView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_keyboard_arrow_down, 0);
         }
 
-        isDescriptionVisible = !isDescriptionVisible;
+        isDescriptionNotVisible = !isDescriptionNotVisible;
     }
 
     @Override
@@ -301,7 +287,7 @@ public class ReminderAddActivity extends AppCompatActivity {
                 return false;
             }
 
-            if (isTitleChanged) {
+            if (isReminderChanged) {
                 new AlertDialog.Builder(this)
                         .setTitle("Confirm Exit")
                         .setMessage("You have unsaved changes. Do you really want to go back?")

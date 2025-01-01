@@ -1,17 +1,14 @@
 package com.example.reminderapp.Adapters;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
@@ -20,15 +17,14 @@ import android.widget.TextView;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.reminderapp.Databases.AppDatabase;
 import com.example.reminderapp.Entities.Category;
 import com.example.reminderapp.Entities.Reminder;
+import com.example.reminderapp.Listeners.OnItemClickListener;
 import com.example.reminderapp.Listeners.OnReminderChangeListener;
-import com.example.reminderapp.Listeners.OnReminderClickListener;
 import com.example.reminderapp.R;
 import com.example.reminderapp.ReminderAddActivity;
 import com.example.reminderapp.Utils;
@@ -41,12 +37,12 @@ public class ReminderListAdapter extends RecyclerView.Adapter<ReminderListAdapte
 
     private final Context context;
     private List<Reminder> reminderList;
-    private final OnReminderClickListener clickListener;
+    private final OnItemClickListener<Reminder> clickListener;
     private final OnReminderChangeListener changeListener;
 
     private final ActivityResultLauncher<Intent> reminderActivityLauncher;
 
-    public ReminderListAdapter(Context context, List<Reminder> reminderList, OnReminderClickListener clickListener, OnReminderChangeListener changeListener, ActivityResultLauncher<Intent> reminderActivityLauncher) {
+    public ReminderListAdapter(Context context, List<Reminder> reminderList, OnItemClickListener<Reminder> clickListener, OnReminderChangeListener changeListener, ActivityResultLauncher<Intent> reminderActivityLauncher) {
         this.context = context;
         this.reminderList = reminderList;
         this.clickListener = clickListener;
@@ -75,16 +71,13 @@ public class ReminderListAdapter extends RecyclerView.Adapter<ReminderListAdapte
             holder.timeDifferenceTextView.setVisibility(View.GONE);
         }
 
-        holder.isCompletedCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    holder.titleTextView.setTextColor(ContextCompat.getColor(context, R.color.gray));
-                    holder.titleTextView.setPaintFlags(holder.titleTextView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-                } else {
-                    holder.titleTextView.setTextColor(ContextCompat.getColor(context, R.color.black));
-                    holder.titleTextView.setPaintFlags(holder.titleTextView.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
-                }
+        holder.isCompletedCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                holder.titleTextView.setTextColor(ContextCompat.getColor(context, R.color.gray));
+                holder.titleTextView.setPaintFlags(holder.titleTextView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+            } else {
+                holder.titleTextView.setTextColor(ContextCompat.getColor(context, R.color.black));
+                holder.titleTextView.setPaintFlags(holder.titleTextView.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
             }
         });
 
@@ -121,24 +114,12 @@ public class ReminderListAdapter extends RecyclerView.Adapter<ReminderListAdapte
         holder.itemView.setOnClickListener(view -> createEditActivity(position, reminder));
 
         holder.itemView.setOnLongClickListener(view -> {
-            clickListener.onReminderLongClick(reminder, holder.reminderCardView);
+            clickListener.onItemLongClick(reminder, holder.reminderCardView);
             return true;
         });
     }
 
     private void createEditActivity(int position, Reminder reminder) {
-//        Intent intent = new Intent(context, ReminderAddActivity.class);
-//
-//        Category selectedCategory = AppDatabase.getInstance(context).categoryDAO().findById(reminder.getCategoryId());
-//        intent.putExtra("selected_category", selectedCategory);
-//        intent.putExtra("selected_reminder", reminder);
-//
-//        ((Activity) context).startActivityForResult(intent, 2);
-//
-//        if (changeListener != null) {
-//            changeListener.onReminderUpdated(position, reminder);
-//        }
-
         Intent intent = new Intent(context, ReminderAddActivity.class);
         Category selectedCategory = AppDatabase.getInstance(context).categoryDAO().findById(reminder.getCategoryId());
         intent.putExtra("selected_category", selectedCategory);
@@ -146,11 +127,6 @@ public class ReminderListAdapter extends RecyclerView.Adapter<ReminderListAdapte
         intent.putExtra("position", position);
 
         reminderActivityLauncher.launch(intent);
-    }
-
-    private void updateCardColor(CardView cardView, boolean isActive) {
-        int color = isActive ? cardView.getContext().getColor(R.color.white) : cardView.getContext().getColor(R.color.light_gray);
-        cardView.setCardBackgroundColor(color);
     }
 
     @Override
