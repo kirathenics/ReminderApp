@@ -15,7 +15,6 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -109,31 +108,29 @@ public class CategoryDialogFragment extends DialogFragment {
             dismiss();
         });
 
-        TextInputEditText editTextName = view.findViewById(R.id.edit_text_name);
         TextInputLayout inputLayout = view.findViewById(R.id.edit_text_category_name);
-        if (editTextName != null) {
-            editTextName.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+        TextInputEditText editTextName = view.findViewById(R.id.edit_text_name);
+        editTextName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    if (inputLayout != null) {
-                        inputLayout.setError(null);
-                        inputLayout.setBoxStrokeColor(ContextCompat.getColor(requireContext(), R.color.lavender_dark));
-                    }
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (inputLayout != null) {
+                    inputLayout.setError(null);
+                    inputLayout.setBoxStrokeColor(ContextCompat.getColor(requireContext(), R.color.lavender_dark));
                 }
+            }
 
-                @Override
-                public void afterTextChanged(Editable s) {
+            @Override
+            public void afterTextChanged(Editable s) {
 //                    String categoryName = s.toString().trim();
 //
 //                    if (!isCategoryNameUnique(categoryName)) {
 //                        showError(getString(R.string.error_category_exists));
 //                    }
-                }
-            });
-        }
+            }
+        });
 
         return view;
     }

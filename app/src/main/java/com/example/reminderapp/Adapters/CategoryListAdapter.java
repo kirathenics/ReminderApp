@@ -78,10 +78,10 @@ public class CategoryListAdapter extends RecyclerView.Adapter<CategoryListAdapte
             PopupMenu popupMenu = new PopupMenu(context, holder.categoryCardView, Gravity.END);
             popupMenu.setOnMenuItemClickListener(item -> {
                 int itemId = item.getItemId();
-                if (itemId == R.id.edit_category) {
+                if (itemId == R.id.edit_option) {
                     createEditDialog(position, category);
                     return true;
-                } else if (itemId == R.id.delete_category) {
+                } else if (itemId == R.id.delete_option) {
                     new AlertDialog.Builder(context)
                             .setTitle("Delete category")
                             .setMessage("Are you sure you want to delete category?")
@@ -96,7 +96,7 @@ public class CategoryListAdapter extends RecyclerView.Adapter<CategoryListAdapte
 
                 return false;
             });
-            popupMenu.inflate(R.menu.category_popup_menu);
+            popupMenu.inflate(R.menu.edit_popup_menu);
             popupMenu.show();
         });
 

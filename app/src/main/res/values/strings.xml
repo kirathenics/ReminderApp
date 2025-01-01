@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ReminderApp</string>
+    <string name="app_name">Reminder Application</string>
 
     <string name="title_categories">Categories</string>
     <string name="title_categories_management">Categories management</string>
@@ -24,7 +24,7 @@
     <string name="title_delete">Delete</string>
     <string name="title_category_name">Category name</string>
     <string name="title_reminders_number">Reminders number</string>
-    <string name="title_category_options">Category options</string>
+    <string name="description_edit_options">Edit options</string>
     <string name="category_drag_handler">Category drag handler</string>
     <string name="description_add_category_button">Add Category Button</string>
     <string name="hint_search_category">Search Category</string>
@@ -79,5 +79,9 @@
     <string name="no_date">No date</string>
     <string name="selected_time_has_already_passed">Selected time has already passed</string>
     <string name="description_notification_icon">Notification icon</string>
+
+    <string name="error_reminder_exists">Reminder with this title already exists!</string>
+    <string name="error_empty_reminder_title">Reminder title is empty!</string>
+    <string name="description_app_icon">App icon</string>
 
 </resources>

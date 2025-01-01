@@ -17,8 +17,17 @@ public interface ReminderDAO {
     @Query("SELECT * FROM reminders ORDER BY id ASC")
     List<Reminder> getAll();
 
+    @Query("SELECT * FROM reminders ORDER BY title ASC")
+    List<Reminder> getAllSortedByTitleAsc();
+
+    @Query("SELECT * FROM reminders ORDER BY title DESC")
+    List<Reminder> getAllSortedByTitleDesc();
+
     @Query("SELECT * FROM reminders WHERE id = :id")
     Reminder findById(int id);
+
+    @Query("SELECT * FROM reminders WHERE title = :title")
+    Reminder findByTitle(String title);
 
     @Query("SELECT * FROM reminders WHERE category_id = :categoryId ORDER BY date, time ASC")
     List<Reminder> findByCategoryId(int categoryId);
@@ -32,7 +41,7 @@ public interface ReminderDAO {
     @Query("UPDATE reminders SET title = :title, description = :description, date = :date, time = :time, " +
             "is_completed = :isCompleted, priority = :priority, repeat = :repeat, category_id = :categoryId, " +
             "updated_at = :updatedAt WHERE id = :id")
-    void update(int id, String title, String description, String date, String time, boolean isCompleted,
+    void update(int id, String title, String description, long date, long time, boolean isCompleted,
                 int priority, String repeat, int categoryId, String updatedAt);
 
     @Update

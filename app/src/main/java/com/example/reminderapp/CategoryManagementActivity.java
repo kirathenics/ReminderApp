@@ -113,9 +113,9 @@ public class CategoryManagementActivity extends AppCompatActivity {
 
     private void filterCategories(String query) {
         List<Category> filteredList = new ArrayList<>();
-        for (Category reminder : categoryList) {
-            if (reminder.getName().toLowerCase().contains(query.toLowerCase())) {
-                filteredList.add(reminder);
+        for (Category category : categoryList) {
+            if (category.getName().toLowerCase().contains(query.toLowerCase())) {
+                filteredList.add(category);
             }
         }
         categoryListAdapter.filterList(filteredList);

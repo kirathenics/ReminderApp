@@ -431,10 +431,10 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:layout_margin="24dp"
-        app:background="@color/lavender_medium"
         android:contentDescription="@string/title_add_alarm"
         android:src="@drawable/ic_add_alarm"
-        android:tint="@color/lavender_dark" />
+        app:background="@color/lavender_medium"
+        app:tint="@color/lavender_dark" />
 
 </RelativeLayout>
 

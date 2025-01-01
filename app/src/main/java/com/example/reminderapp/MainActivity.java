@@ -1,9 +1,9 @@
 package com.example.reminderapp;
 
-import android.app.AlarmManager;
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -14,20 +14,29 @@ import android.view.SubMenu;
 import android.widget.Toast;
 import android.Manifest;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
+import com.example.reminderapp.Adapters.ReminderListAdapter;
 import com.example.reminderapp.Databases.AppDatabase;
 import com.example.reminderapp.Entities.Category;
 import com.example.reminderapp.Entities.Reminder;
+import com.example.reminderapp.Listeners.OnReminderChangeListener;
+import com.example.reminderapp.Listeners.OnReminderClickListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
@@ -40,10 +49,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
 
-    private List<Category> categoryList = new ArrayList<>();
     private AppDatabase appDatabase;
+    private List<Category> categoryList = new ArrayList<>();
+    private List<Reminder> reminderList = new ArrayList<>();
+
+    private RecyclerView reminderRecyclerView;
+    private ReminderListAdapter reminderListAdapter;
+    private OnReminderClickListener onReminderClickListener;
 
     private MenuItem lastCategory;
+    private Menu toolbarMenu;
+
+    private final int ROW_SPAN_COUNT = 1;
+    private final int GRID_SPAN_COUNT = 2;
+    private boolean isGridView = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +89,65 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         addDefaultCategories();
         updateCategoriesMenu();
 
+        reminderRecyclerView = findViewById(R.id.reminder_recycler_view);
+
+        onReminderClickListener = new OnReminderClickListener() {
+            @Override
+            public void onReminderClick(Reminder reminder) {}
+
+            @Override
+            public void onReminderLongClick(Reminder reminder, CardView cardView) {}
+        };
+
+        ActivityResultLauncher<Intent> changeReminderActivityLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                        Reminder updatedReminder = (Reminder) result.getData().getSerializableExtra("new_reminder");
+                        int position = result.getData().getIntExtra("position", -1);
+
+                        if (position != -1 && updatedReminder != null) {
+                            appDatabase.reminderDAO().update(updatedReminder);
+                            reminderList.set(position, updatedReminder);
+                            reminderListAdapter.notifyItemChanged(position);
+                        }
+                    }
+                }
+        );
+
+        new Thread(() -> {
+            reminderList = appDatabase.reminderDAO().getAll();
+            runOnUiThread(() -> {
+                reminderListAdapter = new ReminderListAdapter(MainActivity.this, reminderList, onReminderClickListener, new OnReminderChangeListener() {
+                    @Override
+                    public void onReminderUpdated(int position, Reminder updatedReminder) {}
+
+                    @Override
+                    public void onReminderDeleted(int position) {
+                        Reminder reminder = reminderList.get(position);
+                        appDatabase.reminderDAO().delete(reminder);
+                        reminderList.remove(position);
+                        reminderListAdapter.notifyItemRemoved(position);
+                    }
+                }, changeReminderActivityLauncher);
+                updateReminderRecyclerView(GRID_SPAN_COUNT);
+            });
+        }).start();
+
+        @SuppressLint("NotifyDataSetChanged") ActivityResultLauncher<Intent> createReminderActivityLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                        Reminder newReminder = (Reminder) result.getData().getSerializableExtra("new_reminder");
+
+                        appDatabase.reminderDAO().insert(newReminder);
+                        Reminder reminder = appDatabase.reminderDAO().findByTitle(newReminder.getTitle());
+                        reminderList.add(reminder);
+                        reminderListAdapter.notifyDataSetChanged();
+                    }
+                }
+        );
+
         FloatingActionButton addReminderButton = findViewById(R.id.add_reminder_button);
         addReminderButton.setOnClickListener(v -> {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -82,18 +160,142 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Intent intent = new Intent(MainActivity.this, ReminderAddActivity.class);
 
             if (lastCategory != null) {
-                String selectedCategory = Objects.requireNonNull(lastCategory.getTitle()).toString();
+                Category selectedCategory = appDatabase.categoryDAO().findByName(Objects.requireNonNull(lastCategory.getTitle()).toString());
                 intent.putExtra("selected_category", selectedCategory);
             }
 
-            startActivityForResult(intent, 1);
+//            startActivityForResult(intent, 1);
+            createReminderActivityLauncher.launch(intent);
         });
+    }
+
+    private void updateReminderRecyclerView(int spanCount) {
+        reminderRecyclerView.setHasFixedSize(true);
+        reminderRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(spanCount, LinearLayoutManager.VERTICAL));
+        reminderRecyclerView.setAdapter(reminderListAdapter);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         updateCategoriesMenu();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.category_toolbar_menu, menu);
+
+        toolbarMenu = menu;
+
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) searchItem.getActionView();
+
+        assert searchView != null;
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                filterReminders(query);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                filterReminders(newText);
+                return true;
+            }
+        });
+
+        searchItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(@NonNull MenuItem item) {
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(@NonNull MenuItem item) {
+                filterReminders("");
+                return true;
+            }
+        });
+
+        return true;
+    }
+
+    private void filterReminders(String query) {
+        List<Reminder> filteredList = new ArrayList<>();
+        for (Reminder reminder : reminderList) {
+            if (reminder.getTitle().toLowerCase().contains(query.toLowerCase()) ||
+                    reminder.getDescription().toLowerCase().contains(query.toLowerCase())) {
+                filteredList.add(reminder);
+            }
+        }
+        reminderListAdapter.filterList(filteredList);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int itemId = item.getItemId();
+        if (itemId == R.id.view_mode) {
+            if (isGridView) {
+                isGridView = false;
+                updateReminderRecyclerView(ROW_SPAN_COUNT);
+                item.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_row_view));
+
+            } else {
+                isGridView = true;
+                updateReminderRecyclerView(GRID_SPAN_COUNT);
+                item.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_grid_view));
+            }
+            return true;
+        } else if (itemId == R.id.sort_default || itemId == R.id.sort_name_asc || itemId == R.id.sort_name_desc) {
+            String sortType = "default";
+            int iconResId = R.drawable.ic_sort;
+
+            if (itemId == R.id.sort_name_asc) {
+                sortType = "name_asc";
+                iconResId = R.drawable.ic_sort_az;
+            } else if (itemId == R.id.sort_name_desc) {
+                sortType = "name_desc";
+                iconResId = R.drawable.ic_sort_za;
+            }
+
+            sortReminders(sortType);
+
+            MenuItem sortingItem = toolbarMenu.findItem(R.id.category_sorting);
+            if (sortingItem != null) {
+                updateSortingIcon(sortingItem, iconResId);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private void sortReminders(String sortType) {
+        new Thread(() -> {
+            List<Reminder> sortedList = new ArrayList<>();
+            switch (sortType) {
+                case "default":
+                    sortedList = appDatabase.reminderDAO().getAll();
+                    break;
+                case "name_asc":
+                    sortedList = appDatabase.reminderDAO().getAllSortedByTitleAsc();
+                    break;
+                case "name_desc":
+                    sortedList = appDatabase.reminderDAO().getAllSortedByTitleDesc();
+                    break;
+            }
+            List<Reminder> finalSortedList = sortedList;
+            runOnUiThread(() -> {
+                reminderList.clear();
+                reminderList.addAll(finalSortedList);
+                reminderListAdapter.notifyDataSetChanged();
+            });
+        }).start();
+    }
+
+    private void updateSortingIcon(MenuItem sortingItem, int iconResId) {
+        sortingItem.setIcon(ContextCompat.getDrawable(this, iconResId));
     }
 
     private void addDefaultCategories() {
@@ -224,36 +426,53 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1 && resultCode == RESULT_OK && data != null) {
-            Reminder resultReminder = (Reminder) data.getSerializableExtra("new_reminder");
-            if (resultReminder != null) {
-                long triggerTime = resultReminder.getDate() + resultReminder.getTime();
-
-
-
-                if (triggerTime <= System.currentTimeMillis()) {
-//                    Toast.makeText(this, "Cannot set notification in the past!", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                Intent intent = new Intent(MainActivity.this, ReminderNotificationReceiver.class);
-                intent.putExtra("title", R.string.app_name);
-                intent.putExtra("message", resultReminder.getTitle());
-
-                PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this,
-                        (int) triggerTime,
-                        intent,
-                        PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-
-                AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-                alarmManager.set(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent);
-                Toast.makeText(this, "Notification set for: " + triggerTime, Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
+//    @SuppressLint("NotifyDataSetChanged")
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        if (resultCode == RESULT_OK && data != null) {
+//            if (requestCode == 1) {
+//                Reminder newReminder = (Reminder) data.getSerializableExtra("new_reminder");
+//                appDatabase.reminderDAO().insert(newReminder);
+//                Reminder reminder = appDatabase.reminderDAO().findByTitle(newReminder.getTitle());
+//                reminderList.add(reminder);
+//                reminderListAdapter.notifyDataSetChanged();
+//            }
+//            else if (requestCode == 2) {
+////                Reminder updatedReminder = (Reminder) data.getSerializableExtra("new_reminder");
+////                appDatabase.reminderDAO().update(updatedReminder);
+////                reminderList.set(position, updatedReminder);
+////                reminderListAdapter.notifyItemChanged(position);
+//            }
+//        }
+//
+////        if (requestCode == 1 && resultCode == RESULT_OK && data != null) {
+////            Reminder resultReminder = (Reminder) data.getSerializableExtra("new_reminder");
+////            if (resultReminder != null) {
+////                long triggerTime = resultReminder.getDate() + resultReminder.getTime();
+////
+////
+////
+////                if (triggerTime <= System.currentTimeMillis()) {
+//////                    Toast.makeText(this, "Cannot set notification in the past!", Toast.LENGTH_SHORT).show();
+////                    return;
+////                }
+////
+////                Intent intent = new Intent(MainActivity.this, ReminderNotificationReceiver.class);
+////                intent.putExtra("title", R.string.app_name);
+////                intent.putExtra("message", resultReminder.getTitle());
+////
+////                PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this,
+////                        (int) triggerTime,
+////                        intent,
+////                        PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+////
+////                AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+////                alarmManager.set(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent);
+////                Toast.makeText(this, "Notification set for: " + triggerTime, Toast.LENGTH_SHORT).show();
+////            }
+////        }
+//    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {

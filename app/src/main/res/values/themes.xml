@@ -17,7 +17,7 @@
     </style>
 
     <style name="ToolbarTitleTextStyle" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
-        <item name="android:textSize">20sp</item>
+        <item name="android:textSize">18sp</item>
         <item name="android:textColor">@color/lavender_dark</item>
         <item name="android:textStyle">bold</item>
     </style>
@@ -29,7 +29,7 @@
     <style name="CardView.Background">
         <item name="android:background">@color/white</item>
         <item name="strokeColor">@color/white</item>
-        <item name="strokeWidth">2sp</item>
+        <item name="strokeWidth">3sp</item>
     </style>
 
     <style name="CustomPopupMenu" parent="Widget.AppCompat.PopupMenu">
@@ -72,6 +72,10 @@
         <item name="android:button">@android:color/transparent</item>
         <item name="android:textColor">@color/lavender_dark</item>
         <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="CustomCheckBoxStyle" parent="Widget.MaterialComponents.CompoundButton.CheckBox">
+        <item name="buttonTint">@color/checkbox_color_selector</item>
     </style>
 
 </resources>
