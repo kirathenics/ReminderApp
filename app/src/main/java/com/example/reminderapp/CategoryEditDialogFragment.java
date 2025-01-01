@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class CategoryDialogFragment extends DialogFragment {
+public class CategoryEditDialogFragment extends DialogFragment {
 
     private EditText editTextName;
     private View selectedColorView;
@@ -44,12 +44,12 @@ public class CategoryDialogFragment extends DialogFragment {
         void onCategoryUpdated(Category updatedCategory);
     }
 
-    public static CategoryDialogFragment newInstance() {
-        return new CategoryDialogFragment();
+    public static CategoryEditDialogFragment newInstance() {
+        return new CategoryEditDialogFragment();
     }
 
-    public static CategoryDialogFragment newInstance(Category category) {
-        CategoryDialogFragment fragment = new CategoryDialogFragment();
+    public static CategoryEditDialogFragment newInstance(Category category) {
+        CategoryEditDialogFragment fragment = new CategoryEditDialogFragment();
         Bundle args = new Bundle();
         args.putSerializable("category", category);
         fragment.setArguments(args);
@@ -59,7 +59,7 @@ public class CategoryDialogFragment extends DialogFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_category_dialog, container, false);
+        View view = inflater.inflate(R.layout.fragment_category_edit, container, false);
 
         TextView dialogTitle = view.findViewById(R.id.dialog_title);
         editTextName = view.findViewById(R.id.edit_text_name);

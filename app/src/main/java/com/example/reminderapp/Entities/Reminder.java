@@ -37,8 +37,8 @@ public class Reminder implements Serializable {
     @ColumnInfo(name = "repeat_pattern")
     private String repeatPattern;
 
-    @ColumnInfo(name = "days_of_week")
-    private String daysOfWeek;
+    @ColumnInfo(name = "repeat_value")
+    private int repeatValue;
 
     @ColumnInfo(name = "end_date")
     private long endDate;
@@ -116,12 +116,12 @@ public class Reminder implements Serializable {
         this.repeatPattern = repeatPattern;
     }
 
-    public String getDaysOfWeek() {
-        return daysOfWeek;
+    public int getRepeatValue() {
+        return repeatValue;
     }
 
-    public void setDaysOfWeek(String daysOfWeek) {
-        this.daysOfWeek = daysOfWeek;
+    public void setRepeatValue(int repeatValue) {
+        this.repeatValue = repeatValue;
     }
 
     public long getEndDate() {
@@ -173,7 +173,7 @@ public class Reminder implements Serializable {
                 ", isCompleted=" + isCompleted +
                 ", priority=" + priority +
                 ", repeatPattern='" + repeatPattern + '\'' +
-                ", daysOfWeek='" + daysOfWeek + '\'' +
+                ", repeatValue='" + repeatValue + '\'' +
                 ", endDate=" + formattedEndDate +
                 ", categoryId=" + categoryId +
                 ", createdAt='" + createdAt + '\'' +

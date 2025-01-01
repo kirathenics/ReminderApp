@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_search"
+        android:icon="@drawable/ic_search"
+        app:iconTint="@color/lavender_dark"
+        android:title="@string/title_search"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:showAsAction="ifRoom|collapseActionView" />
+
+    <item
+        android:id="@+id/view_mode"
+        android:icon="@drawable/ic_grid_view"
+        app:iconTint="@color/lavender_dark"
+        android:title="@string/title_grid_view"
+        app:showAsAction="ifRoom" />
+
+<!--    <item-->
+<!--        android:id="@+id/reminder_filter"-->
+<!--        android:icon="@drawable/ic_filter"-->
+<!--        app:iconTint="@color/lavender_dark"-->
+<!--        android:title="@string/title_filter_reminders"-->
+<!--        app:showAsAction="ifRoom" />-->
+
+    <item
+        android:id="@+id/reminder_sorting"
+        android:icon="@drawable/ic_sort"
+        app:iconTint="@color/lavender_dark"
+        android:title="@string/title_sort_reminders"
+        app:showAsAction="ifRoom">
+
+        <menu>
+            <item
+                android:id="@+id/sort_default"
+                android:icon="@drawable/ic_sort"
+                app:iconTint="@color/lavender_dark"
+                android:title="@string/title_default_order"
+                app:showAsAction="never" />
+            <item
+                android:id="@+id/sort_name_asc"
+                android:icon="@drawable/ic_sort_az"
+                app:iconTint="@color/lavender_dark"
+                android:title="@string/title_name_ascending"
+                app:showAsAction="never" />
+            <item
+                android:id="@+id/sort_name_desc"
+                android:icon="@drawable/ic_sort_za"
+                app:iconTint="@color/lavender_dark"
+                android:title="@string/title_name_descending"
+                app:showAsAction="never" />
+        </menu>
+    </item>
+
+</menu>

@@ -83,5 +83,7 @@
     <string name="error_reminder_exists">Reminder with this title already exists!</string>
     <string name="error_empty_reminder_title">Reminder title is empty!</string>
     <string name="description_app_icon">App icon</string>
+    <string name="title_filter_reminders">Filter Reminders</string>
+    <string name="title_sort_reminders">Sort Reminders</string>
 
 </resources>

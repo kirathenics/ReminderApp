@@ -19,7 +19,7 @@ import androidx.appcompat.widget.SwitchCompat;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.reminderapp.CategoryDialogFragment;
+import com.example.reminderapp.CategoryEditDialogFragment;
 import com.example.reminderapp.Databases.AppDatabase;
 import com.example.reminderapp.Entities.Category;
 import com.example.reminderapp.Listeners.OnItemClickListener;
@@ -108,11 +108,11 @@ public class CategoryListAdapter extends RecyclerView.Adapter<CategoryListAdapte
     }
 
     private void createEditDialog(int position, Category category) {
-        CategoryDialogFragment dialogFragment = CategoryDialogFragment.newInstance(category);
+        CategoryEditDialogFragment dialogFragment = CategoryEditDialogFragment.newInstance(category);
         if (context instanceof AppCompatActivity) {
             AppCompatActivity activity = (AppCompatActivity) context;
             dialogFragment.setOnCategoryUpdatedListener(updatedCategory -> itemUpdatedListener.onItemUpdated(position, updatedCategory));
-            dialogFragment.show(activity.getSupportFragmentManager(), CategoryDialogFragment.TAG);
+            dialogFragment.show(activity.getSupportFragmentManager(), CategoryEditDialogFragment.TAG);
         }
     }
 

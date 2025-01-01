@@ -49,6 +49,7 @@ public class ReminderAddActivity extends AppCompatActivity {
     private TextView timeDateTextView;
     private ImageButton removeDateTimeButton;
     private MaterialCardView timeDateCardView;
+    TextView howManyDateTextView;
 
     private TextView timeTextView;
     private TextView dateTextView;
@@ -87,38 +88,40 @@ public class ReminderAddActivity extends AppCompatActivity {
         reminderDescriptionTextView.setOnClickListener(view -> toggleDescriptionVisibility());
 
         timeDateTextView = findViewById(R.id.time_date_text_view);
-
         timeDateCardView = findViewById(R.id.time_date_card_view);
 
         timeTextView = findViewById(R.id.time_text_view);
         dateTextView = findViewById(R.id.date_text_view);
 
+        howManyDateTextView = findViewById(R.id.how_many_time_difference_text_view);
+
         chooseCategoryTextView = findViewById(R.id.reminder_choose_category_text_view);
 
         ImageButton addCategoryImageButton = findViewById(R.id.reminder_add_category_image_button);
         addCategoryImageButton.setOnClickListener(v -> {
-            CategoryDialogFragment dialogFragment = CategoryDialogFragment.newInstance();
+            CategoryEditDialogFragment dialogFragment = CategoryEditDialogFragment.newInstance();
             dialogFragment.setOnCategoryUpdatedListener(newCategory -> {
                 new Thread(() -> appDatabase.categoryDAO().insert(newCategory)).start();
                 runOnUiThread(() -> chooseCategoryTextView.setText(newCategory.getName()));
             });
-            dialogFragment.show(getSupportFragmentManager(), CategoryDialogFragment.TAG);
+            dialogFragment.show(getSupportFragmentManager(), CategoryEditDialogFragment.TAG);
         });
 
         chooseCategoryTextView.setOnClickListener(v -> {
             ChooseCategoryDialogFragment dialogFragment = ChooseCategoryDialogFragment.newInstance();
             dialogFragment.setOnCategoryChoseListener(chosenCategory -> {
                         selectedCategory = chosenCategory;
+                        isReminderChanged = true;
                         changeCategory();
                     });
-            dialogFragment.show(getSupportFragmentManager(), CategoryDialogFragment.TAG);
+            dialogFragment.show(getSupportFragmentManager(), CategoryEditDialogFragment.TAG);
         });
 
         addAlarmButton = findViewById(R.id.add_alarm_button);
         addAlarmButton.setOnClickListener(v -> {
             ChooseTimeDateDialogFragment dialogFragment = ChooseTimeDateDialogFragment.newInstance();
             dialogFragment.setOnDateTimeSelectedListener(onDateTimeSelectedListener);
-            dialogFragment.show(getSupportFragmentManager(), CategoryDialogFragment.TAG);
+            dialogFragment.show(getSupportFragmentManager(), CategoryEditDialogFragment.TAG);
         });
 
         removeDateTimeButton = findViewById(R.id.remove_date_time_button);
@@ -134,7 +137,7 @@ public class ReminderAddActivity extends AppCompatActivity {
         timeTextView.setOnClickListener(v -> {
             ChooseTimeDateDialogFragment dialogFragment = ChooseTimeDateDialogFragment.newInstance(true, selectedTime, selectedDate);
             dialogFragment.setOnDateTimeSelectedListener(onDateTimeSelectedListener);
-            dialogFragment.show(getSupportFragmentManager(), CategoryDialogFragment.TAG);
+            dialogFragment.show(getSupportFragmentManager(), CategoryEditDialogFragment.TAG);
         });
 
         ImageButton removeTimeButton = findViewById(R.id.remove_time_button);
@@ -143,14 +146,19 @@ public class ReminderAddActivity extends AppCompatActivity {
         dateTextView.setOnClickListener(v -> {
             ChooseTimeDateDialogFragment dialogFragment = ChooseTimeDateDialogFragment.newInstance(false, selectedTime, selectedDate);
             dialogFragment.setOnDateTimeSelectedListener(onDateTimeSelectedListener);
-            dialogFragment.show(getSupportFragmentManager(), CategoryDialogFragment.TAG);
+            dialogFragment.show(getSupportFragmentManager(), CategoryEditDialogFragment.TAG);
         });
 
         ImageButton changeDateButton = findViewById(R.id.change_date_button);
         changeDateButton.setOnClickListener(v -> {
             ChooseTimeDateDialogFragment dialogFragment = ChooseTimeDateDialogFragment.newInstance(false, selectedTime, selectedDate);
             dialogFragment.setOnDateTimeSelectedListener(onDateTimeSelectedListener);
-            dialogFragment.show(getSupportFragmentManager(), CategoryDialogFragment.TAG);
+            dialogFragment.show(getSupportFragmentManager(), CategoryEditDialogFragment.TAG);
+        });
+
+        ImageButton addStopRepeatButton = findViewById(R.id.add_stop_repeat_button);
+        addStopRepeatButton.setOnClickListener(v -> {
+
         });
 
         selectedCategory = (Category) getIntent().getSerializableExtra("selected_category");
@@ -191,11 +199,20 @@ public class ReminderAddActivity extends AppCompatActivity {
             }
 
             @Override
-            public void afterTextChanged(Editable s) {
-                if (s.toString().isEmpty()) {
-                    isReminderChanged = false;
-                }
+            public void afterTextChanged(Editable s) {}
+        });
+
+        reminderDescriptionEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                isReminderChanged = true;
             }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
         });
     }
 
@@ -226,12 +243,11 @@ public class ReminderAddActivity extends AppCompatActivity {
             timeTextView.setText(timeFormat.format(new Date(selectedTime)));
             timeTextView.setVisibility(View.VISIBLE);
 
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, d MMM yyyy", Locale.getDefault());
             dateTextView.setText(dateFormat.format(new Date(selectedDate)));
             dateTextView.setVisibility(View.VISIBLE);
 
-            TextView howManyDateTextView = findViewById(R.id.how_many_time_difference_text_view);
-            Utils.calculateAndDisplayDifference(selectedTime, selectedDate, howManyDateTextView,  ReminderAddActivity.this);
+            howManyDateTextView.setText(Utils.calculateTimeDifference(selectedTime, selectedDate, ReminderAddActivity.this));
         } else {
             timeTextView.setText(R.string.zero_time);
             timeTextView.setVisibility(View.GONE);
@@ -371,8 +387,7 @@ public class ReminderAddActivity extends AppCompatActivity {
                 removeDateTimeButton.setVisibility(View.VISIBLE);
                 timeDateCardView.setVisibility(View.VISIBLE);
 
-                TextView howManyDateTextView = findViewById(R.id.how_many_time_difference_text_view);
-                Utils.calculateAndDisplayDifference(selectedTime, selectedDate, howManyDateTextView,  ReminderAddActivity.this);
+                howManyDateTextView.setText(Utils.calculateTimeDifference(selectedTime, selectedDate, ReminderAddActivity.this));
             } catch (ParseException e) {
                 Log.e("ChooseTimeDateDialog", "Error parsing date or time", e);
             }

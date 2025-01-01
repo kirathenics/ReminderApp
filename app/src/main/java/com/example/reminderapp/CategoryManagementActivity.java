@@ -89,7 +89,7 @@ public class CategoryManagementActivity extends AppCompatActivity {
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onClick(View v) {
-                CategoryDialogFragment dialogFragment = CategoryDialogFragment.newInstance();
+                CategoryEditDialogFragment dialogFragment = CategoryEditDialogFragment.newInstance();
                 dialogFragment.setOnCategoryUpdatedListener(newCategory -> {
                     appDatabase.categoryDAO().insert(newCategory);
                     Category category = appDatabase.categoryDAO().findByName(newCategory.getName());
@@ -97,7 +97,7 @@ public class CategoryManagementActivity extends AppCompatActivity {
                     categoryListAdapter.notifyDataSetChanged();
                 });
 
-                dialogFragment.show(getSupportFragmentManager(), CategoryDialogFragment.TAG);
+                dialogFragment.show(getSupportFragmentManager(), CategoryEditDialogFragment.TAG);
             }
         });
     }

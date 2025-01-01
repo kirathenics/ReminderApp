@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
@@ -64,10 +65,12 @@ public class ReminderListAdapter extends RecyclerView.Adapter<ReminderListAdapte
         long time = reminder.getTime();
         long date = reminder.getDate();
         if (date > 0) {
-            Utils.calculateAndDisplayDifference(time, date, holder.timeDifferenceTextView, context);
+            holder.notificationTimeLayout.setVisibility(View.VISIBLE);
+
+            holder.timeDifferenceTextView.setText(Utils.calculateTimeDifference(time, date, context));
+            holder.timeDifferenceTextView.setSelected(true);
         } else {
-            holder.notificationIconImageView.setVisibility(View.GONE);
-            holder.timeDifferenceTextView.setVisibility(View.GONE);
+            holder.notificationTimeLayout.setVisibility(View.GONE);
         }
 
         holder.isCompletedCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -139,17 +142,17 @@ public class ReminderListAdapter extends RecyclerView.Adapter<ReminderListAdapte
         final MaterialCardView reminderCardView;
         final MaterialCheckBox isCompletedCheckBox;
         final TextView titleTextView, timeDifferenceTextView;
-        final ImageView notificationIconImageView;
         final ImageButton optionsImageButton;
+        final LinearLayout notificationTimeLayout;
 
         public ReminderViewHolder(@NonNull View itemView) {
             super(itemView);
             reminderCardView = itemView.findViewById(R.id.reminder_card_view);
             isCompletedCheckBox = itemView.findViewById(R.id.is_completed_check_box);
             titleTextView = itemView.findViewById(R.id.reminder_name_text_view);
-            notificationIconImageView = itemView.findViewById(R.id.notification_icon_image_view);
             timeDifferenceTextView = itemView.findViewById(R.id.how_many_time_difference_text_view_reminder);
             optionsImageButton = itemView.findViewById(R.id.reminder_card_view_options);
+            notificationTimeLayout = itemView.findViewById(R.id.notification_time_layout);
         }
     }
 }
