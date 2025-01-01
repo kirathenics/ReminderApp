@@ -61,7 +61,8 @@
                     android:layout_height="wrap_content"
                     android:inputType="text"
                     android:textSize="16sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    tools:ignore="VisualLintTextFieldSize" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -161,9 +162,10 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:backgroundTint="@color/white"
-                    android:src="@drawable/ic_remove_circle_outline"
                     android:contentDescription="@string/remove_time"
-                    app:tint="@color/lavender_dark" />
+                    android:src="@drawable/ic_remove_circle_outline"
+                    app:tint="@color/lavender_dark"
+                    tools:ignore="DuplicateSpeakableTextCheck,TouchTargetSizeCheck" />
 
                 <Space
                     android:layout_width="0sp"
@@ -224,7 +226,8 @@
                     android:backgroundTint="@color/white"
                     android:contentDescription="@string/remove_time"
                     android:src="@drawable/ic_calendar"
-                    app:tint="@color/lavender_dark" />
+                    app:tint="@color/lavender_dark"
+                    tools:ignore="TouchTargetSizeCheck" />
 
             </LinearLayout>
 
@@ -271,37 +274,44 @@
                 <CheckBox
                     android:id="@+id/monday_checkbox"
                     style="@style/DayOfWeekCheckBox"
-                    android:text="@string/monday" />
+                    android:text="@string/monday"
+                    tools:ignore="TouchTargetSizeCheck" />
 
                 <CheckBox
                     android:id="@+id/tuesday_checkbox"
                     style="@style/DayOfWeekCheckBox"
-                    android:text="@string/tuesday" />
+                    android:text="@string/tuesday"
+                    tools:ignore="TouchTargetSizeCheck" />
 
                 <CheckBox
                     android:id="@+id/wednesday_checkbox"
                     style="@style/DayOfWeekCheckBox"
-                    android:text="@string/wednesday" />
+                    android:text="@string/wednesday"
+                    tools:ignore="TouchTargetSizeCheck" />
 
                 <CheckBox
                     android:id="@+id/thursday_checkbox"
                     style="@style/DayOfWeekCheckBox"
-                    android:text="@string/thursday" />
+                    android:text="@string/thursday"
+                    tools:ignore="TouchTargetSizeCheck" />
 
                 <CheckBox
                     android:id="@+id/friday_checkbox"
                     style="@style/DayOfWeekCheckBox"
-                    android:text="@string/friday" />
+                    android:text="@string/friday"
+                    tools:ignore="TouchTargetSizeCheck" />
 
                 <CheckBox
                     android:id="@+id/saturday_checkbox"
                     style="@style/DayOfWeekCheckBox"
-                    android:text="@string/saturday" />
+                    android:text="@string/saturday"
+                    tools:ignore="TouchTargetSizeCheck" />
 
                 <CheckBox
                     android:id="@+id/sunday_checkbox"
                     style="@style/DayOfWeekCheckBox"
-                    android:text="@string/sunday" />
+                    android:text="@string/sunday"
+                    tools:ignore="TouchTargetSizeCheck" />
 
             </LinearLayout>
 
@@ -343,7 +353,8 @@
                     android:backgroundTint="@color/white"
                     android:contentDescription="@string/remove_time"
                     android:src="@drawable/ic_edit_calendar"
-                    app:tint="@color/lavender_dark" />
+                    app:tint="@color/lavender_dark"
+                    tools:ignore="TouchTargetSizeCheck" />
 
             </LinearLayout>
 
@@ -355,17 +366,18 @@
         android:id="@+id/remove_date_time_button"
         android:layout_width="40sp"
         android:layout_height="40sp"
-        android:layout_alignEnd="@id/time_date_card_view"
         android:layout_alignTop="@id/time_date_card_view"
-        android:layout_marginEnd="15sp"
+        android:layout_alignEnd="@id/time_date_card_view"
         android:layout_marginTop="-20sp"
-        android:src="@drawable/ic_remove_circle_outline"
+        android:layout_marginEnd="15sp"
         android:background="@drawable/round_button"
         android:contentDescription="@string/remove_time_date"
-        android:scaleType="centerInside"
         android:elevation="12sp"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_remove_circle_outline"
         android:visibility="visible"
-        app:tint="@color/white" />
+        app:tint="@color/white"
+        tools:ignore="ImageContrastCheck,TouchTargetSizeCheck" />
 
     <TextView
         android:id="@+id/reminder_category_text_view"
@@ -402,11 +414,12 @@
                 android:id="@+id/reminder_add_category_image_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:backgroundTint="@color/white"
                 android:contentDescription="@string/description_add_category_button"
                 android:padding="8sp"
                 android:src="@drawable/ic_add_to_list"
-                android:backgroundTint="@color/white"
-                app:tint="@color/lavender_dark" />
+                app:tint="@color/lavender_dark"
+                tools:ignore="RedundantDescriptionCheck,TouchTargetSizeCheck" />
 
             <TextView
                 android:id="@+id/reminder_choose_category_text_view"
