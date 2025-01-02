@@ -169,21 +169,6 @@
                     app:tint="@color/lavender_dark"
                     tools:ignore="DuplicateSpeakableTextCheck,TouchTargetSizeCheck" />
 
-                <Space
-                    android:layout_width="0sp"
-                    android:layout_height="0sp"
-                    android:layout_weight="1" />
-
-<!--                <ImageButton-->
-<!--                    android:id="@+id/remove_alarm_button"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_gravity="center"-->
-<!--                    android:backgroundTint="@android:color/transparent"-->
-<!--                    android:contentDescription="@string/remove_time"-->
-<!--                    android:src="@drawable/ic_alarm"-->
-<!--                    app:tint="@color/lavender_dark" />-->
-
             </LinearLayout>
 
             <LinearLayout
@@ -243,7 +228,6 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/repeat_text_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16sp"
@@ -258,7 +242,7 @@
                     android:layout_weight="1" />
 
                 <ImageButton
-                    android:id="@+id/add_repeat_reminder_button"
+                    android:id="@+id/add_repeat_pattern_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -270,7 +254,7 @@
                     tools:ignore="TouchTargetSizeCheck" />
 
                 <ImageButton
-                    android:id="@+id/delete_repeat_reminder_button"
+                    android:id="@+id/delete_repeat_pattern_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -336,7 +320,7 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/selected_repeat_linear_layout"
+                android:id="@+id/selected_repeat_pattern_linear_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16sp"
@@ -353,7 +337,7 @@
                     android:drawablePadding="8sp" />
 
                 <TextView
-                    android:id="@+id/selected_repeat_time_text_view"
+                    android:id="@+id/selected_repeat_pattern_text_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -368,7 +352,7 @@
                     android:layout_weight="1" />
 
                 <ImageButton
-                    android:id="@+id/edit_repeat_reminder_button"
+                    android:id="@+id/edit_repeat_pattern_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -393,9 +377,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:maxLines="2"
-                    android:ellipsize="marquee"
-                    android:marqueeRepeatLimit="marquee_forever"
-                    android:scrollHorizontally="true"
                     android:text="@string/sample_next_time_repeat"
                     android:textColor="@color/gray"
                     android:textSize="14sp"
@@ -414,7 +395,6 @@
                 android:visibility="visible">
 
                 <TextView
-                    android:id="@+id/stop_repeat_text_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16sp"
@@ -424,7 +404,7 @@
                     android:textColor="@color/lavender_dark" />
 
                 <TextView
-                    android:id="@+id/info_stop_repeat_text_view"
+                    android:id="@+id/stop_repeat_info_text_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -464,7 +444,7 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/edit_stop_repeat_reminder_linear_layout"
+                android:id="@+id/selected_stop_repeat_reminder_linear_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16sp"

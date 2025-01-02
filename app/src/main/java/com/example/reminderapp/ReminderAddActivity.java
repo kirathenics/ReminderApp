@@ -3,6 +3,7 @@ package com.example.reminderapp;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -11,6 +12,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -32,7 +34,11 @@ import com.google.android.material.textfield.TextInputLayout;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -57,24 +63,24 @@ public class ReminderAddActivity extends AppCompatActivity {
     private long selectedTime = 0;
     private long selectedDate = 0;
 
-    ImageButton addRepeatReminderButton;
-    ImageButton deleteRepeatReminderButton;
+    ImageButton addRepeatPatternButton;
+    ImageButton deleteRepeatPatternButton;
 
     LinearLayout chooseWeekdayLinearLayout;
 
-    LinearLayout selectedRepeatLinearLayout;
-    TextView selectedRepeatTimeTextView;
-    ImageButton editRepeatReminderButton;
+    LinearLayout selectedRepeatPatternLinearLayout;
+    TextView selectedRepeatPatternTextView;
+    ImageButton editRepeatPatternButton;
 
     LinearLayout nextTimeRepeatLinearLayout;
     TextView nextTimeRepeatInfoTextView;
 
     LinearLayout stopRepeatReminderLinearLayout;
-    TextView infoStopRepeatTextView;
+    TextView stopRepeatInfoTextView;
     ImageButton addStopRepeatButton;
     ImageButton deleteStopRepeatButton;
 
-    LinearLayout editStopRepeatReminderLinearLayout;
+    LinearLayout selectedStopRepeatReminderLinearLayout;
     private TextView stopRepeatTimeTextView;
     private TextView stopRepeatDateTextView;
     private TextView stopRepeatTimeDifferenceTextView;
@@ -157,12 +163,22 @@ public class ReminderAddActivity extends AppCompatActivity {
 
         removeDateTimeButton = findViewById(R.id.remove_date_time_button);
         removeDateTimeButton.setOnClickListener(v -> {
-            timeTextView.setText(R.string.zero_time);
-            dateTextView.setText(R.string.zero_date);
-            addAlarmButton.setVisibility(View.VISIBLE);
-            timeDateTextView.setVisibility(View.GONE);
-            removeDateTimeButton.setVisibility(View.GONE);
+            selectedTime = 0;
+            selectedDate = 0;
+
+            selectedStopRepeatTime = 0;
+            selectedStopRepeatDate = 0;
+
             timeDateCardView.setVisibility(View.GONE);
+            removeDateTimeButton.setVisibility(View.GONE);
+
+            deleteRepeatPatternButton.setVisibility(View.GONE);
+            selectedRepeatPatternLinearLayout.setVisibility(View.GONE);
+            nextTimeRepeatLinearLayout.setVisibility(View.GONE);
+            stopRepeatReminderLinearLayout.setVisibility(View.GONE);
+            selectedStopRepeatReminderLinearLayout.setVisibility(View.GONE);
+
+            addAlarmButton.setVisibility(View.VISIBLE);
         });
 
         timeTextView.setOnClickListener(v -> {
@@ -172,7 +188,10 @@ public class ReminderAddActivity extends AppCompatActivity {
         });
 
         ImageButton removeTimeButton = findViewById(R.id.remove_time_button);
-        removeTimeButton.setOnClickListener(v -> timeTextView.setText(R.string.zero_time));
+        removeTimeButton.setOnClickListener(v -> {
+            timeTextView.setText(R.string.zero_time);
+            selectedTime = 0;
+        });
 
         dateTextView.setOnClickListener(v -> {
             ChooseTimeDateDialogFragment dialogFragment = ChooseTimeDateDialogFragment.newInstance(false, selectedTime, selectedDate);
@@ -188,38 +207,40 @@ public class ReminderAddActivity extends AppCompatActivity {
         });
 
         chooseWeekdayLinearLayout = findViewById(R.id.choose_weekday_linear_layout);
+        setupWeekdayCheckBoxListeners();
 
-        selectedRepeatLinearLayout = findViewById(R.id.selected_repeat_linear_layout);
-        selectedRepeatLinearLayout.setVisibility(View.GONE);
-        selectedRepeatTimeTextView = findViewById(R.id.selected_repeat_time_text_view);
-        editRepeatReminderButton = findViewById(R.id.edit_repeat_reminder_button);
+        selectedRepeatPatternLinearLayout = findViewById(R.id.selected_repeat_pattern_linear_layout);
+        selectedRepeatPatternLinearLayout.setVisibility(View.GONE);
+        selectedRepeatPatternTextView = findViewById(R.id.selected_repeat_pattern_text_view);
+        editRepeatPatternButton = findViewById(R.id.edit_repeat_pattern_button);
 
         nextTimeRepeatLinearLayout = findViewById(R.id.next_time_repeat_linear_layout);
         nextTimeRepeatLinearLayout.setVisibility(View.GONE);
         nextTimeRepeatInfoTextView = findViewById(R.id.next_time_repeat_info_text_view);
 
-        addRepeatReminderButton = findViewById(R.id.add_repeat_reminder_button);
-        addRepeatReminderButton.setOnClickListener(v -> {
+        addRepeatPatternButton = findViewById(R.id.add_repeat_pattern_button);
+        addRepeatPatternButton.setOnClickListener(v -> {
             ChooseRepeatTimeDialogFragment dialogFragment = ChooseRepeatTimeDialogFragment.newInstance(selectedRepeatValue, selectedRepeatPattern);
             dialogFragment.setOnRepeatTimeSelectedListener(onRepeatTimeSelectedListener);
             dialogFragment.show(getSupportFragmentManager(), ChooseRepeatTimeDialogFragment.TAG);
         });
 
-        deleteRepeatReminderButton = findViewById(R.id.delete_repeat_reminder_button);
-        deleteRepeatReminderButton.setVisibility(View.GONE);
-        deleteRepeatReminderButton.setOnClickListener(v -> {
-            addRepeatReminderButton.setVisibility(View.VISIBLE);
-            deleteRepeatReminderButton.setVisibility(View.GONE);
-
-            chooseWeekdayLinearLayout.setVisibility(View.VISIBLE);
-            selectedRepeatLinearLayout.setVisibility(View.GONE);
-            nextTimeRepeatLinearLayout.setVisibility(View.GONE);
-
-            stopRepeatReminderLinearLayout.setVisibility(View.GONE);
-            editStopRepeatReminderLinearLayout.setVisibility(View.GONE);
+        deleteRepeatPatternButton = findViewById(R.id.delete_repeat_pattern_button);
+        deleteRepeatPatternButton.setVisibility(View.GONE);
+        deleteRepeatPatternButton.setOnClickListener(v -> {
+//            addRepeatPatternButton.setVisibility(View.VISIBLE);
+//            deleteRepeatPatternButton.setVisibility(View.GONE);
+//
+//            chooseWeekdayLinearLayout.setVisibility(View.VISIBLE);
+//            selectedRepeatPatternLinearLayout.setVisibility(View.GONE);
+//            nextTimeRepeatLinearLayout.setVisibility(View.GONE);
+//
+//            stopRepeatReminderLinearLayout.setVisibility(View.GONE);
+//            selectedStopRepeatReminderLinearLayout.setVisibility(View.GONE);
+            toggleRepeatTimeVisibility(false);
         });
 
-        editRepeatReminderButton.setOnClickListener(v -> {
+        editRepeatPatternButton.setOnClickListener(v -> {
             ChooseRepeatTimeDialogFragment dialogFragment = ChooseRepeatTimeDialogFragment.newInstance(selectedRepeatValue, selectedRepeatPattern);
             dialogFragment.setOnRepeatTimeSelectedListener(onRepeatTimeSelectedListener);
             dialogFragment.show(getSupportFragmentManager(), ChooseRepeatTimeDialogFragment.TAG);
@@ -227,10 +248,10 @@ public class ReminderAddActivity extends AppCompatActivity {
 
         stopRepeatReminderLinearLayout = findViewById(R.id.stop_repeat_reminder_linear_layout);
         stopRepeatReminderLinearLayout.setVisibility(View.GONE);
-        infoStopRepeatTextView = findViewById(R.id.info_stop_repeat_text_view);
+        stopRepeatInfoTextView = findViewById(R.id.stop_repeat_info_text_view);
 
-        editStopRepeatReminderLinearLayout = findViewById(R.id.edit_stop_repeat_reminder_linear_layout);
-        editStopRepeatReminderLinearLayout.setVisibility(View.GONE);
+        selectedStopRepeatReminderLinearLayout = findViewById(R.id.selected_stop_repeat_reminder_linear_layout);
+        selectedStopRepeatReminderLinearLayout.setVisibility(View.GONE);
         stopRepeatTimeTextView = findViewById(R.id.stop_repeat_time_text_view);
         stopRepeatDateTextView = findViewById(R.id.stop_repeat_date_text_view);
         stopRepeatTimeDifferenceTextView = findViewById(R.id.stop_repeat_time_difference_text_view);
@@ -246,12 +267,14 @@ public class ReminderAddActivity extends AppCompatActivity {
         deleteStopRepeatButton.setVisibility(View.GONE);
         deleteStopRepeatButton.setOnClickListener(v -> {
             addStopRepeatButton.setVisibility(View.VISIBLE);
-            infoStopRepeatTextView.setVisibility(View.VISIBLE);
+            stopRepeatInfoTextView.setVisibility(View.VISIBLE);
             deleteStopRepeatButton.setVisibility(View.GONE);
-            editStopRepeatReminderLinearLayout.setVisibility(View.GONE);
+            selectedStopRepeatReminderLinearLayout.setVisibility(View.GONE);
 
             selectedStopRepeatTime = 0;
             selectedStopRepeatDate = 0;
+
+            nextTimeRepeatInfoTextView.setPaintFlags(nextTimeRepeatInfoTextView.getPaintFlags() | (~Paint.STRIKE_THRU_TEXT_FLAG));
         });
 
         editStopRepeatButton = findViewById(R.id.edit_stop_repeat_button);
@@ -316,6 +339,133 @@ public class ReminderAddActivity extends AppCompatActivity {
         });
     }
 
+    private void setupWeekdayCheckBoxListeners() {
+        for (int i = 0; i < chooseWeekdayLinearLayout.getChildCount(); i++) {
+            View child = chooseWeekdayLinearLayout.getChildAt(i);
+            if (child instanceof CheckBox) {
+                CheckBox checkBox = (CheckBox) child;
+                int dayIndex = i + 1;
+
+                checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                    if (isChecked) {
+                        onDaySelected(dayIndex);
+                    } else {
+                        onDayUnselected(dayIndex);
+                    }
+                });
+            }
+        }
+    }
+
+    private void onDaySelected(int dayIndex) {
+        if (!newReminder.getRepeatDays().contains(dayIndex)) {
+            newReminder.getRepeatDays().add(dayIndex);
+            Collections.sort(newReminder.getRepeatDays());
+        }
+        updateNextReminderTime();
+    }
+
+    private void onDayUnselected(int dayIndex) {
+        newReminder.getRepeatDays().remove(Integer.valueOf(dayIndex));
+        updateNextReminderTime();
+    }
+
+    private void saveSelectedWeekdays() {
+        List<Integer> selectedDays = new ArrayList<>();
+        for (int i = 0; i < chooseWeekdayLinearLayout.getChildCount(); i++) {
+            View child = chooseWeekdayLinearLayout.getChildAt(i);
+            if (child instanceof CheckBox && ((CheckBox) child).isChecked()) {
+                selectedDays.add(i + 1);
+            }
+        }
+
+        newReminder.setRepeatType("weekly");
+        newReminder.setRepeatDays(selectedDays);
+    }
+
+    private void loadSelectedWeekdays() {
+        List<Integer> repeatDays = newReminder.getRepeatDays();
+        if (repeatDays == null || repeatDays.isEmpty()) return;
+
+        for (int i = 0; i < chooseWeekdayLinearLayout.getChildCount(); i++) {
+            View child = chooseWeekdayLinearLayout.getChildAt(i);
+            if (child instanceof CheckBox) {
+                ((CheckBox) child).setChecked(repeatDays.contains(i + 1));
+            }
+        }
+    }
+
+    private void updateNextReminderTime() {
+        List<Integer> repeatDays = newReminder.getRepeatDays();
+        if (repeatDays == null || repeatDays.isEmpty()) {
+            nextTimeRepeatLinearLayout.setVisibility(View.GONE);
+            return;
+        }
+
+        long currentTimeMillis = System.currentTimeMillis();
+        if (currentTimeMillis < selectedTime + selectedDate) {
+            currentTimeMillis = selectedTime + selectedDate;
+        }
+
+        Calendar currentCalendar = Calendar.getInstance();
+        currentCalendar.setTimeInMillis(currentTimeMillis);
+        int currentDayOfWeek = currentCalendar.get(Calendar.DAY_OF_WEEK);
+        int adjustedDayOfWeek = (currentDayOfWeek == Calendar.SUNDAY) ? 7 : currentDayOfWeek - 1;
+        int currentHour = currentCalendar.get(Calendar.HOUR_OF_DAY);
+        int currentMinute = currentCalendar.get(Calendar.MINUTE);
+
+        Calendar reminderTimeCalendar = Calendar.getInstance();
+        reminderTimeCalendar.setTimeInMillis(selectedTime);
+        int reminderHour = reminderTimeCalendar.get(Calendar.HOUR_OF_DAY);
+        int reminderMinute = reminderTimeCalendar.get(Calendar.MINUTE);
+
+        Integer nextDay = null;
+        int minDayOffset = Integer.MAX_VALUE;
+
+        for (int day : repeatDays) {
+            int dayOffset = (day - adjustedDayOfWeek + 7) % 7;
+
+            if (dayOffset == 0) {
+                if (reminderHour > currentHour || (reminderHour == currentHour && reminderMinute > currentMinute)) {
+                    nextDay = day;
+                    minDayOffset = 0;
+                    break;
+                } else {
+                    dayOffset = 7;
+                }
+            }
+
+            if (dayOffset < minDayOffset) {
+                minDayOffset = dayOffset;
+                nextDay = day;
+            }
+        }
+
+        if (nextDay != null) {
+            Calendar nextReminderCalendar = Calendar.getInstance();
+            nextReminderCalendar.setTimeInMillis(currentTimeMillis);
+            nextReminderCalendar.add(Calendar.DAY_OF_YEAR, minDayOffset);
+            nextReminderCalendar.set(Calendar.HOUR_OF_DAY, reminderHour);
+            nextReminderCalendar.set(Calendar.MINUTE, reminderMinute);
+            nextReminderCalendar.set(Calendar.SECOND, 0);
+            nextReminderCalendar.set(Calendar.MILLISECOND, 0);
+
+            long nextTime = nextReminderCalendar.getTimeInMillis() % (24 * 60 * 60 * 1000);
+            long nextDate = nextReminderCalendar.getTimeInMillis() - nextTime;
+
+            String nextTimeInfo = Utils.getNextTimeInfoText(
+                    nextTime,
+                    nextDate,
+                    0,
+                    "week",
+                    this
+            );
+
+            nextTimeRepeatLinearLayout.setVisibility(View.VISIBLE);
+            nextTimeRepeatInfoTextView.setText(nextTimeInfo);
+        }
+    }
+
     private void changeCategory() {
         chooseCategoryTextView.setText(selectedCategory.getName());
         MaterialCardView reminderSummaryCardView = findViewById(R.id.reminder_summary_card_view);
@@ -349,25 +499,37 @@ public class ReminderAddActivity extends AppCompatActivity {
             dateTextView.setVisibility(View.VISIBLE);
 
             howManyDateTextView.setText(Utils.calculateTimeDifference(selectedTime, selectedDate, ReminderAddActivity.this));
+
+            timeDateCardView.setVisibility(View.VISIBLE);
+            removeDateTimeButton.setVisibility(View.VISIBLE);
+            timeDateTextView.setVisibility(View.VISIBLE);
+            addAlarmButton.setVisibility(View.GONE);
         } else {
             timeTextView.setText(R.string.zero_time);
             timeTextView.setVisibility(View.GONE);
 
             dateTextView.setText(R.string.zero_date);
             dateTextView.setVisibility(View.GONE);
+
+//            timeDateCardView.setVisibility(View.GONE);
+//            removeDateTimeButton.setVisibility(View.GONE);
+//            timeDateTextView.setVisibility(View.GONE);
+//            addAlarmButton.setVisibility(View.VISIBLE);
         }
 
-        if (selectedDate > 0) {
-            timeDateCardView.setVisibility(View.VISIBLE);
-            removeDateTimeButton.setVisibility(View.VISIBLE);
-            timeDateTextView.setVisibility(View.VISIBLE);
-            addAlarmButton.setVisibility(View.GONE);
-        } else {
-            timeDateCardView.setVisibility(View.GONE);
-            removeDateTimeButton.setVisibility(View.GONE);
-            timeDateTextView.setVisibility(View.GONE);
-            addAlarmButton.setVisibility(View.VISIBLE);
-        }
+        loadSelectedWeekdays();
+
+//        if (selectedDate > 0) {
+//            timeDateCardView.setVisibility(View.VISIBLE);
+//            removeDateTimeButton.setVisibility(View.VISIBLE);
+//            timeDateTextView.setVisibility(View.VISIBLE);
+//            addAlarmButton.setVisibility(View.GONE);
+//        } else {
+//            timeDateCardView.setVisibility(View.GONE);
+//            removeDateTimeButton.setVisibility(View.GONE);
+//            timeDateTextView.setVisibility(View.GONE);
+//            addAlarmButton.setVisibility(View.VISIBLE);
+//        }
     }
 
     private void toggleDescriptionVisibility() {
@@ -399,10 +561,10 @@ public class ReminderAddActivity extends AppCompatActivity {
         if (itemId == android.R.id.home) {
             String title = Objects.requireNonNull(reminderTitleEditText.getText()).toString().trim();
 
-            if (title.isEmpty()) {
-                showError(getString(R.string.error_empty_reminder_title));
-                return false;
-            }
+//            if (title.isEmpty()) {
+//                showError(getString(R.string.error_empty_reminder_title));
+//                return false;
+//            }
 
             if (isReminderChanged) {
                 new AlertDialog.Builder(this)
@@ -437,9 +599,7 @@ public class ReminderAddActivity extends AppCompatActivity {
             newReminder.setCompleted(false);
 //            newReminder.setPriority();
 //        newReminder.setRepeat();
-            if (editStopRepeatReminderLinearLayout.getVisibility() == View.VISIBLE) {
-
-            }
+            newReminder.setEndDate(selectedStopRepeatTime + selectedStopRepeatDate);
             newReminder.setCategoryId(appDatabase.categoryDAO().findByName(chooseCategoryTextView.getText().toString()).getId());
 //        newReminder.setCreatedAt(new Date().toString());
 //        newReminder.setUpdatedAt(new Date().toString());
@@ -492,6 +652,7 @@ public class ReminderAddActivity extends AppCompatActivity {
                 timeDateTextView.setVisibility(View.VISIBLE);
                 removeDateTimeButton.setVisibility(View.VISIBLE);
                 timeDateCardView.setVisibility(View.VISIBLE);
+                chooseWeekdayLinearLayout.setVisibility(View.VISIBLE);
             } catch (ParseException e) {
                 Log.e("ChooseTimeDateDialog", "Error parsing date or time", e);
             }
@@ -520,15 +681,26 @@ public class ReminderAddActivity extends AppCompatActivity {
 
                 stopRepeatTimeDifferenceTextView.setText(Utils.calculateTimeDifference(selectedStopRepeatTime, selectedStopRepeatDate, selectedTime + selectedDate, ReminderAddActivity.this));
 
+                checkIfRepeatWillBe();
+
                 addStopRepeatButton.setVisibility(View.GONE);
-                infoStopRepeatTextView.setVisibility(View.GONE);
+                stopRepeatInfoTextView.setVisibility(View.GONE);
                 deleteStopRepeatButton.setVisibility(View.VISIBLE);
-                editStopRepeatReminderLinearLayout.setVisibility(View.VISIBLE);
+                selectedStopRepeatReminderLinearLayout.setVisibility(View.VISIBLE);
             } catch (ParseException e) {
                 Log.e("ChooseTimeDateDialog", "Error parsing date or time", e);
             }
         }
     };
+
+    private void checkIfRepeatWillBe() {
+        if ((selectedTime + selectedDate + Utils.getRepeatIntervalMillis(selectedRepeatValue, selectedRepeatPattern)) < (selectedStopRepeatTime + selectedStopRepeatDate)) {
+            nextTimeRepeatInfoTextView.setPaintFlags(nextTimeRepeatInfoTextView.getPaintFlags() | (~Paint.STRIKE_THRU_TEXT_FLAG));
+        }
+        else {
+            nextTimeRepeatInfoTextView.setPaintFlags(nextTimeRepeatInfoTextView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+        }
+    }
 
     ChooseRepeatTimeDialogFragment.OnRepeatTimeSelectedListener onRepeatTimeSelectedListener = new ChooseRepeatTimeDialogFragment.OnRepeatTimeSelectedListener() {
         @Override
@@ -536,17 +708,34 @@ public class ReminderAddActivity extends AppCompatActivity {
             selectedRepeatValue = repeatValue;
             selectedRepeatPattern = repeatPattern;
 
-            addRepeatReminderButton.setVisibility(View.GONE);
-            deleteRepeatReminderButton.setVisibility(View.VISIBLE);
+//            addRepeatPatternButton.setVisibility(View.GONE);
+//            deleteRepeatPatternButton.setVisibility(View.VISIBLE);
+//
+//            chooseWeekdayLinearLayout.setVisibility(View.GONE);
+//            selectedRepeatPatternLinearLayout.setVisibility(View.VISIBLE);
+//            nextTimeRepeatLinearLayout.setVisibility(View.VISIBLE);
+//
+//            stopRepeatReminderLinearLayout.setVisibility(View.VISIBLE);
 
-            chooseWeekdayLinearLayout.setVisibility(View.GONE);
-            selectedRepeatLinearLayout.setVisibility(View.VISIBLE);
-            nextTimeRepeatLinearLayout.setVisibility(View.VISIBLE);
-
-            stopRepeatReminderLinearLayout.setVisibility(View.VISIBLE);
-
-            selectedRepeatTimeTextView.setText(Utils.updateRepeatTime(repeatValue, repeatPattern));
+            selectedRepeatPatternTextView.setText(Utils.updateRepeatTime(repeatValue, repeatPattern));
             nextTimeRepeatInfoTextView.setText(Utils.getNextTimeInfoText(selectedTime, selectedDate, repeatValue, repeatPattern, ReminderAddActivity.this));
+
+            toggleRepeatTimeVisibility(true);
         }
     };
+
+    private void toggleRepeatTimeVisibility(boolean isVisible) {
+        int visibility = isVisible ? View.VISIBLE : View.GONE;
+        int inverseVisibility = isVisible ? View.GONE : View.VISIBLE;
+
+        addRepeatPatternButton.setVisibility(inverseVisibility);
+        deleteRepeatPatternButton.setVisibility(visibility);
+
+        chooseWeekdayLinearLayout.setVisibility(inverseVisibility);
+        selectedRepeatPatternLinearLayout.setVisibility(visibility);
+        nextTimeRepeatLinearLayout.setVisibility(visibility);
+
+        stopRepeatReminderLinearLayout.setVisibility(visibility);
+        selectedStopRepeatReminderLinearLayout.setVisibility(visibility);
+    }
 }

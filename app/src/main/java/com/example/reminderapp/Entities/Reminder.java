@@ -4,10 +4,15 @@ import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
+import androidx.room.TypeConverters;
+
+import com.example.reminderapp.Converters.Converters;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 @Entity(tableName = "reminders")
@@ -31,8 +36,11 @@ public class Reminder implements Serializable {
     @ColumnInfo(name = "is_completed")
     private boolean isCompleted;
 
-    @ColumnInfo(name = "priority")
-    private int priority;
+//    @ColumnInfo(name = "priority")
+//    private int priority;
+
+    @ColumnInfo(name = "repeat_type") // "periodic" or "weekly"
+    private String repeatType;
 
     @ColumnInfo(name = "repeat_pattern")
     private String repeatPattern;
@@ -40,17 +48,24 @@ public class Reminder implements Serializable {
     @ColumnInfo(name = "repeat_value")
     private int repeatValue;
 
+//    @ColumnInfo(name = "repeat_days") // E.g.: "1,3,5" (Mon, Wed, Fri)
+//    private String repeatDays;
+
+    @TypeConverters(Converters.class)
+    @ColumnInfo(name = "repeat_days")
+    private List<Integer> repeatDays = new ArrayList<>();
+
     @ColumnInfo(name = "end_date")
     private long endDate;
 
     @ColumnInfo(name = "category_id")
     private int categoryId;
 
-    @ColumnInfo(name = "created_at")
-    private String createdAt;
-
-    @ColumnInfo(name = "updated_at")
-    private String updatedAt;
+//    @ColumnInfo(name = "created_at")
+//    private String createdAt;
+//
+//    @ColumnInfo(name = "updated_at")
+//    private String updatedAt;
 
     public int getId() {
         return id;
@@ -100,12 +115,20 @@ public class Reminder implements Serializable {
         isCompleted = completed;
     }
 
-    public int getPriority() {
-        return priority;
+//    public int getPriority() {
+//        return priority;
+//    }
+//
+//    public void setPriority(int priority) {
+//        this.priority = priority;
+//    }
+
+    public String getRepeatType() {
+        return repeatType;
     }
 
-    public void setPriority(int priority) {
-        this.priority = priority;
+    public void setRepeatType(String repeatType) {
+        this.repeatType = repeatType;
     }
 
     public String getRepeatPattern() {
@@ -124,6 +147,22 @@ public class Reminder implements Serializable {
         this.repeatValue = repeatValue;
     }
 
+//    public String getRepeatDays() {
+//        return repeatDays;
+//    }
+//
+//    public void setRepeatDays(String repeatDays) {
+//        this.repeatDays = repeatDays;
+//    }
+
+    public List<Integer> getRepeatDays() {
+        return repeatDays;
+    }
+
+    public void setRepeatDays(List<Integer> repeatDays) {
+        this.repeatDays = repeatDays;
+    }
+
     public long getEndDate() {
         return endDate;
     }
@@ -140,44 +179,41 @@ public class Reminder implements Serializable {
         this.categoryId = categoryId;
     }
 
-    public String getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public String getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(String updatedAt) {
-        this.updatedAt = updatedAt;
-    }
+//    public String getCreatedAt() {
+//        return createdAt;
+//    }
+//
+//    public void setCreatedAt(String createdAt) {
+//        this.createdAt = createdAt;
+//    }
+//
+//    public String getUpdatedAt() {
+//        return updatedAt;
+//    }
+//
+//    public void setUpdatedAt(String updatedAt) {
+//        this.updatedAt = updatedAt;
+//    }
 
     @NonNull
     @Override
     public String toString() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
-        String formattedTime = dateFormat.format(new Date(time));
-        String formattedDate = dateFormat.format(new Date(date));
+        String formattedTime = dateFormat.format(new Date(time + date));
         String formattedEndDate = dateFormat.format(new Date(endDate));
 
         return "Reminder{" +
                 "id=" + id +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
-                ", time=" + formattedTime +
-                ", date=" + formattedDate +
+                ", date,time=" + formattedTime +
                 ", isCompleted=" + isCompleted +
-                ", priority=" + priority +
+                ", repeatType='" + repeatType + '\'' +
                 ", repeatPattern='" + repeatPattern + '\'' +
-                ", repeatValue='" + repeatValue + '\'' +
+                ", repeatValue=" + repeatValue +
+                ", repeatDays='" + repeatDays + '\'' +
                 ", endDate=" + formattedEndDate +
                 ", categoryId=" + categoryId +
-                ", createdAt='" + createdAt + '\'' +
-                ", updatedAt='" + updatedAt + '\'' +
                 '}';
     }
 }

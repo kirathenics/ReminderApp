@@ -10,60 +10,6 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public class Utils {
-//    @SuppressLint("DefaultLocale")
-//    public static String calculateTimeDifference(long selectedTime, long selectedDate, Context context) {
-//        Date currentDate = new Date();
-//        long currentTimeMillis = currentDate.getTime();
-//
-//        long totalDifferenceInMillis = selectedDate + selectedTime - currentTimeMillis;
-//        if (totalDifferenceInMillis < 0) {
-//            return context.getString(R.string.selected_time_has_already_passed);
-//        }
-//
-//        long differenceInSeconds = (totalDifferenceInMillis / 1000) % 60;
-//        long differenceInMinutes = (totalDifferenceInMillis / (1000 * 60)) % 60;
-//        long totalDifferenceInHours = (totalDifferenceInMillis / (1000 * 60 * 60));
-//        long totalDifferenceInDays = totalDifferenceInMillis / (1000 * 60 * 60 * 24);
-//
-//        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-//        String formattedDate = dateFormat.format(new Date());
-//
-//        Date currentDateWithoutTime;
-//        try {
-//            currentDateWithoutTime = dateFormat.parse(formattedDate);
-//        } catch (ParseException e) {
-//            throw new RuntimeException(e);
-//        }
-//        assert currentDateWithoutTime != null;
-//        long dayDifference = (selectedDate - currentDateWithoutTime.getTime()) / (1000 * 60 * 60 * 24);
-//
-//        if (dayDifference == 0 && differenceInMinutes < 1) {
-//            return String.format("Today, in %d %s", differenceInSeconds, getPluralForm(differenceInSeconds, "second", "seconds"));
-//        }
-//
-//        if (dayDifference == 0 && totalDifferenceInHours < 1) {
-//            return String.format("Today, in %d %s", differenceInMinutes, getPluralForm(differenceInMinutes, "minute", "minutes"));
-//        }
-//
-//        if (dayDifference == 0) {
-//            return String.format("Today, in %d %s and %d %s",
-//                    totalDifferenceInHours, getPluralForm(totalDifferenceInHours, "hour", "hours"),
-//                    differenceInMinutes, getPluralForm(differenceInMinutes, "minute", "minutes"));
-//        }
-//
-//        if (dayDifference == 1) {
-//            return String.format("Tomorrow, in %d %s and %d %s",
-//                    totalDifferenceInHours, getPluralForm(totalDifferenceInHours, "hour", "hours"),
-//                    differenceInMinutes, getPluralForm(differenceInMinutes, "minute", "minutes"));
-//        }
-//
-//        return String.format("In %d %s", totalDifferenceInDays, getPluralForm(totalDifferenceInDays, "day", "days"));
-//    }
-//
-//    private static String getPluralForm(long count, String singular, String plural) {
-//        return count == 1 ? singular : plural;
-//    }
-
     @SuppressLint("DefaultLocale")
     public static String calculateTimeDifference(long selectedTime, long selectedDate, Context context) {
         long currentTimeMillis = System.currentTimeMillis();
@@ -77,10 +23,6 @@ public class Utils {
             return context.getString(R.string.selected_time_has_already_passed);
         }
 
-//        long differenceInSeconds = (totalDifferenceInMillis / 1000) % 60;
-//        long differenceInMinutes = (totalDifferenceInMillis / (1000 * 60)) % 60;
-//        long totalDifferenceInHours = (totalDifferenceInMillis / (1000 * 60 * 60));
-//        long totalDifferenceInDays = totalDifferenceInMillis / (1000 * 60 * 60 * 24);
         long differenceInSeconds = TimeUnit.MILLISECONDS.toSeconds(totalDifferenceInMillis) % 60;
         long differenceInMinutes = TimeUnit.MILLISECONDS.toMinutes(totalDifferenceInMillis) % 60;
         long totalDifferenceInHours = TimeUnit.MILLISECONDS.toHours(totalDifferenceInMillis);
@@ -146,26 +88,7 @@ public class Utils {
         return count == 1 ? singular : plural;
     }
 
-//    private static long getRepeatIntervalMillis(int repeatValue, String repeatPattern) {
-//        switch (repeatPattern) {
-//            case "minute":
-//                return repeatValue * 60 * 1000L;
-//            case "hour":
-//                return repeatValue * 60 * 60 * 1000L;
-//            case "day":
-//                return repeatValue * 24 * 60 * 60 * 1000L;
-//            case "week":
-//                return repeatValue * 7 * 24 * 60 * 60 * 1000L;
-//            case "month":
-//                return repeatValue * 30L * 24 * 60 * 60 * 1000L;
-//            case "year":
-//                return repeatValue * 365L * 24 * 60 * 60 * 1000L;
-//            default:
-//                throw new IllegalArgumentException("Invalid repeat pattern: " + repeatPattern);
-//        }
-//    }
-
-    private static long getRepeatIntervalMillis(int repeatValue, String repeatPattern) {
+    public static long getRepeatIntervalMillis(int repeatValue, String repeatPattern) {
         switch (repeatPattern) {
             case "minute":
                 return TimeUnit.MINUTES.toMillis(repeatValue);
