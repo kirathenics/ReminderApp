@@ -20,6 +20,8 @@ import java.util.Calendar;
 
 public class ChooseTimeDateDialogFragment extends DialogFragment {
 
+    public static final String TAG = "ChooseTimeDateDialogFragment";
+
     private static final String ARG_INITIAL_FRAGMENT = "initial_fragment";
     private static final String ARG_INITIAL_TIME = "initial_time";
     private static final String ARG_INITIAL_DATE = "initial_date";

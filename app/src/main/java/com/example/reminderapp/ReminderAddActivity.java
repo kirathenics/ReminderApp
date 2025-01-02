@@ -57,15 +57,31 @@ public class ReminderAddActivity extends AppCompatActivity {
     private long selectedTime = 0;
     private long selectedDate = 0;
 
-    LinearLayout repeatReminderLayout;
-    TextView infoTextView;
+    ImageButton addRepeatReminderButton;
+    ImageButton deleteRepeatReminderButton;
+
+    LinearLayout chooseWeekdayLinearLayout;
+
+    LinearLayout selectedRepeatLinearLayout;
+    TextView selectedRepeatTimeTextView;
+    ImageButton editRepeatReminderButton;
+
+    LinearLayout nextTimeRepeatLinearLayout;
+    TextView nextTimeRepeatInfoTextView;
+
+    LinearLayout stopRepeatReminderLinearLayout;
+    TextView infoStopRepeatTextView;
     ImageButton addStopRepeatButton;
     ImageButton deleteStopRepeatButton;
-    ImageButton editStopRepeatButton;
 
+    LinearLayout editStopRepeatReminderLinearLayout;
     private TextView stopRepeatTimeTextView;
     private TextView stopRepeatDateTextView;
     private TextView stopRepeatTimeDifferenceTextView;
+    ImageButton editStopRepeatButton;
+
+    private int selectedRepeatValue = 1;
+    private String selectedRepeatPattern = "day";
 
     private long selectedStopRepeatTime = 0;
     private long selectedStopRepeatDate = 0;
@@ -98,6 +114,7 @@ public class ReminderAddActivity extends AppCompatActivity {
         reminderTitleTextInputLayout = findViewById(R.id.reminder_title_text_layout);
         reminderDescriptionTextView = findViewById(R.id.reminder_description_text_view);
         reminderDescriptionTextInputLayout = findViewById(R.id.reminder_description_text_layout);
+        reminderDescriptionTextInputLayout.setVisibility(View.GONE);
         reminderDescriptionEditText = findViewById(R.id.reminder_description_edit_text);
         reminderDescriptionTextView.setOnClickListener(view -> toggleDescriptionVisibility());
 
@@ -128,14 +145,14 @@ public class ReminderAddActivity extends AppCompatActivity {
                         isReminderChanged = true;
                         changeCategory();
                     });
-            dialogFragment.show(getSupportFragmentManager(), CategoryEditDialogFragment.TAG);
+            dialogFragment.show(getSupportFragmentManager(), ChooseCategoryDialogFragment.TAG);
         });
 
         addAlarmButton = findViewById(R.id.add_alarm_button);
         addAlarmButton.setOnClickListener(v -> {
             ChooseTimeDateDialogFragment dialogFragment = ChooseTimeDateDialogFragment.newInstance();
             dialogFragment.setOnDateTimeSelectedListener(onDateTimeSelectedListener);
-            dialogFragment.show(getSupportFragmentManager(), CategoryEditDialogFragment.TAG);
+            dialogFragment.show(getSupportFragmentManager(), ChooseTimeDateDialogFragment.TAG);
         });
 
         removeDateTimeButton = findViewById(R.id.remove_date_time_button);
@@ -151,7 +168,7 @@ public class ReminderAddActivity extends AppCompatActivity {
         timeTextView.setOnClickListener(v -> {
             ChooseTimeDateDialogFragment dialogFragment = ChooseTimeDateDialogFragment.newInstance(true, selectedTime, selectedDate);
             dialogFragment.setOnDateTimeSelectedListener(onDateTimeSelectedListener);
-            dialogFragment.show(getSupportFragmentManager(), CategoryEditDialogFragment.TAG);
+            dialogFragment.show(getSupportFragmentManager(), ChooseTimeDateDialogFragment.TAG);
         });
 
         ImageButton removeTimeButton = findViewById(R.id.remove_time_button);
@@ -160,18 +177,60 @@ public class ReminderAddActivity extends AppCompatActivity {
         dateTextView.setOnClickListener(v -> {
             ChooseTimeDateDialogFragment dialogFragment = ChooseTimeDateDialogFragment.newInstance(false, selectedTime, selectedDate);
             dialogFragment.setOnDateTimeSelectedListener(onDateTimeSelectedListener);
-            dialogFragment.show(getSupportFragmentManager(), CategoryEditDialogFragment.TAG);
+            dialogFragment.show(getSupportFragmentManager(), ChooseTimeDateDialogFragment.TAG);
         });
 
         ImageButton changeDateButton = findViewById(R.id.change_date_button);
         changeDateButton.setOnClickListener(v -> {
             ChooseTimeDateDialogFragment dialogFragment = ChooseTimeDateDialogFragment.newInstance(false, selectedTime, selectedDate);
             dialogFragment.setOnDateTimeSelectedListener(onDateTimeSelectedListener);
-            dialogFragment.show(getSupportFragmentManager(), CategoryEditDialogFragment.TAG);
+            dialogFragment.show(getSupportFragmentManager(), ChooseTimeDateDialogFragment.TAG);
         });
 
-        repeatReminderLayout = findViewById(R.id.repeat_reminder_layout);
-        infoTextView = findViewById(R.id.info_stop_repeat_text_view);
+        chooseWeekdayLinearLayout = findViewById(R.id.choose_weekday_linear_layout);
+
+        selectedRepeatLinearLayout = findViewById(R.id.selected_repeat_linear_layout);
+        selectedRepeatLinearLayout.setVisibility(View.GONE);
+        selectedRepeatTimeTextView = findViewById(R.id.selected_repeat_time_text_view);
+        editRepeatReminderButton = findViewById(R.id.edit_repeat_reminder_button);
+
+        nextTimeRepeatLinearLayout = findViewById(R.id.next_time_repeat_linear_layout);
+        nextTimeRepeatLinearLayout.setVisibility(View.GONE);
+        nextTimeRepeatInfoTextView = findViewById(R.id.next_time_repeat_info_text_view);
+
+        addRepeatReminderButton = findViewById(R.id.add_repeat_reminder_button);
+        addRepeatReminderButton.setOnClickListener(v -> {
+            ChooseRepeatTimeDialogFragment dialogFragment = ChooseRepeatTimeDialogFragment.newInstance(selectedRepeatValue, selectedRepeatPattern);
+            dialogFragment.setOnRepeatTimeSelectedListener(onRepeatTimeSelectedListener);
+            dialogFragment.show(getSupportFragmentManager(), ChooseRepeatTimeDialogFragment.TAG);
+        });
+
+        deleteRepeatReminderButton = findViewById(R.id.delete_repeat_reminder_button);
+        deleteRepeatReminderButton.setVisibility(View.GONE);
+        deleteRepeatReminderButton.setOnClickListener(v -> {
+            addRepeatReminderButton.setVisibility(View.VISIBLE);
+            deleteRepeatReminderButton.setVisibility(View.GONE);
+
+            chooseWeekdayLinearLayout.setVisibility(View.VISIBLE);
+            selectedRepeatLinearLayout.setVisibility(View.GONE);
+            nextTimeRepeatLinearLayout.setVisibility(View.GONE);
+
+            stopRepeatReminderLinearLayout.setVisibility(View.GONE);
+            editStopRepeatReminderLinearLayout.setVisibility(View.GONE);
+        });
+
+        editRepeatReminderButton.setOnClickListener(v -> {
+            ChooseRepeatTimeDialogFragment dialogFragment = ChooseRepeatTimeDialogFragment.newInstance(selectedRepeatValue, selectedRepeatPattern);
+            dialogFragment.setOnRepeatTimeSelectedListener(onRepeatTimeSelectedListener);
+            dialogFragment.show(getSupportFragmentManager(), ChooseRepeatTimeDialogFragment.TAG);
+        });
+
+        stopRepeatReminderLinearLayout = findViewById(R.id.stop_repeat_reminder_linear_layout);
+        stopRepeatReminderLinearLayout.setVisibility(View.GONE);
+        infoStopRepeatTextView = findViewById(R.id.info_stop_repeat_text_view);
+
+        editStopRepeatReminderLinearLayout = findViewById(R.id.edit_stop_repeat_reminder_linear_layout);
+        editStopRepeatReminderLinearLayout.setVisibility(View.GONE);
         stopRepeatTimeTextView = findViewById(R.id.stop_repeat_time_text_view);
         stopRepeatDateTextView = findViewById(R.id.stop_repeat_date_text_view);
         stopRepeatTimeDifferenceTextView = findViewById(R.id.stop_repeat_time_difference_text_view);
@@ -180,15 +239,16 @@ public class ReminderAddActivity extends AppCompatActivity {
         addStopRepeatButton.setOnClickListener(v -> {
             ChooseTimeDateDialogFragment dialogFragment = ChooseTimeDateDialogFragment.newInstance(false, selectedStopRepeatTime, selectedStopRepeatDate);
             dialogFragment.setOnDateTimeSelectedListener(onStopRepeatDateTimeSelectedListener);
-            dialogFragment.show(getSupportFragmentManager(), CategoryEditDialogFragment.TAG);
+            dialogFragment.show(getSupportFragmentManager(), ChooseTimeDateDialogFragment.TAG);
         });
 
         deleteStopRepeatButton = findViewById(R.id.delete_stop_repeat_button);
+        deleteStopRepeatButton.setVisibility(View.GONE);
         deleteStopRepeatButton.setOnClickListener(v -> {
             addStopRepeatButton.setVisibility(View.VISIBLE);
-            infoTextView.setVisibility(View.VISIBLE);
+            infoStopRepeatTextView.setVisibility(View.VISIBLE);
             deleteStopRepeatButton.setVisibility(View.GONE);
-            repeatReminderLayout.setVisibility(View.GONE);
+            editStopRepeatReminderLinearLayout.setVisibility(View.GONE);
 
             selectedStopRepeatTime = 0;
             selectedStopRepeatDate = 0;
@@ -198,7 +258,7 @@ public class ReminderAddActivity extends AppCompatActivity {
         editStopRepeatButton.setOnClickListener(v -> {
             ChooseTimeDateDialogFragment dialogFragment = ChooseTimeDateDialogFragment.newInstance(false, selectedStopRepeatTime, selectedStopRepeatDate);
             dialogFragment.setOnDateTimeSelectedListener(onStopRepeatDateTimeSelectedListener);
-            dialogFragment.show(getSupportFragmentManager(), CategoryEditDialogFragment.TAG);
+            dialogFragment.show(getSupportFragmentManager(), ChooseTimeDateDialogFragment.TAG);
         });
 
         selectedCategory = (Category) getIntent().getSerializableExtra("selected_category");
@@ -265,6 +325,7 @@ public class ReminderAddActivity extends AppCompatActivity {
     }
 
     private void populateReminderData(Reminder reminder) {
+        // TODO: set other fields
         reminderTitleEditText.setText(reminder.getTitle());
 
         if (!reminder.getDescription().isEmpty()) {
@@ -376,6 +437,9 @@ public class ReminderAddActivity extends AppCompatActivity {
             newReminder.setCompleted(false);
 //            newReminder.setPriority();
 //        newReminder.setRepeat();
+            if (editStopRepeatReminderLinearLayout.getVisibility() == View.VISIBLE) {
+
+            }
             newReminder.setCategoryId(appDatabase.categoryDAO().findByName(chooseCategoryTextView.getText().toString()).getId());
 //        newReminder.setCreatedAt(new Date().toString());
 //        newReminder.setUpdatedAt(new Date().toString());
@@ -457,12 +521,32 @@ public class ReminderAddActivity extends AppCompatActivity {
                 stopRepeatTimeDifferenceTextView.setText(Utils.calculateTimeDifference(selectedStopRepeatTime, selectedStopRepeatDate, selectedTime + selectedDate, ReminderAddActivity.this));
 
                 addStopRepeatButton.setVisibility(View.GONE);
-                infoTextView.setVisibility(View.GONE);
+                infoStopRepeatTextView.setVisibility(View.GONE);
                 deleteStopRepeatButton.setVisibility(View.VISIBLE);
-                repeatReminderLayout.setVisibility(View.VISIBLE);
+                editStopRepeatReminderLinearLayout.setVisibility(View.VISIBLE);
             } catch (ParseException e) {
                 Log.e("ChooseTimeDateDialog", "Error parsing date or time", e);
             }
+        }
+    };
+
+    ChooseRepeatTimeDialogFragment.OnRepeatTimeSelectedListener onRepeatTimeSelectedListener = new ChooseRepeatTimeDialogFragment.OnRepeatTimeSelectedListener() {
+        @Override
+        public void onRepeatTimeSelected(int repeatValue, String repeatPattern) {
+            selectedRepeatValue = repeatValue;
+            selectedRepeatPattern = repeatPattern;
+
+            addRepeatReminderButton.setVisibility(View.GONE);
+            deleteRepeatReminderButton.setVisibility(View.VISIBLE);
+
+            chooseWeekdayLinearLayout.setVisibility(View.GONE);
+            selectedRepeatLinearLayout.setVisibility(View.VISIBLE);
+            nextTimeRepeatLinearLayout.setVisibility(View.VISIBLE);
+
+            stopRepeatReminderLinearLayout.setVisibility(View.VISIBLE);
+
+            selectedRepeatTimeTextView.setText(Utils.updateRepeatTime(repeatValue, repeatPattern));
+            nextTimeRepeatInfoTextView.setText(Utils.getNextTimeInfoText(selectedTime, selectedDate, repeatValue, repeatPattern, ReminderAddActivity.this));
         }
     };
 }

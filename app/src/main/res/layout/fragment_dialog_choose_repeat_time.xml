@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/choose_repeat_time_dialog_fragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/rounded_corner"
+    tools:context=".ChooseRepeatTimeDialogFragment">
+
+    <LinearLayout
+        android:id="@+id/info_repeat_time_linear_layout"
+        style="?android:attr/buttonBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8sp"
+            android:text="@string/every"
+            android:textColor="@color/lavender_dark"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/chosen_repeat_time_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8sp"
+            android:text="@string/sample_chosen_repeat_time"
+            android:textStyle="bold"
+            android:textColor="@color/lavender_dark"
+            android:textSize="20sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/choose_repeat_time_linear_layout"
+        style="?android:attr/buttonBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8sp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/info_repeat_time_linear_layout"
+        android:orientation="horizontal">
+
+        <NumberPicker
+            android:id="@+id/choose_repeat_value_number_picker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8sp"
+            android:theme="@style/NumberPickerTheme" />
+
+        <NumberPicker
+            android:id="@+id/choose_repeat_pattern_number_picker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8sp"
+            android:theme="@style/NumberPickerTheme" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        style="?android:attr/buttonBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8sp"
+        android:layout_marginBottom="8sp"
+        android:layout_marginStart="24sp"
+        android:layout_marginEnd="24sp"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/choose_repeat_time_linear_layout"
+        android:orientation="horizontal">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/cancel_date_time_button"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/lavender_dark"
+            android:layout_marginEnd="10sp"
+            android:text="@string/title_cancel" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/ok_date_time_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:backgroundTint="@color/lavender_dark"
+            android:text="@string/title_ok" />
+
+    </LinearLayout>
+
+</RelativeLayout>

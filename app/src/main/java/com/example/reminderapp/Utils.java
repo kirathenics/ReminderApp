@@ -7,6 +7,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class Utils {
 //    @SuppressLint("DefaultLocale")
@@ -76,10 +77,14 @@ public class Utils {
             return context.getString(R.string.selected_time_has_already_passed);
         }
 
-        long differenceInSeconds = (totalDifferenceInMillis / 1000) % 60;
-        long differenceInMinutes = (totalDifferenceInMillis / (1000 * 60)) % 60;
-        long totalDifferenceInHours = (totalDifferenceInMillis / (1000 * 60 * 60));
-        long totalDifferenceInDays = totalDifferenceInMillis / (1000 * 60 * 60 * 24);
+//        long differenceInSeconds = (totalDifferenceInMillis / 1000) % 60;
+//        long differenceInMinutes = (totalDifferenceInMillis / (1000 * 60)) % 60;
+//        long totalDifferenceInHours = (totalDifferenceInMillis / (1000 * 60 * 60));
+//        long totalDifferenceInDays = totalDifferenceInMillis / (1000 * 60 * 60 * 24);
+        long differenceInSeconds = TimeUnit.MILLISECONDS.toSeconds(totalDifferenceInMillis) % 60;
+        long differenceInMinutes = TimeUnit.MILLISECONDS.toMinutes(totalDifferenceInMillis) % 60;
+        long totalDifferenceInHours = TimeUnit.MILLISECONDS.toHours(totalDifferenceInMillis);
+        long totalDifferenceInDays = TimeUnit.MILLISECONDS.toDays(totalDifferenceInMillis);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         String formattedDate = dateFormat.format(new Date(currentTimeMillis));
@@ -116,7 +121,66 @@ public class Utils {
         return String.format("In %d %s", totalDifferenceInDays, getPluralForm(totalDifferenceInDays, "day", "days"));
     }
 
+    @SuppressLint("DefaultLocale")
+    public static String updateRepeatTime(int repeatValue, String repeatPattern) {
+        return String.format("%d %s", repeatValue, getPluralForm(1, repeatPattern, repeatPattern + "s"));
+    }
+
+    public static String getNextTimeInfoText(long selectedTime, long selectedDate, int repeatValue, String repeatPattern, Context context) {
+        long repeatIntervalMillis = getRepeatIntervalMillis(repeatValue, repeatPattern);
+        long nextTimeMillis = selectedDate + selectedTime + repeatIntervalMillis;
+
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, d MMM yyyy", Locale.getDefault());
+        String formattedTime = timeFormat.format(new Date(nextTimeMillis));
+        String formattedDate = dateFormat.format(new Date(nextTimeMillis));
+
+        long time = nextTimeMillis % (24 * 60 * 60 * 1000);
+        long date = nextTimeMillis - time;
+        String timeDifference = calculateTimeDifference(time, date, context);
+
+        return String.format("Next time: %s • %s • %s", formattedTime, formattedDate, timeDifference);
+    }
+
     private static String getPluralForm(long count, String singular, String plural) {
         return count == 1 ? singular : plural;
+    }
+
+//    private static long getRepeatIntervalMillis(int repeatValue, String repeatPattern) {
+//        switch (repeatPattern) {
+//            case "minute":
+//                return repeatValue * 60 * 1000L;
+//            case "hour":
+//                return repeatValue * 60 * 60 * 1000L;
+//            case "day":
+//                return repeatValue * 24 * 60 * 60 * 1000L;
+//            case "week":
+//                return repeatValue * 7 * 24 * 60 * 60 * 1000L;
+//            case "month":
+//                return repeatValue * 30L * 24 * 60 * 60 * 1000L;
+//            case "year":
+//                return repeatValue * 365L * 24 * 60 * 60 * 1000L;
+//            default:
+//                throw new IllegalArgumentException("Invalid repeat pattern: " + repeatPattern);
+//        }
+//    }
+
+    private static long getRepeatIntervalMillis(int repeatValue, String repeatPattern) {
+        switch (repeatPattern) {
+            case "minute":
+                return TimeUnit.MINUTES.toMillis(repeatValue);
+            case "hour":
+                return TimeUnit.HOURS.toMillis(repeatValue);
+            case "day":
+                return TimeUnit.DAYS.toMillis(repeatValue);
+            case "week":
+                return TimeUnit.DAYS.toMillis(repeatValue) * 7;
+            case "month":
+                return TimeUnit.DAYS.toMillis(repeatValue) * 30;
+            case "year":
+                return TimeUnit.DAYS.toMillis(repeatValue) * 365;
+            default:
+                throw new IllegalArgumentException("Invalid repeat pattern: " + repeatPattern);
+        }
     }
 }

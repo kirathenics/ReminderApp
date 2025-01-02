@@ -25,6 +25,8 @@ import java.util.List;
 
 public class ChooseCategoryDialogFragment extends DialogFragment {
 
+    public static final String TAG = "ChooseCategoryDialogFragment";
+
     private AppDatabase appDatabase;
     private List<Category> categoryList = new ArrayList<>();
     private RecyclerView categoryRecyclerView;

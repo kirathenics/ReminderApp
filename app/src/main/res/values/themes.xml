@@ -82,4 +82,9 @@
         <item name="background">@drawable/rounded_corner</item>
     </style>
 
+    <style name="NumberPickerTheme" parent="Base.Theme.ReminderApp">
+        <item name="colorControlNormal">@color/lavender_dark</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    
 </resources>
