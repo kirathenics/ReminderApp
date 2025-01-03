@@ -36,9 +36,6 @@ public class Reminder implements Serializable {
     @ColumnInfo(name = "is_completed")
     private boolean isCompleted;
 
-//    @ColumnInfo(name = "priority")
-//    private int priority;
-
     @ColumnInfo(name = "repeat_type") // "periodic" or "weekly"
     private String repeatType;
 
@@ -47,9 +44,6 @@ public class Reminder implements Serializable {
 
     @ColumnInfo(name = "repeat_value")
     private int repeatValue;
-
-//    @ColumnInfo(name = "repeat_days") // E.g.: "1,3,5" (Mon, Wed, Fri)
-//    private String repeatDays;
 
     @TypeConverters(Converters.class)
     @ColumnInfo(name = "repeat_days")
@@ -61,11 +55,11 @@ public class Reminder implements Serializable {
     @ColumnInfo(name = "category_id")
     private int categoryId;
 
-//    @ColumnInfo(name = "created_at")
-//    private String createdAt;
-//
-//    @ColumnInfo(name = "updated_at")
-//    private String updatedAt;
+    @ColumnInfo(name = "created_at")
+    private long createdAt;
+
+    @ColumnInfo(name = "updated_at")
+    private long updatedAt;
 
     public int getId() {
         return id;
@@ -115,14 +109,6 @@ public class Reminder implements Serializable {
         isCompleted = completed;
     }
 
-//    public int getPriority() {
-//        return priority;
-//    }
-//
-//    public void setPriority(int priority) {
-//        this.priority = priority;
-//    }
-
     public String getRepeatType() {
         return repeatType;
     }
@@ -146,14 +132,6 @@ public class Reminder implements Serializable {
     public void setRepeatValue(int repeatValue) {
         this.repeatValue = repeatValue;
     }
-
-//    public String getRepeatDays() {
-//        return repeatDays;
-//    }
-//
-//    public void setRepeatDays(String repeatDays) {
-//        this.repeatDays = repeatDays;
-//    }
 
     public List<Integer> getRepeatDays() {
         return repeatDays;
@@ -179,21 +157,21 @@ public class Reminder implements Serializable {
         this.categoryId = categoryId;
     }
 
-//    public String getCreatedAt() {
-//        return createdAt;
-//    }
-//
-//    public void setCreatedAt(String createdAt) {
-//        this.createdAt = createdAt;
-//    }
-//
-//    public String getUpdatedAt() {
-//        return updatedAt;
-//    }
-//
-//    public void setUpdatedAt(String updatedAt) {
-//        this.updatedAt = updatedAt;
-//    }
+    public long getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(long createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public long getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(long updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 
     @NonNull
     @Override
@@ -201,6 +179,8 @@ public class Reminder implements Serializable {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
         String formattedTime = dateFormat.format(new Date(time + date));
         String formattedEndDate = dateFormat.format(new Date(endDate));
+        String formattedCreatedAt = dateFormat.format(new Date(createdAt));
+        String formattedUpdatedAt = dateFormat.format(new Date(updatedAt));
 
         return "Reminder{" +
                 "id=" + id +
@@ -214,6 +194,8 @@ public class Reminder implements Serializable {
                 ", repeatDays='" + repeatDays + '\'' +
                 ", endDate=" + formattedEndDate +
                 ", categoryId=" + categoryId +
+                ", createdAt=" + formattedCreatedAt +
+                ", updatedAt=" + formattedUpdatedAt +
                 '}';
     }
 }

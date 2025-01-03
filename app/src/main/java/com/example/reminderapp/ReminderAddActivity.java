@@ -131,6 +131,7 @@ public class ReminderAddActivity extends AppCompatActivity {
             populateReminderData(newReminder);
         } else {
             newReminder = new Reminder();
+            newReminder.setCreatedAt(System.currentTimeMillis());
             toggleTimeDateVisibility(false);
         }
 
@@ -229,6 +230,8 @@ public class ReminderAddActivity extends AppCompatActivity {
             newReminder.setEndDate(selectedStopRepeatTime + selectedStopRepeatDate);
 
             newReminder.setCategoryId(appDatabase.categoryDAO().findByName(chooseCategoryTextView.getText().toString()).getId());
+
+            newReminder.setUpdatedAt(System.currentTimeMillis());
 
             Log.i("save reminder info", newReminder.toString());
 
@@ -525,7 +528,6 @@ public class ReminderAddActivity extends AppCompatActivity {
 
             setTextStopRepeatTimeDifference();
             setTextNextTimeRepeatInfo();
-//            checkIfWillRepeatValue();
             toggleStopRepeatTimeVisibility(true);
         }
 
@@ -653,7 +655,6 @@ public class ReminderAddActivity extends AppCompatActivity {
 
                 setTextStopRepeatTimeDifference();
                 setTextNextTimeRepeatInfo();
-//                checkIfWillRepeatValue();
 
                 toggleStopRepeatTimeVisibility(true);
             } catch (ParseException e) {
@@ -777,7 +778,6 @@ public class ReminderAddActivity extends AppCompatActivity {
             nextTimeRepeatInfoTextView.setText(nextTimeInfo);
             checkIfWillRepeatDays(nextTime, nextDate);
             toggleRepeatWeekVisibility(true);
-//            nextTimeRepeatLinearLayout.setVisibility(View.VISIBLE);
         }
     }
 
