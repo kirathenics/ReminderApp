@@ -64,6 +64,8 @@ public class ReminderListAdapter extends RecyclerView.Adapter<ReminderListAdapte
         Reminder reminder = reminderList.get(position);
 
         holder.titleTextView.setText(reminder.getTitle());
+        holder.titleTextView.setSelected(true);
+
         long time = reminder.getTime();
         long date = reminder.getDate();
         if (date > 0) {

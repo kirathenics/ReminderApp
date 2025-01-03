@@ -41,7 +41,7 @@ public interface CategoryDAO {
             "CASE WHEN NOT :isAsc THEN c.name END DESC ")
     List<CategoryWithReminderCount> getAllSortedByNameWithReminderCount(boolean isAsc);
 
-    @Query("SELECT * FROM categories ORDER BY id DESC LIMIT 1")
+    @Query("SELECT * FROM categories ORDER BY id DESC LIMIT 1 ")
     Category getLastInsertedCategory();
 
     @Query("SELECT * FROM categories WHERE id = :id ")

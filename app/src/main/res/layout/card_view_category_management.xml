@@ -22,21 +22,7 @@
             android:layout_marginTop="13dp"
             android:background="@drawable/circle_background" />
 
-        <TextView
-            android:id="@+id/category_card_view_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_toEndOf="@id/category_card_view_color_circle"
-            android:singleLine="true"
-            android:ellipsize="marquee"
-            android:marqueeRepeatLimit="marquee_forever"
-            android:scrollHorizontally="true"
-            android:padding="8dp"
-            android:text="@string/title_category_name"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
-<!--        <ImageButton-->
+        <!--        <ImageButton-->
 <!--            android:id="@+id/category_card_view_drag_handler"-->
 <!--            android:layout_width="30dp"-->
 <!--            android:layout_height="30dp"-->
@@ -46,6 +32,21 @@
 <!--            android:background="@drawable/ic_drag_handle"-->
 <!--            android:backgroundTint="@color/gray"-->
 <!--            android:contentDescription="@string/category_drag_handler" />-->
+
+        <TextView
+            android:id="@+id/category_card_view_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="0dp"
+            android:layout_toEndOf="@id/category_card_view_color_circle"
+            android:ellipsize="marquee"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:padding="8dp"
+            android:scrollHorizontally="true"
+            android:singleLine="true"
+            android:text="@string/title_category_name"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/category_card_view_reminder_number"

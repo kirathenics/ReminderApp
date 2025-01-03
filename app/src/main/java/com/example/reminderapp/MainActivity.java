@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         lastCategory = null;
         addDefaultCategories();
-        updateCategoriesMenu();
+//        updateCategoriesMenu();
 
         reminderRecyclerView = findViewById(R.id.reminder_recycler_view);
 
@@ -121,9 +121,69 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
         );
 
+//        new Thread(() -> {
+//            reminderList = appDatabase.reminderDAO().getAll();
+//            runOnUiThread(() -> {
+//                reminderListAdapter = new ReminderListAdapter(MainActivity.this, reminderList,
+//                        new OnItemClickListener<>() {
+//                            @Override
+//                            public void onItemClick(Reminder item) {
+//                            }
+//
+//                            @Override
+//                            public void onItemLongClick(Reminder item, CardView cardView) {
+//                            }
+//                        },
+//                        changeReminderActivityLauncher,
+//                        (position, updatedItem) -> {
+//                            appDatabase.reminderDAO().update(updatedItem);
+//                            reminderList.set(position, updatedItem);
+//                            reminderListAdapter.notifyItemChanged(position);
+//                            if (lastCategory != null) {
+//                                filterRemindersByCategory(lastCategory);
+//                            }
+//                        },
+//                        (position, deletedItem) -> {
+//
+//                            appDatabase.reminderDAO().delete(deletedItem);
+//                            reminderList.remove(position);
+//                            reminderListAdapter.notifyItemRemoved(position);
+//                            if (lastCategory != null) {
+//                                filterRemindersByCategory(lastCategory);
+//                            }
+//                        });
+//                updateReminderRecyclerView(GRID_SPAN_COUNT);
+//            });
+//        }).start();
+
+//        @SuppressLint("NotifyDataSetChanged") ActivityResultLauncher<Intent> createReminderActivityLauncher = registerForActivityResult(
+//                new ActivityResultContracts.StartActivityForResult(),
+//                result -> {
+//                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+//                        Reminder newReminder = (Reminder) result.getData().getSerializableExtra("new_reminder");
+//
+//                        new Thread(() -> {
+//                            runOnUiThread(() -> {
+//                                categoryList.add(newCategoryWithReminderCount);
+//                                categoryListAdapter.notifyDataSetChanged();
+//                            });
+//                        }).start());
+//                        appDatabase.reminderDAO().insert(newReminder);
+//
+//                        Reminder reminder = appDatabase.reminderDAO().findByTitle(Objects.requireNonNull(newReminder).getTitle());
+////                        Reminder reminder = appDatabase.reminderDAO().findByTitle(newReminder.getTitle());
+//                        reminderList.add(reminder);
+//                        reminderListAdapter.notifyDataSetChanged();
+//
+//                        if (lastCategory != null) {
+//                            filterRemindersByCategory(lastCategory);
+//                        }
+//                    }
+//                }
+//        );
+
         new Thread(() -> {
             reminderList = appDatabase.reminderDAO().getAll();
-            Log.i("reminders main", reminderList.toString());
             runOnUiThread(() -> {
                 reminderListAdapter = new ReminderListAdapter(MainActivity.this, reminderList,
                         new OnItemClickListener<>() {
@@ -148,6 +208,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             appDatabase.reminderDAO().delete(deletedItem);
                             reminderList.remove(position);
                             reminderListAdapter.notifyItemRemoved(position);
+                            reminderListAdapter.notifyItemRangeChanged(position, reminderList.size());
                             if (lastCategory != null) {
                                 filterRemindersByCategory(lastCategory);
                             }
@@ -160,17 +221,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
-                        Reminder newReminder = (Reminder) result.getData().getSerializableExtra("new_reminder");
+                        new Thread(() -> {
+                            Reminder newReminder = (Reminder) result.getData().getSerializableExtra("new_reminder");
+                            appDatabase.reminderDAO().insert(newReminder);
 
-                        appDatabase.reminderDAO().insert(newReminder);
-                        Reminder reminder = appDatabase.reminderDAO().findByTitle(Objects.requireNonNull(newReminder).getTitle());
-//                        Reminder reminder = appDatabase.reminderDAO().findByTitle(newReminder.getTitle());
-                        reminderList.add(reminder);
-                        reminderListAdapter.notifyDataSetChanged();
+                            Reminder addedReminder = appDatabase.reminderDAO().getLastInsertedReminder();
 
-                        if (lastCategory != null) {
-                            filterRemindersByCategory(lastCategory);
-                        }
+                            runOnUiThread(() -> {
+                                reminderList.add(addedReminder);
+                                reminderListAdapter.notifyDataSetChanged();
+
+                                if (lastCategory != null) {
+                                    filterRemindersByCategory(lastCategory);
+                                }
+                            });
+                        }).start();
                     }
                 }
         );
@@ -206,6 +271,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onResume() {
         super.onResume();
         updateCategoriesMenu();
+
+        runOnUiThread(() -> {
+            if (lastCategory != null) {
+                filterRemindersByCategory(lastCategory);
+            } else {
+                Log.e("onResume", "lastCategory is null");
+            }
+        });
     }
 
     @Override
@@ -306,10 +379,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     sortedList = appDatabase.reminderDAO().getAll();
                     break;
                 case "name_asc":
-                    sortedList = appDatabase.reminderDAO().getAllSortedByTitleAsc();
+                    sortedList = appDatabase.reminderDAO().getAllSortedByTitle(true);
                     break;
                 case "name_desc":
-                    sortedList = appDatabase.reminderDAO().getAllSortedByTitleDesc();
+                    sortedList = appDatabase.reminderDAO().getAllSortedByTitle(false);
                     break;
             }
             List<Reminder> finalSortedList = sortedList;
@@ -404,7 +477,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int itemId = item.getItemId();
         if (itemId == R.id.CategoriesManagement) {
             startActivity(new Intent(MainActivity.this, CategoryManagementActivity.class));
-            filterRemindersByCategory(lastCategory);
         }
         else if (itemId == R.id.Settings) {
             // TODO: implement Settings menu

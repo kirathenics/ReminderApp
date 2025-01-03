@@ -1,8 +1,12 @@
 package com.example.reminderapp.Entities;
 
+import static androidx.room.ForeignKey.CASCADE;
+
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.ForeignKey;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 
@@ -15,9 +19,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-@Entity(tableName = "reminders")
-//(foreignKeys = @ForeignKey(entity = Category.class, parentColumns = "id", childColumns = "category_id", onDelete = CASCADE))
-//indices
+@Entity(tableName = "reminders",
+        foreignKeys = @ForeignKey(entity = Category.class, parentColumns = "id", childColumns = "category_id", onDelete = CASCADE),
+        indices = {@Index(value = {"title"}, unique = true), @Index(value = {"category_id"})})
 public class Reminder implements Serializable {
 
     @PrimaryKey(autoGenerate = true)

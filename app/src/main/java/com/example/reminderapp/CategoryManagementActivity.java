@@ -78,9 +78,6 @@ public class CategoryManagementActivity extends AppCompatActivity {
                             categoryListAdapter.notifyItemChanged(position);
                         },
                         (position, deletedItem) -> {
-//                            appDatabase.reminderDAO().deleteByCategoryId(deletedItem.getCategory().getId());
-                            // TODO: make reminders cascade
-
                             appDatabase.categoryDAO().delete(deletedItem.getCategory());
                             categoryList.remove(position);
                             categoryListAdapter.notifyItemRemoved(position);

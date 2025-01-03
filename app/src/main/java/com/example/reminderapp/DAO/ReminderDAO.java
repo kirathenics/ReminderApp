@@ -1,10 +1,9 @@
 package com.example.reminderapp.DAO;
 
-import static androidx.room.OnConflictStrategy.REPLACE;
-
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
@@ -12,30 +11,31 @@ import com.example.reminderapp.Entities.Reminder;
 
 import java.util.List;
 
+
 @Dao
 public interface ReminderDAO {
-    @Query("SELECT * FROM reminders ORDER BY id ASC")
+    @Query("SELECT * FROM reminders ORDER BY id ASC ")
     List<Reminder> getAll();
 
-    @Query("SELECT * FROM reminders ORDER BY title ASC")
-    List<Reminder> getAllSortedByTitleAsc();
+    @Query("SELECT * FROM reminders " +
+            "ORDER BY " +
+            "CASE WHEN :isAsc THEN title END ASC, " +
+            "CASE WHEN NOT :isAsc THEN title END DESC ")
+    List<Reminder> getAllSortedByTitle(boolean isAsc);
 
-    @Query("SELECT * FROM reminders ORDER BY title DESC")
-    List<Reminder> getAllSortedByTitleDesc();
+    @Query("SELECT * FROM reminders ORDER BY id DESC LIMIT 1 ")
+    Reminder getLastInsertedReminder();
 
-    @Query("SELECT * FROM reminders WHERE id = :id")
-    Reminder findById(int id);
-
-    @Query("SELECT * FROM reminders WHERE title = :title")
+    @Query("SELECT * FROM reminders WHERE title = :title ")
     Reminder findByTitle(String title);
 
-    @Query("SELECT * FROM reminders WHERE category_id = :categoryId ORDER BY id ASC")
+    @Query("SELECT * FROM reminders WHERE category_id = :categoryId ORDER BY id ASC ")
     List<Reminder> findByCategoryId(int categoryId);
 
-    @Query("SELECT * FROM reminders WHERE is_completed = :isCompleted ORDER BY id ASC")
+    @Query("SELECT * FROM reminders WHERE is_completed = :isCompleted ORDER BY id ASC ")
     List<Reminder> findByCompletionStatus(boolean isCompleted);
 
-    @Insert(onConflict = REPLACE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(Reminder reminder);
 
     @Update
@@ -43,10 +43,4 @@ public interface ReminderDAO {
 
     @Delete
     void delete(Reminder reminder);
-
-    @Query("DELETE FROM reminders WHERE id = :id")
-    void deleteById(int id);
-
-    @Query("DELETE FROM reminders WHERE category_id = :categoryId")
-    void deleteByCategoryId(int categoryId);
 }

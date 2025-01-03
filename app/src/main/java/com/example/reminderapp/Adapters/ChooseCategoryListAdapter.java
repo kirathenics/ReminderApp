@@ -43,6 +43,7 @@ public class ChooseCategoryListAdapter extends RecyclerView.Adapter<ChooseCatego
         Category category = categoryList.get(position);
 
         holder.nameTextView.setText(category.getName());
+        holder.nameTextView.setSelected(true);
 
         String hexColor = category.getColor();
         try {
