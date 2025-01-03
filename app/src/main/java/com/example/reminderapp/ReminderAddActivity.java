@@ -233,8 +233,6 @@ public class ReminderAddActivity extends AppCompatActivity {
 
             newReminder.setUpdatedAt(System.currentTimeMillis());
 
-            Log.i("save reminder info", newReminder.toString());
-
             Intent resultIntent = new Intent();
             resultIntent.putExtra("new_reminder", newReminder);
             resultIntent.putExtra("position", reminderPosition);
@@ -303,10 +301,11 @@ public class ReminderAddActivity extends AppCompatActivity {
         ImageButton addCategoryImageButton = findViewById(R.id.reminder_add_category_image_button);
         addCategoryImageButton.setOnClickListener(v -> {
             CategoryEditDialogFragment dialogFragment = CategoryEditDialogFragment.newInstance();
-            dialogFragment.setOnCategoryUpdatedListener(newCategory -> {
-                new Thread(() -> appDatabase.categoryDAO().insert(newCategory)).start();
-                runOnUiThread(() -> chooseCategoryTextView.setText(newCategory.getName()));
-            });
+            dialogFragment.setOnCategoryUpdatedListener(newCategory -> new Thread(() -> {
+                appDatabase.categoryDAO().insert(newCategory);
+                selectedCategory = newCategory;
+                runOnUiThread(this::changeCategory);
+            }).start());
             dialogFragment.show(getSupportFragmentManager(), CategoryEditDialogFragment.TAG);
         });
 
@@ -530,8 +529,6 @@ public class ReminderAddActivity extends AppCompatActivity {
             setTextNextTimeRepeatInfo();
             toggleStopRepeatTimeVisibility(true);
         }
-
-        Log.i("load reminder info", newReminder.toString());
     }
 
     private void toggleDescriptionVisibility() {

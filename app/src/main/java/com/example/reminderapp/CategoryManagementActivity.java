@@ -20,18 +20,20 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import com.example.reminderapp.Adapters.CategoryListAdapter;
 import com.example.reminderapp.Databases.AppDatabase;
 import com.example.reminderapp.Entities.Category;
+import com.example.reminderapp.Entities.CategoryWithReminderCount;
 import com.example.reminderapp.Listeners.OnItemClickListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class CategoryManagementActivity extends AppCompatActivity {
 
     private RecyclerView categoryRecyclerView;
 
     private AppDatabase appDatabase;
-    private List<Category> categoryList = new ArrayList<>();
+    private List<CategoryWithReminderCount> categoryList = new ArrayList<>();
 
     private CategoryListAdapter categoryListAdapter;
 
@@ -59,27 +61,30 @@ public class CategoryManagementActivity extends AppCompatActivity {
 
         appDatabase = AppDatabase.getInstance(this);
         new Thread(() -> {
-//            categoryList = appDatabase.categoryDAO().getAll();
             categoryList = appDatabase.categoryDAO().getAllWithReminderCount();
             Log.i("categories", categoryList.toString());
             runOnUiThread(() -> {
                 categoryListAdapter = new CategoryListAdapter(CategoryManagementActivity.this, categoryList,
                         new OnItemClickListener<>() {
                             @Override
-                            public void onItemClick(Category item) {}
+                            public void onItemClick(CategoryWithReminderCount item) {}
 
                             @Override
-                            public void onItemLongClick(Category item, CardView cardView) {}
+                            public void onItemLongClick(CategoryWithReminderCount item, CardView cardView) {}
                         },
                         (position, updatedItem) -> {
-                            appDatabase.categoryDAO().update(updatedItem);
+                            appDatabase.categoryDAO().update(updatedItem.getCategory());
                             categoryList.set(position, updatedItem);
                             categoryListAdapter.notifyItemChanged(position);
                         },
                         (position, deletedItem) -> {
-                            appDatabase.categoryDAO().delete(deletedItem);
+//                            appDatabase.reminderDAO().deleteByCategoryId(deletedItem.getCategory().getId());
+                            // TODO: make reminders cascade
+
+                            appDatabase.categoryDAO().delete(deletedItem.getCategory());
                             categoryList.remove(position);
                             categoryListAdapter.notifyItemRemoved(position);
+                            categoryListAdapter.notifyItemRangeChanged(position, categoryList.size());
                         });
                 updateCategoryRecyclerView(GRID_SPAN_COUNT);
             });
@@ -91,21 +96,30 @@ public class CategoryManagementActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 CategoryEditDialogFragment dialogFragment = CategoryEditDialogFragment.newInstance();
-                dialogFragment.setOnCategoryUpdatedListener(newCategory -> {
+                dialogFragment.setOnCategoryUpdatedListener(newCategory -> new Thread(() -> {
                     appDatabase.categoryDAO().insert(newCategory);
-                    Category category = appDatabase.categoryDAO().findByName(newCategory.getName());
-                    categoryList.add(category);
-                    categoryListAdapter.notifyDataSetChanged();
-                });
+
+                    Category addedCategory = appDatabase.categoryDAO().getLastInsertedCategory();
+
+                    CategoryWithReminderCount newCategoryWithReminderCount = new CategoryWithReminderCount();
+                    newCategoryWithReminderCount.setCategory(addedCategory);
+
+                    runOnUiThread(() -> {
+                        categoryList.add(newCategoryWithReminderCount);
+                        categoryListAdapter.notifyDataSetChanged();
+                    });
+                }).start());
                 dialogFragment.show(getSupportFragmentManager(), CategoryEditDialogFragment.TAG);
             }
         });
     }
 
     private void filterCategories(String query) {
-        List<Category> filteredList = new ArrayList<>();
-        for (Category category : categoryList) {
-            if (category.getName().toLowerCase().contains(query.toLowerCase())) {
+        List<CategoryWithReminderCount> filteredList = new ArrayList<>();
+        for (CategoryWithReminderCount category : categoryList) {
+            if (category.getCategory().getName().toLowerCase().contains(query.toLowerCase())
+                    || (Integer.toString(category.getNotCompletedReminders()).contains(query) && category.getNotCompletedReminders() != 0)
+                    || Integer.toString(category.getCompletedReminders()).contains(query) && category.getCompletedReminders() != 0) {
                 filteredList.add(category);
             }
         }
@@ -114,7 +128,7 @@ public class CategoryManagementActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.category_toolbar_menu, menu);
+        getMenuInflater().inflate(R.menu.category_management_toolbar_menu, menu);
 
         toolbarMenu = menu;
 
@@ -201,22 +215,19 @@ public class CategoryManagementActivity extends AppCompatActivity {
     @SuppressLint("NotifyDataSetChanged")
     private void sortCategories(String sortType) {
         new Thread(() -> {
-            List<Category> sortedList = new ArrayList<>();
+            List<CategoryWithReminderCount> sortedList = new ArrayList<>();
             switch (sortType) {
                 case "default":
-//                    sortedList = appDatabase.categoryDAO().getAll();
                     sortedList = appDatabase.categoryDAO().getAllWithReminderCount();
                     break;
                 case "name_asc":
-//                    sortedList = appDatabase.categoryDAO().getAllSortedByNameAsc();
-                    sortedList = appDatabase.categoryDAO().getAllSortedByNameAscWithReminderCount();
+                    sortedList = appDatabase.categoryDAO().getAllSortedByNameWithReminderCount(true);
                     break;
                 case "name_desc":
-//                    sortedList = appDatabase.categoryDAO().getAllSortedByNameDesc();
-                    sortedList = appDatabase.categoryDAO().getAllSortedByNameDescWithReminderCount();
+                    sortedList = appDatabase.categoryDAO().getAllSortedByNameWithReminderCount(false);
                     break;
             }
-            List<Category> finalSortedList = sortedList;
+            List<CategoryWithReminderCount> finalSortedList = sortedList;
             runOnUiThread(() -> {
                 categoryList.clear();
                 categoryList.addAll(finalSortedList);

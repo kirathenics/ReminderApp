@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Locale;
 
 @Entity(tableName = "reminders")
+//(foreignKeys = @ForeignKey(entity = Category.class, parentColumns = "id", childColumns = "category_id", onDelete = CASCADE))
+//indices
 public class Reminder implements Serializable {
 
     @PrimaryKey(autoGenerate = true)

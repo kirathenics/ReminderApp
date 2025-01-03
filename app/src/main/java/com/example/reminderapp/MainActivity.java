@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
@@ -122,6 +123,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         new Thread(() -> {
             reminderList = appDatabase.reminderDAO().getAll();
+            Log.i("reminders main", reminderList.toString());
             runOnUiThread(() -> {
                 reminderListAdapter = new ReminderListAdapter(MainActivity.this, reminderList,
                         new OnItemClickListener<>() {
@@ -395,8 +397,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             item.setChecked(true);
             lastCategory = item;
 
-//            Toast.makeText(this, lastCategory.getTitle(), Toast.LENGTH_SHORT).show();
-
             drawerLayout.closeDrawer(GravityCompat.START);
             return true;
         }
@@ -404,6 +404,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int itemId = item.getItemId();
         if (itemId == R.id.CategoriesManagement) {
             startActivity(new Intent(MainActivity.this, CategoryManagementActivity.class));
+            filterRemindersByCategory(lastCategory);
         }
         else if (itemId == R.id.Settings) {
             // TODO: implement Settings menu
