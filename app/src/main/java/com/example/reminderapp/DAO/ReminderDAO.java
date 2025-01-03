@@ -29,20 +29,14 @@ public interface ReminderDAO {
     @Query("SELECT * FROM reminders WHERE title = :title")
     Reminder findByTitle(String title);
 
-    @Query("SELECT * FROM reminders WHERE category_id = :categoryId ORDER BY date, time ASC")
+    @Query("SELECT * FROM reminders WHERE category_id = :categoryId ORDER BY id ASC")
     List<Reminder> findByCategoryId(int categoryId);
 
-    @Query("SELECT * FROM reminders WHERE is_completed = :isCompleted ORDER BY date, time ASC")
+    @Query("SELECT * FROM reminders WHERE is_completed = :isCompleted ORDER BY id ASC")
     List<Reminder> findByCompletionStatus(boolean isCompleted);
 
     @Insert(onConflict = REPLACE)
     void insert(Reminder reminder);
-
-//    @Query("UPDATE reminders SET title = :title, description = :description, date = :date, time = :time, " +
-//            "is_completed = :isCompleted, priority = :priority, repeat = :repeat, category_id = :categoryId, " +
-//            "updated_at = :updatedAt WHERE id = :id")
-//    void update(int id, String title, String description, long date, long time, boolean isCompleted,
-//                int priority, String repeat, int categoryId, String updatedAt);
 
     @Update
     void update(Reminder reminder);

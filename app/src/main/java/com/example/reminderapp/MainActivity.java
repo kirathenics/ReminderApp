@@ -12,7 +12,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.Manifest;
-import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
@@ -127,12 +126,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 reminderListAdapter = new ReminderListAdapter(MainActivity.this, reminderList,
                         new OnItemClickListener<>() {
                             @Override
-                            public void onItemClick(Reminder item) {}
+                            public void onItemClick(Reminder item) {
+                            }
 
                             @Override
-                            public void onItemLongClick(Reminder item, CardView cardView) {}
+                            public void onItemLongClick(Reminder item, CardView cardView) {
+                            }
                         },
                         changeReminderActivityLauncher,
+                        (position, updatedItem) -> {
+                            appDatabase.reminderDAO().update(updatedItem);
+                            reminderList.set(position, updatedItem);
+                            reminderListAdapter.notifyItemChanged(position);
+                            if (lastCategory != null) {
+                                filterRemindersByCategory(lastCategory);
+                            }
+                        },
                         (position, deletedItem) -> {
                             appDatabase.reminderDAO().delete(deletedItem);
                             reminderList.remove(position);
@@ -151,12 +160,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
                         Reminder newReminder = (Reminder) result.getData().getSerializableExtra("new_reminder");
 
-//                        if (newReminder != null) {
-//
-//                        }
                         appDatabase.reminderDAO().insert(newReminder);
-//                        Reminder reminder = appDatabase.reminderDAO().findByTitle(Objects.requireNonNull(newReminder).getTitle());
-                        Reminder reminder = appDatabase.reminderDAO().findByTitle(newReminder.getTitle());
+                        Reminder reminder = appDatabase.reminderDAO().findByTitle(Objects.requireNonNull(newReminder).getTitle());
+//                        Reminder reminder = appDatabase.reminderDAO().findByTitle(newReminder.getTitle());
                         reminderList.add(reminder);
                         reminderListAdapter.notifyDataSetChanged();
 
@@ -424,6 +430,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return false;
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private void filterRemindersByCategory(@NonNull MenuItem item) {
         new Thread(() -> {
             String categoryName = Objects.requireNonNull(item.getTitle()).toString();

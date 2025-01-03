@@ -2,6 +2,7 @@ package com.example.reminderapp.Entities;
 
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
+import androidx.room.Embedded;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
@@ -21,6 +22,18 @@ public class Category implements Serializable {
 
     @ColumnInfo(name = "is_active")
     private boolean isActive;
+
+//    @Embedded
+//    private int totalReminders;
+//
+//    @Embedded
+//    private int completedReminders;
+//
+//    @Embedded
+//    private int notCompletedReminders;
+
+    @Embedded
+    private ReminderCount reminderCount;
 
     public int getId() {
         return id;
@@ -54,6 +67,49 @@ public class Category implements Serializable {
         isActive = active;
     }
 
+//    public int getTotalReminders() {
+//        return totalReminders;
+//    }
+//
+//    public void setTotalReminders(int totalReminders) {
+//        this.totalReminders = totalReminders;
+//    }
+//
+//    public int getCompletedReminders() {
+//        return completedReminders;
+//    }
+//
+//    public void setCompletedReminders(int completedReminders) {
+//        this.completedReminders = completedReminders;
+//    }
+//
+//    public int getNotCompletedReminders() {
+//        return notCompletedReminders;
+//    }
+//
+//    public void setNotCompletedReminders(int notCompletedReminders) {
+//        this.notCompletedReminders = notCompletedReminders;
+//    }
+
+    public ReminderCount getReminderCount() {
+        return reminderCount;
+    }
+
+    public void setReminderCount(ReminderCount reminderCount) {
+        this.reminderCount = reminderCount;
+    }
+
+//    @NonNull
+//    @Override
+//    public String toString() {
+//        return "Category{" +
+//                "id=" + id +
+//                ", name='" + name + '\'' +
+//                ", color='" + color + '\'' +
+//                ", isActive=" + isActive +
+//                '}';
+//    }
+
     @NonNull
     @Override
     public String toString() {
@@ -62,6 +118,7 @@ public class Category implements Serializable {
                 ", name='" + name + '\'' +
                 ", color='" + color + '\'' +
                 ", isActive=" + isActive +
+                ", reminderCount=" + reminderCount.toString() +
                 '}';
     }
 }

@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -26,6 +25,7 @@ import com.example.reminderapp.Entities.Category;
 import com.example.reminderapp.Entities.Reminder;
 import com.example.reminderapp.Listeners.OnItemClickListener;
 import com.example.reminderapp.Listeners.OnItemDeletedListener;
+import com.example.reminderapp.Listeners.OnItemUpdatedListener;
 import com.example.reminderapp.R;
 import com.example.reminderapp.ReminderAddActivity;
 import com.example.reminderapp.Utils;
@@ -40,13 +40,15 @@ public class ReminderListAdapter extends RecyclerView.Adapter<ReminderListAdapte
     private List<Reminder> reminderList;
     private final OnItemClickListener<Reminder> clickListener;
     private final ActivityResultLauncher<Intent> reminderActivityLauncher;
+    private final OnItemUpdatedListener<Reminder> itemUpdatedListener;
     private final OnItemDeletedListener<Reminder> itemDeletedListener;
 
-    public ReminderListAdapter(Context context, List<Reminder> reminderList, OnItemClickListener<Reminder> clickListener, ActivityResultLauncher<Intent> reminderActivityLauncher, OnItemDeletedListener<Reminder> itemDeletedListener) {
+    public ReminderListAdapter(Context context, List<Reminder> reminderList, OnItemClickListener<Reminder> clickListener, ActivityResultLauncher<Intent> reminderActivityLauncher, OnItemUpdatedListener<Reminder> itemUpdatedListener, OnItemDeletedListener<Reminder> itemDeletedListener) {
         this.context = context;
         this.reminderList = reminderList;
         this.clickListener = clickListener;
         this.reminderActivityLauncher = reminderActivityLauncher;
+        this.itemUpdatedListener = itemUpdatedListener;
         this.itemDeletedListener = itemDeletedListener;
     }
 
@@ -73,14 +75,15 @@ public class ReminderListAdapter extends RecyclerView.Adapter<ReminderListAdapte
             holder.notificationTimeLayout.setVisibility(View.GONE);
         }
 
+        holder.isCompletedCheckBox.setOnCheckedChangeListener(null);
+        holder.isCompletedCheckBox.setChecked(reminder.isCompleted());
+
+        checkIfReminderIsCompleted(holder);
+
         holder.isCompletedCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                holder.titleTextView.setTextColor(ContextCompat.getColor(context, R.color.gray));
-                holder.titleTextView.setPaintFlags(holder.titleTextView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-            } else {
-                holder.titleTextView.setTextColor(ContextCompat.getColor(context, R.color.black));
-                holder.titleTextView.setPaintFlags(holder.titleTextView.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
-            }
+            reminder.setCompleted(isChecked);
+            checkIfReminderIsCompleted(holder);
+            itemUpdatedListener.onItemUpdated(position, reminder);
         });
 
         String hexColor = AppDatabase.getInstance(context).categoryDAO().findById(reminder.getCategoryId()).getColor();
@@ -115,6 +118,16 @@ public class ReminderListAdapter extends RecyclerView.Adapter<ReminderListAdapte
             clickListener.onItemLongClick(reminder, holder.reminderCardView);
             return true;
         });
+    }
+
+    private void checkIfReminderIsCompleted(@NonNull ReminderViewHolder holder) {
+        if (holder.isCompletedCheckBox.isChecked()) {
+            holder.titleTextView.setTextColor(ContextCompat.getColor(context, R.color.gray));
+            holder.titleTextView.setPaintFlags(holder.titleTextView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+        } else {
+            holder.titleTextView.setTextColor(ContextCompat.getColor(context, R.color.black));
+            holder.titleTextView.setPaintFlags(holder.titleTextView.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+        }
     }
 
     private void createEditActivity(int position, Reminder reminder) {

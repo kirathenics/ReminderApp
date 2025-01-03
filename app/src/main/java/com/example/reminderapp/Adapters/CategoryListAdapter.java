@@ -4,6 +4,9 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.style.ForegroundColorSpan;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +20,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.reminderapp.CategoryEditDialogFragment;
@@ -58,7 +62,34 @@ public class CategoryListAdapter extends RecyclerView.Adapter<CategoryListAdapte
         Category category = categoryList.get(position);
 
         holder.nameTextView.setText(category.getName());
-        holder.remindersNumberTextView.setText(R.string.text_no_reminders);
+        if (category.getReminderCount().totalReminders == 0) {
+            holder.remindersNumberTextView.setText(R.string.text_no_reminders);
+        } else {
+            int notCompleted = category.getReminderCount().notCompletedReminders;
+            int completed = category.getReminderCount().completedReminders;
+
+            String reminderText = "Reminders: " + notCompleted + " + " + completed;
+
+            SpannableStringBuilder spannable = new SpannableStringBuilder(reminderText);
+
+            int lavenderDarkColor = ContextCompat.getColor(context, R.color.lavender_dark);
+            spannable.setSpan(
+                    new ForegroundColorSpan(lavenderDarkColor),
+                    0,
+                    reminderText.indexOf('+') - 1,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            );
+
+            int grayColor = ContextCompat.getColor(holder.itemView.getContext(), R.color.gray);
+            spannable.setSpan(
+                    new ForegroundColorSpan(grayColor),
+                    reminderText.indexOf('+'),
+                    reminderText.length(),
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            );
+
+            holder.remindersNumberTextView.setText(spannable);
+        }
 
         holder.is_activeSwitchCompat.setChecked(category.isActive());
         updateCardColor(holder.categoryCardView, category.isActive());

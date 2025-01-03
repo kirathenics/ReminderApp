@@ -29,6 +29,36 @@ public interface CategoryDAO {
     @Query("SELECT * FROM categories WHERE name LIKE :name")
     Category findByName(String name);
 
+    @Query("SELECT categories.*, " +
+            "COUNT(reminders.id) AS totalReminders, " +
+            "SUM(CASE WHEN reminders.is_completed = 1 THEN 1 ELSE 0 END) AS completedReminders, " +
+            "SUM(CASE WHEN reminders.is_completed = 0 THEN 1 ELSE 0 END) AS notCompletedReminders " +
+            "FROM categories " +
+            "LEFT JOIN reminders ON categories.id = reminders.category_id " +
+            "GROUP BY categories.id " +
+            "ORDER BY categories.id ASC")
+    List<Category> getAllWithReminderCount();
+
+    @Query("SELECT categories.*, " +
+            "COUNT(reminders.id) AS totalReminders, " +
+            "SUM(CASE WHEN reminders.is_completed = 1 THEN 1 ELSE 0 END) AS completedReminders, " +
+            "SUM(CASE WHEN reminders.is_completed = 0 THEN 1 ELSE 0 END) AS notCompletedReminders " +
+            "FROM categories " +
+            "LEFT JOIN reminders ON categories.id = reminders.category_id " +
+            "GROUP BY categories.id " +
+            "ORDER BY categories.name ASC")
+    List<Category> getAllSortedByNameAscWithReminderCount();
+
+    @Query("SELECT categories.*, " +
+            "COUNT(reminders.id) AS totalReminders, " +
+            "SUM(CASE WHEN reminders.is_completed = 1 THEN 1 ELSE 0 END) AS completedReminders, " +
+            "SUM(CASE WHEN reminders.is_completed = 0 THEN 1 ELSE 0 END) AS notCompletedReminders " +
+            "FROM categories " +
+            "LEFT JOIN reminders ON categories.id = reminders.category_id " +
+            "GROUP BY categories.id " +
+            "ORDER BY categories.name DESC")
+    List<Category> getAllSortedByNameDescWithReminderCount();
+
     @Insert(onConflict = REPLACE)
     void insert(Category category);
 
@@ -40,7 +70,4 @@ public interface CategoryDAO {
 
     @Delete
     void delete(Category category);
-
-    @Query("DELETE FROM categories WHERE name = :name")
-    void delete(String name);
 }

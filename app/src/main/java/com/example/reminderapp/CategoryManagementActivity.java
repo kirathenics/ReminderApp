@@ -2,6 +2,7 @@ package com.example.reminderapp;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -58,7 +59,9 @@ public class CategoryManagementActivity extends AppCompatActivity {
 
         appDatabase = AppDatabase.getInstance(this);
         new Thread(() -> {
-            categoryList = appDatabase.categoryDAO().getAll();
+//            categoryList = appDatabase.categoryDAO().getAll();
+            categoryList = appDatabase.categoryDAO().getAllWithReminderCount();
+            Log.i("categories", categoryList.toString());
             runOnUiThread(() -> {
                 categoryListAdapter = new CategoryListAdapter(CategoryManagementActivity.this, categoryList,
                         new OnItemClickListener<>() {
@@ -66,9 +69,7 @@ public class CategoryManagementActivity extends AppCompatActivity {
                             public void onItemClick(Category item) {}
 
                             @Override
-                            public void onItemLongClick(Category item, CardView cardView) {
-                                // TODO: move category
-                            }
+                            public void onItemLongClick(Category item, CardView cardView) {}
                         },
                         (position, updatedItem) -> {
                             appDatabase.categoryDAO().update(updatedItem);
@@ -96,7 +97,6 @@ public class CategoryManagementActivity extends AppCompatActivity {
                     categoryList.add(category);
                     categoryListAdapter.notifyDataSetChanged();
                 });
-
                 dialogFragment.show(getSupportFragmentManager(), CategoryEditDialogFragment.TAG);
             }
         });
@@ -204,13 +204,16 @@ public class CategoryManagementActivity extends AppCompatActivity {
             List<Category> sortedList = new ArrayList<>();
             switch (sortType) {
                 case "default":
-                    sortedList = appDatabase.categoryDAO().getAll();
+//                    sortedList = appDatabase.categoryDAO().getAll();
+                    sortedList = appDatabase.categoryDAO().getAllWithReminderCount();
                     break;
                 case "name_asc":
-                    sortedList = appDatabase.categoryDAO().getAllSortedByNameAsc();
+//                    sortedList = appDatabase.categoryDAO().getAllSortedByNameAsc();
+                    sortedList = appDatabase.categoryDAO().getAllSortedByNameAscWithReminderCount();
                     break;
                 case "name_desc":
-                    sortedList = appDatabase.categoryDAO().getAllSortedByNameDesc();
+//                    sortedList = appDatabase.categoryDAO().getAllSortedByNameDesc();
+                    sortedList = appDatabase.categoryDAO().getAllSortedByNameDescWithReminderCount();
                     break;
             }
             List<Category> finalSortedList = sortedList;
