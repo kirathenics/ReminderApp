@@ -26,6 +26,7 @@ import com.example.reminderapp.Listeners.OnItemClickListener;
 import com.example.reminderapp.Listeners.OnItemDeletedListener;
 import com.example.reminderapp.Listeners.OnItemUpdatedListener;
 import com.example.reminderapp.R;
+import com.google.android.material.card.MaterialCardView;
 
 import java.util.List;
 
@@ -68,6 +69,11 @@ public class CategoryListAdapter extends RecyclerView.Adapter<CategoryListAdapte
             holder.colorCircleView.setBackgroundTintList(ColorStateList.valueOf(color));
         } catch (IllegalArgumentException e) {
             holder.colorCircleView.setBackgroundTintList(ColorStateList.valueOf(Color.GRAY));
+        }
+
+        if (holder.nameTextView.getText().equals(context.getString(R.string.category_name_by_default))) {
+            holder.is_activeSwitchCompat.setVisibility(View.GONE);
+            holder.optionsImageButton.setVisibility(View.GONE);
         }
 
         holder.is_activeSwitchCompat.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -117,7 +123,7 @@ public class CategoryListAdapter extends RecyclerView.Adapter<CategoryListAdapte
     }
 
     private void updateCardColor(CardView cardView, boolean isActive) {
-        int color = isActive ? cardView.getContext().getColor(android.R.color.transparent) : cardView.getContext().getColor(R.color.light_gray);
+        int color = isActive ? cardView.getContext().getColor(android.R.color.white) : cardView.getContext().getColor(R.color.light_gray);
         cardView.setCardBackgroundColor(color);
     }
 
@@ -133,7 +139,7 @@ public class CategoryListAdapter extends RecyclerView.Adapter<CategoryListAdapte
     }
 
     public static class CategoryViewHolder extends RecyclerView.ViewHolder {
-        final CardView categoryCardView;
+        final MaterialCardView categoryCardView;
         final TextView nameTextView, remindersNumberTextView;
         final SwitchCompat is_activeSwitchCompat;
         final ImageButton optionsImageButton;

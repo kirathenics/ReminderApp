@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.Manifest;
+import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
@@ -112,6 +113,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             reminderList.set(position, updatedReminder);
                             reminderListAdapter.notifyItemChanged(position);
                         }
+
+                        if (lastCategory != null) {
+                            filterRemindersByCategory(lastCategory);
+                        }
                     }
                 }
         );
@@ -132,6 +137,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             appDatabase.reminderDAO().delete(deletedItem);
                             reminderList.remove(position);
                             reminderListAdapter.notifyItemRemoved(position);
+                            if (lastCategory != null) {
+                                filterRemindersByCategory(lastCategory);
+                            }
                         });
                 updateReminderRecyclerView(GRID_SPAN_COUNT);
             });
@@ -147,9 +155,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //
 //                        }
                         appDatabase.reminderDAO().insert(newReminder);
+//                        Reminder reminder = appDatabase.reminderDAO().findByTitle(Objects.requireNonNull(newReminder).getTitle());
                         Reminder reminder = appDatabase.reminderDAO().findByTitle(newReminder.getTitle());
                         reminderList.add(reminder);
                         reminderListAdapter.notifyDataSetChanged();
+
+                        if (lastCategory != null) {
+                            filterRemindersByCategory(lastCategory);
+                        }
                     }
                 }
         );
@@ -331,35 +344,33 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 subMenu.clear();
 
-                MenuItem allCategoryItem  = subMenu.add(R.id.categories_group, Menu.FIRST, Menu.NONE, R.string.category_name_all)
+                MenuItem allCategoryItem = subMenu.add(R.id.categories_group, Menu.FIRST, Menu.NONE, R.string.category_name_all)
                         .setIcon(R.drawable.ic_list)
                         .setCheckable(true);
 
+                menu.setGroupCheckable(R.id.categories_group, true, true);
+
                 boolean hasActiveCategory = false;
 
-                for (int i = 0; i < categoryList.size(); i++) {
-                    Category category = categoryList.get(i);
+                for (Category category : categoryList) {
                     if (category.isActive()) {
-                        if (lastCategory != null && Objects.requireNonNull(lastCategory.getTitle()).toString().equals(category.getName())) {
-                            hasActiveCategory = true;
-                        }
-
-//                        subMenu.add(R.id.categories_group, Menu.FIRST + i + 1, Menu.NONE, category.getName())
-//                                .setIcon(R.drawable.ic_list)
-//                                .setCheckable(true);
-                        subMenu.add(R.id.categories_group, Menu.FIRST + 1 + category.getId(), Menu.NONE, category.getName())
+                        MenuItem categoryItem = subMenu.add(R.id.categories_group, Menu.FIRST + 1 + category.getId(), Menu.NONE, category.getName())
                                 .setIcon(R.drawable.ic_list)
                                 .setCheckable(true);
+
+                        if (lastCategory != null && Objects.requireNonNull(lastCategory.getTitle()).toString().equals(category.getName())) {
+                            hasActiveCategory = true;
+                            lastCategory = categoryItem;
+                        }
                     }
                 }
 
                 if (!hasActiveCategory) {
-                    lastCategory = null;
+                    lastCategory = allCategoryItem;
                 }
 
-                if (lastCategory == null) {
-                    allCategoryItem.setChecked(true);
-                    lastCategory = allCategoryItem;
+                if (lastCategory != null) {
+                    lastCategory.setChecked(true);
                 }
 
                 navigationView.invalidate();
@@ -370,40 +381,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @SuppressLint("NotifyDataSetChanged")
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-//        if (item.getGroupId() == R.id.categories_group) {
-//            lastCategory.setChecked(false);
-//
-//            String selectedCategory = Objects.requireNonNull(item.getTitle()).toString();
-//            Toast.makeText(this, "Selected Category: " + selectedCategory, Toast.LENGTH_SHORT).show();
-//            item.setChecked(true);
-//            lastCategory = item;
-//            drawerLayout.closeDrawer(GravityCompat.START);
-//            return true;
-//        }
-
         if (item.getGroupId() == R.id.categories_group) {
             lastCategory.setChecked(false);
 
-            new Thread(() -> {
-                String categoryName = Objects.requireNonNull(item.getTitle()).toString();
-                List<Reminder> filteredList;
-                if (categoryName.equals(this.getString(R.string.category_name_all))) {
-                    filteredList = appDatabase.reminderDAO().getAll();
-                } else {
-                    int categoryId = item.getItemId() - Menu.FIRST - 1;
-//                    int categoryId = appDatabase.categoryDAO().findByName(categoryName).getId();
-                    filteredList = appDatabase.reminderDAO().findByCategoryId(categoryId);
-                }
-                List<Reminder> finalFilteredList = filteredList;
-                runOnUiThread(() -> {
-                    reminderList.clear();
-                    reminderList.addAll(finalFilteredList);
-                    reminderListAdapter.notifyDataSetChanged();
-                });
-            }).start();
+            filterRemindersByCategory(item);
 
             item.setChecked(true);
             lastCategory = item;
+
+//            Toast.makeText(this, lastCategory.getTitle(), Toast.LENGTH_SHORT).show();
+
             drawerLayout.closeDrawer(GravityCompat.START);
             return true;
         }
@@ -435,6 +422,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         drawerLayout.closeDrawer(GravityCompat.START);
         return false;
+    }
+
+    private void filterRemindersByCategory(@NonNull MenuItem item) {
+        new Thread(() -> {
+            String categoryName = Objects.requireNonNull(item.getTitle()).toString();
+            List<Reminder> filteredList;
+            if (categoryName.equals(this.getString(R.string.category_name_all))) {
+                filteredList = appDatabase.reminderDAO().getAll();
+            } else {
+                int categoryId = item.getItemId() - Menu.FIRST - 1;
+//                    int categoryId = appDatabase.categoryDAO().findByName(categoryName).getId();
+                filteredList = appDatabase.reminderDAO().findByCategoryId(categoryId);
+            }
+            List<Reminder> finalFilteredList = filteredList;
+            runOnUiThread(() -> {
+                reminderList.clear();
+                reminderList.addAll(finalFilteredList);
+                reminderListAdapter.notifyDataSetChanged();
+            });
+        }).start();
     }
 
     @SuppressLint("ObsoleteSdkInt")
