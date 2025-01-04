@@ -8,13 +8,11 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.Manifest;
-import android.widget.CompoundButton;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
@@ -109,7 +107,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         lastCategory = null;
         addDefaultCategories();
-//        updateCategoriesMenu();
 
         reminderRecyclerView = findViewById(R.id.reminder_recycler_view);
 
@@ -133,9 +130,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         }
 
                         filterAndSortReminders();
-//                        if (lastCategory != null) {
-//                            filterRemindersByCategory(lastCategory);
-//                        }
                     }
                 }
         );
@@ -147,20 +141,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         new OnItemClickListener<>() {
                             @Override
                             public void onItemClick(Reminder item) {}
-                            // TODO: check if on click working
 
                             @Override
                             public void onItemLongClick(Reminder item, CardView cardView) {}
                         },
                         changeReminderActivityLauncher,
+                        // TODO: make with new Thread
                         (position, updatedItem) -> {
                             appDatabase.reminderDAO().update(updatedItem);
                             reminderList.set(position, updatedItem);
                             reminderListAdapter.notifyItemChanged(position);
                             filterAndSortReminders();
-//                            if (lastCategory != null) {
-//                                filterRemindersByCategory(lastCategory);
-//                            }
                         },
                         (position, deletedItem) -> {
                             appDatabase.reminderDAO().delete(deletedItem);
@@ -168,11 +159,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //                            reminderListAdapter.notifyItemRemoved(position);
 //                            reminderListAdapter.notifyItemRangeChanged(position, reminderList.size());
                             filterAndSortReminders();
-                            // TODO: check if filter and sorting needed
-//                            filterAndSortReminders();
-//                            if (lastCategory != null) {
-//                                filterRemindersByCategory(lastCategory);
-//                            }
                         });
                 updateReminderRecyclerView(GRID_SPAN_COUNT);
             });
@@ -199,9 +185,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 }
 
                                 filterAndSortReminders();
-//                                if (lastCategory != null) {
-//                                    filterRemindersByCategory(lastCategory);
-//                                }
                             });
                         }).start();
                     }
@@ -220,7 +203,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Intent intent = new Intent(MainActivity.this, ReminderAddActivity.class);
 
             if (selectedCategoryId != null) {
-//                Category selectedCategory = appDatabase.categoryDAO().findByName(Objects.requireNonNull(lastCategory.getTitle()).toString());
                 Category selectedCategory = appDatabase.categoryDAO().findById(selectedCategoryId);
                 intent.putExtra("selected_category", selectedCategory);
             }
@@ -244,14 +226,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onResume() {
         super.onResume();
-        updateCategoriesMenu();
 
+        updateCategoriesMenu();
         runOnUiThread(this::filterAndSortReminders);
-        //            if (lastCategory != null) {
-        //                filterRemindersByCategory(lastCategory);
-        //            } else {
-        //                Log.e("onResume", "lastCategory is null");
-        //            }
     }
 
     @Override
@@ -302,81 +279,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 foundReminderList.add(reminder);
             }
         }
-//        reminderListAdapter.filterList(filteredList);
-        // TODO: check if works
-        reminderListAdapter.setReminders(foundReminderList);
+
+        reminderListAdapter.searchReminders(foundReminderList);
     }
-
-//    @Override
-//    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-//        int itemId = item.getItemId();
-//        if (itemId == R.id.view_mode) {
-//            if (isGridView) {
-//                isGridView = false;
-//                updateReminderRecyclerView(ROW_SPAN_COUNT);
-//                item.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_row_view));
-//
-//            } else {
-//                isGridView = true;
-//                updateReminderRecyclerView(GRID_SPAN_COUNT);
-//                item.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_grid_view));
-//            }
-//            return true;
-//        } else if (itemId == R.id.sort_default || itemId == R.id.sort_name_asc || itemId == R.id.sort_name_desc) {
-//            String sortType = "default";
-//            int iconResId = R.drawable.ic_sort;
-//
-//            if (itemId == R.id.sort_name_asc) {
-//                sortType = "name_asc";
-//                iconResId = R.drawable.ic_sort_az;
-//            } else if (itemId == R.id.sort_name_desc) {
-//                sortType = "name_desc";
-//                iconResId = R.drawable.ic_sort_za;
-//            }
-//
-//            sortReminders(sortType);
-//
-//            MenuItem sortingItem = toolbarMenu.findItem(R.id.category_sorting);
-//            if (sortingItem != null) {
-//                updateSortingIcon(sortingItem, iconResId);
-//            }
-//            return true;
-//        }
-//        return false;
-//    }
-
-//    @SuppressLint("NonConstantResourceId")
-//    private void handleSortingOption(final int itemId) {
-//        sortField = ReminderSortField.NONE;
-//        sortType = SortType.NONE;
-//        int iconResId = R.drawable.ic_sort;
-//
-//        switch (itemId) {
-//            case R.id.sort_title_asc:
-//                sortField = ReminderSortField.TITLE;
-//                sortType = SortType.ASC;
-//                iconResId = R.drawable.ic_sort_az;
-//                break;
-//            case R.id.sort_title_desc:
-//                sortField = ReminderSortField.TITLE;
-//                sortType = SortType.DESC;
-//                iconResId = R.drawable.ic_sort_za;
-//                break;
-//            case R.id.sort_created_time_asc:
-//                sortField = ReminderSortField.CREATED_AT;
-//                sortType = SortType.ASC;
-//                iconResId = R.drawable.ic_time;
-//                break;
-//            case R.id.sort_created_time_desc:
-//                sortField = ReminderSortField.CREATED_AT;
-//                sortType = SortType.DESC;
-//                iconResId = R.drawable.ic_time_restore;
-//                break;
-//        }
-//
-//        updateSortingIcon(toolbarMenu.findItem(R.id.reminder_sorting), iconResId);
-//        runOnUiThread(this::filterAndSortReminders);
-//    }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
@@ -437,34 +342,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void updateSortingIcon(MenuItem sortingItem, int iconResId) {
         sortingItem.setIcon(ContextCompat.getDrawable(this, iconResId));
     }
-
-//    @SuppressLint("NotifyDataSetChanged")
-//    private void sortReminders(String sortType) {
-//        new Thread(() -> {
-//            List<Reminder> sortedList = new ArrayList<>();
-//            switch (sortType) {
-//                case "default":
-//                    sortedList = appDatabase.reminderDAO().getAll();
-//                    break;
-//                case "name_asc":
-//                    sortedList = appDatabase.reminderDAO().getAllSortedByTitle(true);
-//                    break;
-//                case "name_desc":
-//                    sortedList = appDatabase.reminderDAO().getAllSortedByTitle(false);
-//                    break;
-//            }
-//            List<Reminder> finalSortedList = sortedList;
-//            runOnUiThread(() -> {
-//                reminderList.clear();
-//                reminderList.addAll(finalSortedList);
-//                reminderListAdapter.notifyDataSetChanged();
-//            });
-//        }).start();
-//    }
-//
-//    private void updateSortingIcon(MenuItem sortingItem, int iconResId) {
-//        sortingItem.setIcon(ContextCompat.getDrawable(this, iconResId));
-//    }
 
     private void addDefaultCategories() {
         List<Category> existingCategories = appDatabase.categoryDAO().getAll();
@@ -535,13 +412,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (item.getGroupId() == R.id.categories_group) {
             lastCategory.setChecked(false);
 
-            if (item.getTitle().toString().equals(this.getString(R.string.category_name_all))) {
+            if (Objects.requireNonNull(item.getTitle()).toString().equals(this.getString(R.string.category_name_all))) {
                 selectedCategoryId = null;
             } else {
                 selectedCategoryId = item.getItemId() - Menu.FIRST - 1;
             }
 
-//            filterRemindersByCategory(item);
             filterAndSortReminders();
 
             item.setChecked(true);
@@ -580,46 +456,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return false;
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    private void filterRemindersByCategory(@NonNull MenuItem item) {
-        new Thread(() -> {
-            String categoryName = Objects.requireNonNull(item.getTitle()).toString();
-            List<Reminder> filteredList;
-            if (categoryName.equals(this.getString(R.string.category_name_all))) {
-                filteredList = appDatabase.reminderDAO().getAll();
-            } else {
-                int categoryId = item.getItemId() - Menu.FIRST - 1;
-//                    int categoryId = appDatabase.categoryDAO().findByName(categoryName).getId();
-                filteredList = appDatabase.reminderDAO().getByCategoryId(categoryId);
-            }
-            List<Reminder> finalFilteredList = filteredList;
-            runOnUiThread(() -> {
-                reminderList.clear();
-                reminderList.addAll(finalFilteredList);
-                reminderListAdapter.notifyDataSetChanged();
-            });
-        }).start();
-    }
-
     private void filterAndSortReminders() {
         // TODO: add completed reminders amount to text view
         new Thread(() -> {
-            if (selectedCategoryId != null) {
-                Log.i("selectedCategoryId", selectedCategoryId.toString());
-            } else {
-                Log.i("selectedCategoryId", "null");
-            }
-            Log.i("isCompleted", isCompleted.toString());
-
             List<Reminder> filteredAndSortedList;
             switch (sortField) {
                 case NONE:
                     filteredAndSortedList = appDatabase.reminderDAO().getFiltered(selectedCategoryId, isCompleted);
                     break;
                 case TITLE:
-                    Log.i("sort field", sortField.toString());
-                    Log.i("sort type", sortType.toString());
-//                    filteredAndSortedList = appDatabase.reminderDAO().getFilteredAndSortedByTitle(selectedCategoryId, isCompleted, sortType);
                     if (sortType == SortType.ASC) {
                         filteredAndSortedList = appDatabase.reminderDAO().getFilteredAndSortedByTitleAsc(selectedCategoryId, isCompleted);
                     } else {
@@ -627,7 +472,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                     break;
                 case CREATED_AT:
-//                    filteredAndSortedList = appDatabase.reminderDAO().getFilteredAndSortedByCreatedTime(selectedCategoryId, isCompleted, sortType);
                     if (sortType == SortType.ASC) {
                         filteredAndSortedList = appDatabase.reminderDAO().getFilteredAndSortedByCreatedTimeAsc(selectedCategoryId, isCompleted);
                     } else {
@@ -638,9 +482,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     filteredAndSortedList = reminderList;
             }
             List<Reminder> finalFilteredAndSortedList = filteredAndSortedList;
-            Log.i("filtered reminders", finalFilteredAndSortedList.toString());
             runOnUiThread(() -> reminderListAdapter.setReminders(finalFilteredAndSortedList));
-            Log.i("filtered reminders", finalFilteredAndSortedList.toString());
         }).start();
     }
 

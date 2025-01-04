@@ -160,8 +160,8 @@ public class ReminderListAdapter extends RecyclerView.Adapter<ReminderListAdapte
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    public void filterList(List<Reminder> filteredList) {
-        reminderList = filteredList;
+    public void searchReminders(List<Reminder> foundReminderList) {
+        reminderList = foundReminderList;
         notifyDataSetChanged();
     }
 
