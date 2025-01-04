@@ -75,7 +75,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Integer selectedCategoryId = null;
     private Boolean isCompleted = true;
     private ReminderSortField sortField = ReminderSortField.NONE;
-    private SortType sortType = SortType.NONE;
+//    private SortType sortType = SortType.NONE;
+    private SortType sortType = SortType.ASC;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -301,18 +302,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     filteredAndSortedList = appDatabase.reminderDAO().getFiltered(selectedCategoryId, isCompleted);
                     break;
                 case TITLE:
-                    if (sortType == SortType.ASC) {
-                        filteredAndSortedList = appDatabase.reminderDAO().getFilteredAndSortedByTitleAsc(selectedCategoryId, isCompleted);
-                    } else {
-                        filteredAndSortedList = appDatabase.reminderDAO().getFilteredAndSortedByTitleDesc(selectedCategoryId, isCompleted);
-                    }
+                    filteredAndSortedList = appDatabase.reminderDAO().getFilteredAndSortedByTitle(selectedCategoryId, isCompleted, sortType == SortType.ASC);
                     break;
                 case UPDATED_AT:
-                    if (sortType == SortType.ASC) {
-                        filteredAndSortedList = appDatabase.reminderDAO().getFilteredAndSortedByUpdatedTimeAsc(selectedCategoryId, isCompleted);
-                    } else {
-                        filteredAndSortedList = appDatabase.reminderDAO().getFilteredAndSortedByUpdatedTimeDesc(selectedCategoryId, isCompleted);
-                    }
+                    filteredAndSortedList = appDatabase.reminderDAO().getFilteredAndSortedByUpdatedTime(selectedCategoryId, isCompleted, sortType == SortType.ASC);
                     break;
                 default:
                     filteredAndSortedList = reminderList;
@@ -459,7 +452,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void handleSortingOption(final int itemId) {
         Map<Integer, Pair<ReminderSortField, SortType>> sortingOptions = new HashMap<>();
-        sortingOptions.put(R.id.sort_default, new Pair<>(ReminderSortField.NONE, SortType.NONE));
+        sortingOptions.put(R.id.sort_default, new Pair<>(ReminderSortField.NONE, SortType.ASC));
         sortingOptions.put(R.id.sort_title_asc, new Pair<>(ReminderSortField.TITLE, SortType.ASC));
         sortingOptions.put(R.id.sort_title_desc, new Pair<>(ReminderSortField.TITLE, SortType.DESC));
         sortingOptions.put(R.id.sort_updated_time_asc, new Pair<>(ReminderSortField.UPDATED_AT, SortType.ASC));
@@ -474,7 +467,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         Pair<ReminderSortField, SortType> sortOption = sortingOptions.get(itemId);
         sortField = sortOption != null ? sortOption.first : ReminderSortField.NONE;
-        sortType = sortOption != null ? sortOption.second : SortType.NONE;
+        sortType = sortOption != null ? sortOption.second : SortType.ASC;
         Integer iconResIdValue = iconOptions.get(itemId);
         int iconResId = (iconResIdValue != null) ? iconResIdValue : R.drawable.ic_sort;
 

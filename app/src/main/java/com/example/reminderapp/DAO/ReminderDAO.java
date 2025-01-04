@@ -27,27 +27,19 @@ public interface ReminderDAO {
     @Query("SELECT * FROM reminders " +
             "WHERE (:categoryId IS NULL OR category_id = :categoryId) " +
             "AND (:isCompleted IS NULL OR (:isCompleted = 0 AND is_completed = 0) OR :isCompleted) " +
-            "ORDER BY title ASC")
-    List<Reminder> getFilteredAndSortedByTitleAsc(Integer categoryId, Boolean isCompleted);
-
-    @Query("SELECT * FROM reminders " +
-            "WHERE (:categoryId IS NULL OR category_id = :categoryId) " +
-            "AND (:isCompleted IS NULL OR (:isCompleted = 0 AND is_completed = 0) OR :isCompleted) " +
-            "ORDER BY title DESC")
-    List<Reminder> getFilteredAndSortedByTitleDesc(Integer categoryId, Boolean isCompleted);
+            "ORDER BY  " +
+            "CASE WHEN :isAsc THEN title END ASC, " +
+            "CASE WHEN NOT :isAsc THEN title END DESC ")
+    List<Reminder> getFilteredAndSortedByTitle(Integer categoryId, Boolean isCompleted, Boolean isAsc);
 
 
     @Query("SELECT * FROM reminders " +
             "WHERE (:categoryId IS NULL OR category_id = :categoryId) " +
             "AND (:isCompleted IS NULL OR (:isCompleted = 0 AND is_completed = 0) OR :isCompleted) " +
-            "ORDER BY updated_at ASC")
-    List<Reminder> getFilteredAndSortedByUpdatedTimeAsc(Integer categoryId, Boolean isCompleted);
-
-    @Query("SELECT * FROM reminders " +
-            "WHERE (:categoryId IS NULL OR category_id = :categoryId) " +
-            "AND (:isCompleted IS NULL OR (:isCompleted = 0 AND is_completed = 0) OR :isCompleted) " +
-            "ORDER BY updated_at DESC ")
-    List<Reminder> getFilteredAndSortedByUpdatedTimeDesc(Integer categoryId, Boolean isCompleted);
+            "ORDER BY  " +
+            "CASE WHEN :isAsc THEN updated_at END ASC, " +
+            "CASE WHEN NOT :isAsc THEN updated_at END DESC ")
+    List<Reminder> getFilteredAndSortedByUpdatedTime(Integer categoryId, Boolean isCompleted, Boolean isAsc);
 
     @Query("SELECT COUNT(*) FROM reminders " +
             "WHERE is_completed = 1 " +
