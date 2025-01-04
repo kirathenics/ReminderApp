@@ -26,6 +26,7 @@
                 app:titleTextAppearance="@style/ToolbarTitleTextStyle" />
 
             <LinearLayout
+                android:id="@+id/completed_reminders_amount_linear_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end">
@@ -56,13 +57,44 @@
 
             </LinearLayout>
 
-
-
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/reminder_recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="8dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/no_reminders_linear_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/text_no_reminders"
+                android:src="@drawable/ic_notification_off_image"
+                style="@style/CustomImageButtonStyle" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/text_no_reminders"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/no_reminders_category_name_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="8sp"
+                android:text="@string/category_name_by_default"
+                android:textStyle="bold" />
 
         </LinearLayout>
 

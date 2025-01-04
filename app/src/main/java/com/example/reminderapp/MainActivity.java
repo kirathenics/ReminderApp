@@ -1,5 +1,7 @@
 package com.example.reminderapp;
 
+import android.animation.AnimatorInflater;
+import android.animation.AnimatorSet;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.NotificationChannel;
@@ -8,14 +10,19 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.Manifest;
+import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -61,20 +68,182 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private List<Category> categoryList = new ArrayList<>();
     private List<Reminder> reminderList = new ArrayList<>();
 
+    private ActivityResultLauncher<Intent> createReminderActivityLauncher;
+    private ActivityResultLauncher<Intent> changeReminderActivityLauncher;
+
     private RecyclerView reminderRecyclerView;
     private ReminderListAdapter reminderListAdapter;
 
+    LinearLayout completedRemindersAmountLinearLayout;
     TextView completedRemindersAmountTextView;
+
+    LinearLayout noRemindersLinearLayout;
+    TextView noRemindersCategoryNameTextView;
 
     private final int ROW_SPAN_COUNT = 1;
     private final int GRID_SPAN_COUNT = 2;
     private boolean isGridView = true;
 
-    private MenuItem lastCategory;
+    private MenuItem lastCategory = null;
     private Integer selectedCategoryId = null;
     private Boolean isCompleted = true;
     private ReminderSortField sortField = ReminderSortField.NONE;
     private SortOrder sortOrder = SortOrder.ASC;
+
+    FloatingActionButton addReminderButton;
+    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final int interval = 10000;
+
+//    @Override
+//    protected void onCreate(Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+//        setContentView(R.layout.activity_main);
+//        createNotificationChannel();
+//
+//        Toolbar toolbar = findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
+//
+//        drawerLayout = findViewById(R.id.drawer_layout);
+//        navigationView = findViewById(R.id.nav_view);
+//        navigationView.setNavigationItemSelectedListener(this);
+//
+//        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.Open, R.string.Close);
+//        int color = ContextCompat.getColor(this, R.color.lavender_dark);
+//        toggle.getDrawerArrowDrawable().setColor(color);
+//        drawerLayout.addDrawerListener(toggle);
+//        toggle.syncState();
+//
+//        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+//            @Override
+//            public void handleOnBackPressed() {
+//                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+//                    drawerLayout.closeDrawer(GravityCompat.START);
+//                } else {
+//                    finish();
+//                }
+//            }
+//        });
+//
+//        reminderRecyclerView = findViewById(R.id.reminder_recycler_view);
+//
+//        completedRemindersAmountLinearLayout = findViewById(R.id.completed_reminders_amount_linear_layout);
+//        completedRemindersAmountTextView = findViewById(R.id.completed_reminders_amount_text_view);
+//
+//        noRemindersLinearLayout = findViewById(R.id.no_reminders_linear_layout);
+//        noRemindersCategoryNameTextView = findViewById(R.id.no_reminders_category_name_text_view);
+//
+//        appDatabase = AppDatabase.getInstance(this);
+//
+//        lastCategory = null;
+//        addDefaultCategories();
+//
+//        ActivityResultLauncher<Intent> changeReminderActivityLauncher = registerForActivityResult(
+//                new ActivityResultContracts.StartActivityForResult(),
+//                result -> {
+//                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+//                        Reminder updatedReminder = (Reminder) result.getData().getSerializableExtra("new_reminder");
+//                        int position = result.getData().getIntExtra("position", -1);
+//
+//                        if (position != -1 && updatedReminder != null) {
+//                            appDatabase.reminderDAO().update(updatedReminder);
+//                            reminderList.set(position, updatedReminder);
+//                            reminderListAdapter.notifyItemChanged(position);
+//
+//                            if (selectedCategoryId != null) {
+//                                if (selectedCategoryId != updatedReminder.getCategoryId()) {
+//                                    selectedCategoryId = updatedReminder.getCategoryId();
+//                                }
+//                            }
+//                        }
+//
+//                        filterAndSortReminders();
+//                    }
+//                }
+//        );
+//
+//        new Thread(() -> {
+//            reminderList = appDatabase.reminderDAO().getAll();
+//            runOnUiThread(() -> {
+//                reminderListAdapter = new ReminderListAdapter(MainActivity.this, reminderList,
+//                        new OnItemClickListener<>() {
+//                            @Override
+//                            public void onItemClick(Reminder item) {}
+//
+//                            @Override
+//                            public void onItemLongClick(Reminder item, CardView cardView) {}
+//                        },
+//                        changeReminderActivityLauncher,
+//                        (position, updatedItem) -> {
+//                            appDatabase.reminderDAO().update(updatedItem);
+//                            reminderList.set(position, updatedItem);
+//                            reminderListAdapter.notifyItemChanged(position);
+//                            filterAndSortReminders();
+//                        },
+//                        (position, deletedItem) -> {
+//                            appDatabase.reminderDAO().delete(deletedItem);
+//                            reminderList.remove(position);
+////                            reminderListAdapter.notifyItemRemoved(position);
+////                            reminderListAdapter.notifyItemRangeChanged(position, reminderList.size());
+//                            filterAndSortReminders();
+//                        });
+//                updateReminderRecyclerView(GRID_SPAN_COUNT);
+//            });
+//        }).start();
+//
+//        @SuppressLint("NotifyDataSetChanged") ActivityResultLauncher<Intent> createReminderActivityLauncher = registerForActivityResult(
+//                new ActivityResultContracts.StartActivityForResult(),
+//                result -> {
+//                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+//                        new Thread(() -> {
+//                            Reminder newReminder = (Reminder) result.getData().getSerializableExtra("new_reminder");
+//                            appDatabase.reminderDAO().insert(newReminder);
+//
+//                            Reminder addedReminder = appDatabase.reminderDAO().getLastInsertedReminder();
+//
+//                            runOnUiThread(() -> {
+//                                reminderList.add(addedReminder);
+//                                reminderListAdapter.notifyDataSetChanged();
+//
+//                                if (selectedCategoryId != null) {
+//                                    if (selectedCategoryId != addedReminder.getCategoryId()) {
+//                                        selectedCategoryId = addedReminder.getCategoryId();
+//                                    }
+//                                }
+//
+//                                filterAndSortReminders();
+//                            });
+//                        }).start();
+//                    }
+//                }
+//        );
+//
+//        addReminderButton = findViewById(R.id.add_reminder_button);
+//        addReminderButton.setOnClickListener(v -> {
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+//                if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+//                        != PackageManager.PERMISSION_GRANTED) {
+//                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, 1);
+//                }
+//            }
+//
+//            Intent intent = new Intent(MainActivity.this, ReminderAddActivity.class);
+//
+//            if (selectedCategoryId != null) {
+//                Category selectedCategory = appDatabase.categoryDAO().findById(selectedCategoryId);
+//                intent.putExtra("selected_category", selectedCategory);
+//            }
+//
+//            createReminderActivityLauncher.launch(intent);
+//        });
+//
+//        SwitchCompat isCompletedRemindersVisibleSwitchCompat = findViewById(R.id.is_completed_reminders_visible_switch_compat);
+//        isCompletedRemindersVisibleSwitchCompat.setOnCheckedChangeListener((buttonView, isChecked) -> {
+//            isCompleted = isChecked;
+//            filterAndSortReminders();
+//        });
+//
+//        startPulseAnimation();
+//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,16 +251,36 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_main);
         createNotificationChannel();
 
+        initToolbar();
+        initDrawer();
+        initViews();
+        initDatabase();
+        initResultLaunchers();
+
+        addReminderButton = findViewById(R.id.add_reminder_button);
+        addReminderButton.setOnClickListener(v -> onAddReminderButtonClicked());
+
+        SwitchCompat isCompletedRemindersVisibleSwitchCompat = findViewById(R.id.is_completed_reminders_visible_switch_compat);
+        isCompletedRemindersVisibleSwitchCompat.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            isCompleted = isChecked;
+            filterAndSortReminders();
+        });
+
+        startPulseAnimation();
+    }
+
+    private void initToolbar() {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+    }
 
+    private void initDrawer() {
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.Open, R.string.Close);
-        int color = ContextCompat.getColor(this, R.color.lavender_dark);
-        toggle.getDrawerArrowDrawable().setColor(color);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, findViewById(R.id.toolbar), R.string.Open, R.string.Close);
+        toggle.getDrawerArrowDrawable().setColor(ContextCompat.getColor(this, R.color.lavender_dark));
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
@@ -105,120 +294,145 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
         });
+    }
 
+    private void initViews() {
         reminderRecyclerView = findViewById(R.id.reminder_recycler_view);
 
-        appDatabase = AppDatabase.getInstance(this);
-
-        lastCategory = null;
-        addDefaultCategories();
-
-        ActivityResultLauncher<Intent> changeReminderActivityLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
-                        Reminder updatedReminder = (Reminder) result.getData().getSerializableExtra("new_reminder");
-                        int position = result.getData().getIntExtra("position", -1);
-
-                        if (position != -1 && updatedReminder != null) {
-                            appDatabase.reminderDAO().update(updatedReminder);
-                            reminderList.set(position, updatedReminder);
-                            reminderListAdapter.notifyItemChanged(position);
-
-                            if (selectedCategoryId != null) {
-                                if (selectedCategoryId != updatedReminder.getCategoryId()) {
-                                    selectedCategoryId = updatedReminder.getCategoryId();
-                                }
-                            }
-                        }
-
-                        filterAndSortReminders();
-                    }
-                }
-        );
-
-        new Thread(() -> {
-            reminderList = appDatabase.reminderDAO().getAll();
-            runOnUiThread(() -> {
-                reminderListAdapter = new ReminderListAdapter(MainActivity.this, reminderList,
-                        new OnItemClickListener<>() {
-                            @Override
-                            public void onItemClick(Reminder item) {}
-
-                            @Override
-                            public void onItemLongClick(Reminder item, CardView cardView) {}
-                        },
-                        changeReminderActivityLauncher,
-                        (position, updatedItem) -> {
-                            appDatabase.reminderDAO().update(updatedItem);
-                            reminderList.set(position, updatedItem);
-                            reminderListAdapter.notifyItemChanged(position);
-                            filterAndSortReminders();
-                        },
-                        (position, deletedItem) -> {
-                            appDatabase.reminderDAO().delete(deletedItem);
-                            reminderList.remove(position);
-//                            reminderListAdapter.notifyItemRemoved(position);
-//                            reminderListAdapter.notifyItemRangeChanged(position, reminderList.size());
-                            filterAndSortReminders();
-                        });
-                updateReminderRecyclerView(GRID_SPAN_COUNT);
-            });
-        }).start();
-
-        @SuppressLint("NotifyDataSetChanged") ActivityResultLauncher<Intent> createReminderActivityLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
-                        new Thread(() -> {
-                            Reminder newReminder = (Reminder) result.getData().getSerializableExtra("new_reminder");
-                            appDatabase.reminderDAO().insert(newReminder);
-
-                            Reminder addedReminder = appDatabase.reminderDAO().getLastInsertedReminder();
-
-                            runOnUiThread(() -> {
-                                reminderList.add(addedReminder);
-                                reminderListAdapter.notifyDataSetChanged();
-
-                                if (selectedCategoryId != null) {
-                                    if (selectedCategoryId != addedReminder.getCategoryId()) {
-                                        selectedCategoryId = addedReminder.getCategoryId();
-                                    }
-                                }
-
-                                filterAndSortReminders();
-                            });
-                        }).start();
-                    }
-                }
-        );
-
-        FloatingActionButton addReminderButton = findViewById(R.id.add_reminder_button);
-        addReminderButton.setOnClickListener(v -> {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
-                        != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, 1);
-                }
-            }
-
-            Intent intent = new Intent(MainActivity.this, ReminderAddActivity.class);
-
-            if (selectedCategoryId != null) {
-                Category selectedCategory = appDatabase.categoryDAO().findById(selectedCategoryId);
-                intent.putExtra("selected_category", selectedCategory);
-            }
-
-            createReminderActivityLauncher.launch(intent);
-        });
-
+        completedRemindersAmountLinearLayout = findViewById(R.id.completed_reminders_amount_linear_layout);
         completedRemindersAmountTextView = findViewById(R.id.completed_reminders_amount_text_view);
 
-        SwitchCompat isCompletedRemindersVisibleSwitchCompat = findViewById(R.id.is_completed_reminders_visible_switch_compat);
-        isCompletedRemindersVisibleSwitchCompat.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            isCompleted = isChecked;
-            filterAndSortReminders();
-        });
+        noRemindersLinearLayout = findViewById(R.id.no_reminders_linear_layout);
+        noRemindersCategoryNameTextView = findViewById(R.id.no_reminders_category_name_text_view);
+    }
+
+    private void initDatabase() {
+        appDatabase = AppDatabase.getInstance(this);
+        addDefaultCategories();
+        new Thread(() -> {
+            reminderList = appDatabase.reminderDAO().getAll();
+            runOnUiThread(this::setupReminderAdapter);
+        }).start();
+    }
+
+    private void initResultLaunchers() {
+        createReminderActivityLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                this::handleCreateReminderResult
+        );
+
+        changeReminderActivityLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                this::handleChangeReminderResult
+        );
+    }
+
+    private void onAddReminderButtonClicked() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, 1);
+        }
+
+        Intent intent = new Intent(MainActivity.this, ReminderAddActivity.class);
+
+        if (selectedCategoryId != null) {
+            Category selectedCategory = appDatabase.categoryDAO().findById(selectedCategoryId);
+            intent.putExtra("selected_category", selectedCategory);
+        }
+
+        createReminderActivityLauncher.launch(intent);
+    }
+
+    private void setupReminderAdapter() {
+        reminderListAdapter = new ReminderListAdapter(
+                this,
+                reminderList,
+                new OnItemClickListener<>() {
+                    @Override
+                    public void onItemClick(Reminder item) {
+                    }
+
+                    @Override
+                    public void onItemLongClick(Reminder item, CardView cardView) {
+                    }
+                },
+                changeReminderActivityLauncher,
+                this::updateReminder,
+                this::deleteReminder
+        );
+        updateReminderRecyclerView(GRID_SPAN_COUNT);
+    }
+
+    private void handleCreateReminderResult(ActivityResult result) {
+        if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+            new Thread(() -> {
+                Reminder newReminder = (Reminder) result.getData().getSerializableExtra("new_reminder");
+                appDatabase.reminderDAO().insert(newReminder);
+
+                Reminder addedReminder = appDatabase.reminderDAO().getLastInsertedReminder();
+
+                runOnUiThread(() -> {
+                    reminderList.add(addedReminder);
+                    updateSelectedCategory(addedReminder.getCategoryId());
+                    filterAndSortReminders();
+                });
+            }).start();
+        }
+    }
+
+    private void handleChangeReminderResult(ActivityResult result) {
+        if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+            Reminder updatedReminder = (Reminder) result.getData().getSerializableExtra("new_reminder");
+            int position = result.getData().getIntExtra("position", -1);
+
+            if (position != -1 && updatedReminder != null) {
+                appDatabase.reminderDAO().update(updatedReminder);
+                reminderList.set(position, updatedReminder);
+                reminderListAdapter.notifyItemChanged(position);
+                updateSelectedCategory(updatedReminder.getCategoryId());
+                filterAndSortReminders();
+            }
+        }
+    }
+
+    private void updateSelectedCategory(Integer categoryId) {
+        if (selectedCategoryId != null && !selectedCategoryId.equals(categoryId)) {
+            selectedCategoryId = categoryId;
+        }
+    }
+
+    private void updateReminder(int position, Reminder updatedItem) {
+        appDatabase.reminderDAO().update(updatedItem);
+        reminderList.set(position, updatedItem);
+        reminderListAdapter.notifyItemChanged(position);
+        filterAndSortReminders();
+    }
+
+    private void deleteReminder(int position, Reminder deletedItem) {
+        appDatabase.reminderDAO().delete(deletedItem);
+        reminderList.remove(position);
+        filterAndSortReminders();
+    }
+
+    private void startPulseAnimation() {
+        Runnable pulseRunnable = new Runnable() {
+            @Override
+            public void run() {
+                AnimatorSet pulseAnimation = (AnimatorSet) AnimatorInflater.loadAnimator(MainActivity.this, R.animator.button_pulse_animation);
+                pulseAnimation.setTarget(addReminderButton);
+                pulseAnimation.start();
+
+                handler.postDelayed(this, interval);
+            }
+        };
+
+        handler.post(pulseRunnable);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        handler.removeCallbacksAndMessages(null);
     }
 
     @Override
@@ -310,8 +524,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             List<Reminder> finalFilteredAndSortedList = filteredAndSortedList;
             runOnUiThread(() -> {
-                completedRemindersAmountTextView.setText(String.format(Locale.getDefault(), "%d", appDatabase.reminderDAO().getCompletedRemindersCountByCategoryId(selectedCategoryId)));
-                reminderListAdapter.setReminders(finalFilteredAndSortedList);
+                if (finalFilteredAndSortedList.isEmpty()) {
+                    completedRemindersAmountLinearLayout.setVisibility(View.GONE);
+                    reminderRecyclerView.setVisibility(View.GONE);
+
+                    noRemindersCategoryNameTextView.setText(Objects.requireNonNull(lastCategory.getTitle()).toString());
+                    noRemindersLinearLayout.setVisibility(View.VISIBLE);
+                }
+                else {
+                    noRemindersLinearLayout.setVisibility(View.GONE);
+
+                    completedRemindersAmountTextView.setText(String.format(Locale.getDefault(), "%d", appDatabase.reminderDAO().getCompletedRemindersCountByCategoryId(selectedCategoryId)));
+                    reminderListAdapter.setReminders(finalFilteredAndSortedList);
+
+                    completedRemindersAmountLinearLayout.setVisibility(View.VISIBLE);
+                    reminderRecyclerView.setVisibility(View.VISIBLE);
+                }
             });
         }).start();
     }
