@@ -98,5 +98,11 @@
         <item name="colorControlNormal">@color/lavender_dark</item>
         <item name="android:textStyle">bold</item>
     </style>
-    
+
+    <style name="CustomScrollBarStyle">
+        <item name="android:scrollbarThumbHorizontal">@color/lavender_dark</item>
+        <item name="android:scrollbarTrackHorizontal">@color/lavender_medium</item>
+        <item name="android:scrollbarSize">4dp</item>
+    </style>
+
 </resources>

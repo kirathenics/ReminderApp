@@ -44,10 +44,10 @@ public interface CategoryDAO {
     @Query("SELECT * FROM categories ORDER BY id DESC LIMIT 1 ")
     Category getLastInsertedCategory();
 
-    @Query("SELECT * FROM categories WHERE id = :id ")
+    @Query("SELECT * FROM categories WHERE id = :id LIMIT 1 ")
     Category findById(int id);
 
-    @Query("SELECT * FROM categories WHERE name LIKE :name ")
+    @Query("SELECT * FROM categories WHERE name = :name LIMIT 1 ")
     Category findByName(String name);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

@@ -17,23 +17,48 @@ public interface ReminderDAO {
     @Query("SELECT * FROM reminders ORDER BY id ASC ")
     List<Reminder> getAll();
 
+
+    @Query("SELECT * FROM reminders WHERE category_id = :categoryId ORDER BY id ASC ")
+    List<Reminder> getByCategoryId(int categoryId);
+
+
     @Query("SELECT * FROM reminders " +
-            "ORDER BY " +
-            "CASE WHEN :isAsc THEN title END ASC, " +
-            "CASE WHEN NOT :isAsc THEN title END DESC ")
-    List<Reminder> getAllSortedByTitle(boolean isAsc);
+            "WHERE (:categoryId IS NULL OR category_id = :categoryId) " +
+            "AND (:isCompleted IS NULL OR (:isCompleted = 0 AND is_completed = 0) OR :isCompleted) " +
+            "ORDER BY id ASC ")
+    List<Reminder> getFiltered(Integer categoryId, Boolean isCompleted);
+
+
+    @Query("SELECT * FROM reminders " +
+            "WHERE (:categoryId IS NULL OR category_id = :categoryId) " +
+            "AND (:isCompleted IS NULL OR (:isCompleted = 0 AND is_completed = 0) OR :isCompleted) " +
+            "ORDER BY title ASC")
+    List<Reminder> getFilteredAndSortedByTitleAsc(Integer categoryId, Boolean isCompleted);
+
+    @Query("SELECT * FROM reminders " +
+            "WHERE (:categoryId IS NULL OR category_id = :categoryId) " +
+            "AND (:isCompleted IS NULL OR (:isCompleted = 0 AND is_completed = 0) OR :isCompleted) " +
+            "ORDER BY title DESC")
+    List<Reminder> getFilteredAndSortedByTitleDesc(Integer categoryId, Boolean isCompleted);
+
+
+    @Query("SELECT * FROM reminders " +
+            "WHERE (:categoryId IS NULL OR category_id = :categoryId) " +
+            "AND (:isCompleted IS NULL OR (:isCompleted = 0 AND is_completed = 0) OR :isCompleted) " +
+            "ORDER BY created_at ASC")
+    List<Reminder> getFilteredAndSortedByCreatedTimeAsc(Integer categoryId, Boolean isCompleted);
+
+    @Query("SELECT * FROM reminders " +
+            "WHERE (:categoryId IS NULL OR category_id = :categoryId) " +
+            "AND (:isCompleted IS NULL OR (:isCompleted = 0 AND is_completed = 0) OR :isCompleted) " +
+            "ORDER BY created_at DESC")
+    List<Reminder> getFilteredAndSortedByCreatedTimeDesc(Integer categoryId, Boolean isCompleted);
+
+    @Query("SELECT * FROM reminders WHERE title = :title LIMIT 1 ")
+    Reminder findByTitle(String title);
 
     @Query("SELECT * FROM reminders ORDER BY id DESC LIMIT 1 ")
     Reminder getLastInsertedReminder();
-
-    @Query("SELECT * FROM reminders WHERE title = :title ")
-    Reminder findByTitle(String title);
-
-    @Query("SELECT * FROM reminders WHERE category_id = :categoryId ORDER BY id ASC ")
-    List<Reminder> findByCategoryId(int categoryId);
-
-    @Query("SELECT * FROM reminders WHERE is_completed = :isCompleted ORDER BY id ASC ")
-    List<Reminder> findByCompletionStatus(boolean isCompleted);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(Reminder reminder);

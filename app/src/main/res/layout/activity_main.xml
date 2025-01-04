@@ -25,6 +25,39 @@
                 app:title="@string/app_name"
                 app:titleTextAppearance="@style/ToolbarTitleTextStyle" />
 
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end">
+
+                <TextView
+                    android:id="@+id/completed_reminders_amount_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center_vertical"
+                    android:text="@string/zero"
+                    android:textSize="14sp"
+                    android:textColor="@color/gray"
+                    android:textStyle="bold"
+                    app:drawableStartCompat="@drawable/ic_double_check"
+                    android:drawablePadding="8sp"
+                    app:drawableTint="@color/gray" />
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/is_completed_reminders_visible_switch_compat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30sp"
+                    android:layout_marginEnd="16sp"
+                    android:checked="true"
+                    app:thumbTint="@color/switch_thumb_color"
+                    app:trackTint="@color/switch_track_color"
+                    tools:ignore="TouchTargetSizeCheck" />
+
+            </LinearLayout>
+
+
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/reminder_recycler_view"
                 android:layout_width="match_parent"
@@ -60,6 +93,6 @@
         android:theme="@style/Theme.Navigation"
         app:itemBackground="@drawable/background"
         app:itemTextColor="@color/text_color_state"
-        app:itemIconTint="@color/icon_color_state"/>
+        app:itemIconTint="@color/icon_color_state" />
 
 </androidx.drawerlayout.widget.DrawerLayout>

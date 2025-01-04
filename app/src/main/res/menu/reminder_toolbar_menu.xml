@@ -17,13 +17,6 @@
         android:title="@string/title_grid_view"
         app:showAsAction="ifRoom" />
 
-<!--    <item-->
-<!--        android:id="@+id/reminder_filter"-->
-<!--        android:icon="@drawable/ic_filter"-->
-<!--        app:iconTint="@color/lavender_dark"-->
-<!--        android:title="@string/title_filter_reminders"-->
-<!--        app:showAsAction="ifRoom" />-->
-
     <item
         android:id="@+id/reminder_sorting"
         android:icon="@drawable/ic_sort"
@@ -32,25 +25,43 @@
         app:showAsAction="ifRoom">
 
         <menu>
-            <item
-                android:id="@+id/sort_default"
-                android:icon="@drawable/ic_sort"
-                app:iconTint="@color/lavender_dark"
-                android:title="@string/title_default_order"
-                app:showAsAction="never" />
-            <item
-                android:id="@+id/sort_name_asc"
-                android:icon="@drawable/ic_sort_az"
-                app:iconTint="@color/lavender_dark"
-                android:title="@string/title_name_ascending"
-                app:showAsAction="never" />
-            <item
-                android:id="@+id/sort_name_desc"
-                android:icon="@drawable/ic_sort_za"
-                app:iconTint="@color/lavender_dark"
-                android:title="@string/title_name_descending"
-                app:showAsAction="never" />
+            <group android:id="@+id/sorting_group">
+
+                <item
+                    android:id="@+id/sort_default"
+                    android:icon="@drawable/ic_sort"
+                    app:iconTint="@color/lavender_dark"
+                    android:title="@string/title_default_order"
+                    app:showAsAction="never" />
+                <item
+                    android:id="@+id/sort_title_asc"
+                    android:icon="@drawable/ic_sort_az"
+                    app:iconTint="@color/lavender_dark"
+                    android:title="@string/title_title_ascending"
+                    app:showAsAction="never" />
+                <item
+                    android:id="@+id/sort_title_desc"
+                    android:icon="@drawable/ic_sort_za"
+                    app:iconTint="@color/lavender_dark"
+                    android:title="@string/title_title_descending"
+                    app:showAsAction="never" />
+
+                <item
+                    android:id="@+id/sort_created_time_asc"
+                    android:icon="@drawable/ic_time"
+                    app:iconTint="@color/lavender_dark"
+                    android:title="@string/title_created_time_ascending"
+                    app:showAsAction="never" />
+                <item
+                    android:id="@+id/sort_created_time_desc"
+                    android:icon="@drawable/ic_time_restore"
+                    app:iconTint="@color/lavender_dark"
+                    android:title="@string/title_created_time_descending"
+                    app:showAsAction="never" />
+
+            </group>
         </menu>
+
     </item>
 
 </menu>

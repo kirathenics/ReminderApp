@@ -43,7 +43,12 @@ public class ReminderListAdapter extends RecyclerView.Adapter<ReminderListAdapte
     private final OnItemUpdatedListener<Reminder> itemUpdatedListener;
     private final OnItemDeletedListener<Reminder> itemDeletedListener;
 
-    public ReminderListAdapter(Context context, List<Reminder> reminderList, OnItemClickListener<Reminder> clickListener, ActivityResultLauncher<Intent> reminderActivityLauncher, OnItemUpdatedListener<Reminder> itemUpdatedListener, OnItemDeletedListener<Reminder> itemDeletedListener) {
+    public ReminderListAdapter(Context context,
+                               List<Reminder> reminderList,
+                               OnItemClickListener<Reminder> clickListener,
+                               ActivityResultLauncher<Intent> reminderActivityLauncher,
+                               OnItemUpdatedListener<Reminder> itemUpdatedListener,
+                               OnItemDeletedListener<Reminder> itemDeletedListener) {
         this.context = context;
         this.reminderList = reminderList;
         this.clickListener = clickListener;
@@ -145,6 +150,13 @@ public class ReminderListAdapter extends RecyclerView.Adapter<ReminderListAdapte
     @Override
     public int getItemCount() {
         return reminderList.size();
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    public void setReminders(List<Reminder> reminders) {
+        this.reminderList.clear();
+        this.reminderList.addAll(reminders);
+        notifyDataSetChanged();
     }
 
     @SuppressLint("NotifyDataSetChanged")
