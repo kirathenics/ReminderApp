@@ -91,10 +91,10 @@
     <string name="description_edit">Edit</string>
     <string name="sample_next_time_repeat">Next time: 00:00 • Thu, 1 Jan 1970 • Tomorrow</string>
     <string name="zero">0</string>
-    <string name="title_created_time_ascending">Created time Ascending</string>
-    <string name="title_created_time_descending">Created time Descending</string>
     <string name="title_title_ascending">Title Ascending</string>
     <string name="title_title_descending">Title Descending</string>
+    <string name="title_most_recently_updated">Most Recently Updated</string>
+    <string name="title_least_recently_updated">Least Recently Updated</string>
 
     <string-array name="repeat_types">
         <item>periodic</item>

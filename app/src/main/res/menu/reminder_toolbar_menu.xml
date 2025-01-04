@@ -47,16 +47,16 @@
                     app:showAsAction="never" />
 
                 <item
-                    android:id="@+id/sort_created_time_asc"
+                    android:id="@+id/sort_updated_time_asc"
                     android:icon="@drawable/ic_time"
                     app:iconTint="@color/lavender_dark"
-                    android:title="@string/title_created_time_ascending"
+                    android:title="@string/title_most_recently_updated"
                     app:showAsAction="never" />
                 <item
-                    android:id="@+id/sort_created_time_desc"
+                    android:id="@+id/sort_updated_time_desc"
                     android:icon="@drawable/ic_time_restore"
                     app:iconTint="@color/lavender_dark"
-                    android:title="@string/title_created_time_descending"
+                    android:title="@string/title_least_recently_updated"
                     app:showAsAction="never" />
 
             </group>

@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.Manifest;
+import android.widget.TextView;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
@@ -46,6 +47,7 @@ import com.google.android.material.navigation.NavigationView;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -63,6 +65,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private MenuItem lastCategory;
     private Menu toolbarMenu;
+
+    TextView completedRemindersAmountTextView;
 
     private final int ROW_SPAN_COUNT = 1;
     private final int GRID_SPAN_COUNT = 2;
@@ -146,7 +150,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             public void onItemLongClick(Reminder item, CardView cardView) {}
                         },
                         changeReminderActivityLauncher,
-                        // TODO: make with new Thread
                         (position, updatedItem) -> {
                             appDatabase.reminderDAO().update(updatedItem);
                             reminderList.set(position, updatedItem);
@@ -210,17 +213,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             createReminderActivityLauncher.launch(intent);
         });
 
+        completedRemindersAmountTextView = findViewById(R.id.completed_reminders_amount_text_view);
+
         SwitchCompat isCompletedRemindersVisibleSwitchCompat = findViewById(R.id.is_completed_reminders_visible_switch_compat);
         isCompletedRemindersVisibleSwitchCompat.setOnCheckedChangeListener((buttonView, isChecked) -> {
             isCompleted = isChecked;
             filterAndSortReminders();
         });
-    }
-
-    private void updateReminderRecyclerView(int spanCount) {
-        reminderRecyclerView.setHasFixedSize(true);
-        reminderRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(spanCount, LinearLayoutManager.VERTICAL));
-        reminderRecyclerView.setAdapter(reminderListAdapter);
     }
 
     @Override
@@ -229,6 +228,150 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         updateCategoriesMenu();
         runOnUiThread(this::filterAndSortReminders);
+    }
+
+    private void addDefaultCategories() {
+        List<Category> existingCategories = appDatabase.categoryDAO().getAll();
+        if (existingCategories.isEmpty()) {
+            String[] defaultCategories = getResources().getStringArray(R.array.default_categories);
+            for (String categoryName : defaultCategories) {
+                Category category = new Category();
+                category.setName(categoryName);
+                int colorInt = ContextCompat.getColor(this, R.color.lavender_medium);
+                String colorHexWithoutAlpha = String.format("#%08X", colorInt);
+                category.setColor(colorHexWithoutAlpha);
+                category.setActive(true);
+                appDatabase.categoryDAO().insert(category);
+            }
+        }
+    }
+
+    public void updateCategoriesMenu() {
+        new Thread(() -> {
+            categoryList = appDatabase.categoryDAO().getAll();
+            runOnUiThread(() -> {
+                Menu menu = navigationView.getMenu();
+                MenuItem categoriesMenuItem = menu.findItem(R.id.CategoriesMenu);
+                SubMenu subMenu = categoriesMenuItem.getSubMenu();
+                if (subMenu == null) return;
+
+                subMenu.clear();
+
+                MenuItem allCategoryItem = subMenu.add(R.id.categories_group, Menu.FIRST, Menu.NONE, R.string.category_name_all)
+                        .setIcon(R.drawable.ic_list)
+                        .setCheckable(true);
+
+                menu.setGroupCheckable(R.id.categories_group, true, true);
+
+                boolean hasActiveCategory = false;
+
+                for (Category category : categoryList) {
+                    if (category.isActive()) {
+                        MenuItem categoryItem = subMenu.add(R.id.categories_group, Menu.FIRST + 1 + category.getId(), Menu.NONE, category.getName())
+                                .setIcon(R.drawable.ic_list)
+                                .setCheckable(true);
+
+                        if (lastCategory != null && Objects.requireNonNull(lastCategory.getTitle()).toString().equals(category.getName())) {
+                            hasActiveCategory = true;
+                            lastCategory = categoryItem;
+                            selectedCategoryId = category.getId();
+                        }
+                    }
+                }
+
+                if (!hasActiveCategory) {
+                    lastCategory = allCategoryItem;
+                    selectedCategoryId = null;
+                }
+
+                if (lastCategory != null) {
+                    lastCategory.setChecked(true);
+                }
+
+                navigationView.invalidate();
+            });
+        }).start();
+    }
+
+    private void filterAndSortReminders() {
+        new Thread(() -> {
+            List<Reminder> filteredAndSortedList;
+            switch (sortField) {
+                case NONE:
+                    filteredAndSortedList = appDatabase.reminderDAO().getFiltered(selectedCategoryId, isCompleted);
+                    break;
+                case TITLE:
+                    if (sortType == SortType.ASC) {
+                        filteredAndSortedList = appDatabase.reminderDAO().getFilteredAndSortedByTitleAsc(selectedCategoryId, isCompleted);
+                    } else {
+                        filteredAndSortedList = appDatabase.reminderDAO().getFilteredAndSortedByTitleDesc(selectedCategoryId, isCompleted);
+                    }
+                    break;
+                case UPDATED_AT:
+                    if (sortType == SortType.ASC) {
+                        filteredAndSortedList = appDatabase.reminderDAO().getFilteredAndSortedByUpdatedTimeAsc(selectedCategoryId, isCompleted);
+                    } else {
+                        filteredAndSortedList = appDatabase.reminderDAO().getFilteredAndSortedByUpdatedTimeDesc(selectedCategoryId, isCompleted);
+                    }
+                    break;
+                default:
+                    filteredAndSortedList = reminderList;
+            }
+            List<Reminder> finalFilteredAndSortedList = filteredAndSortedList;
+            runOnUiThread(() -> {
+                completedRemindersAmountTextView.setText(String.format(Locale.getDefault(), "%d", appDatabase.reminderDAO().getCompletedRemindersCountByCategoryId(selectedCategoryId)));
+                reminderListAdapter.setReminders(finalFilteredAndSortedList);
+            });
+        }).start();
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        if (item.getGroupId() == R.id.categories_group) {
+            lastCategory.setChecked(false);
+
+            if (Objects.requireNonNull(item.getTitle()).toString().equals(this.getString(R.string.category_name_all))) {
+                selectedCategoryId = null;
+            } else {
+                selectedCategoryId = item.getItemId() - Menu.FIRST - 1;
+            }
+
+            filterAndSortReminders();
+
+            item.setChecked(true);
+            lastCategory = item;
+
+            drawerLayout.closeDrawer(GravityCompat.START);
+            return true;
+        }
+
+        int itemId = item.getItemId();
+        if (itemId == R.id.CategoriesManagement) {
+            startActivity(new Intent(MainActivity.this, CategoryManagementActivity.class));
+        }
+        else if (itemId == R.id.Settings) {
+            // TODO: implement Settings menu
+        }
+        else if (itemId == R.id.Info) {
+            new AlertDialog.Builder(this)
+                    .setTitle("About the Application")
+                    .setMessage("This application was developed as part of a course project.")
+                    .setPositiveButton("OK", null)
+                    .show();
+        }
+        else if (itemId == R.id.Exit) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Exit")
+                    .setMessage("Are you sure you want to exit?")
+                    .setPositiveButton("Yes", (dialog, which) -> {
+                        finish();
+                        System.exit(0);
+                    })
+                    .setNegativeButton("No", null)
+                    .show();
+        }
+        drawerLayout.closeDrawer(GravityCompat.START);
+        return false;
     }
 
     @Override
@@ -319,15 +462,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         sortingOptions.put(R.id.sort_default, new Pair<>(ReminderSortField.NONE, SortType.NONE));
         sortingOptions.put(R.id.sort_title_asc, new Pair<>(ReminderSortField.TITLE, SortType.ASC));
         sortingOptions.put(R.id.sort_title_desc, new Pair<>(ReminderSortField.TITLE, SortType.DESC));
-        sortingOptions.put(R.id.sort_created_time_asc, new Pair<>(ReminderSortField.CREATED_AT, SortType.ASC));
-        sortingOptions.put(R.id.sort_created_time_desc, new Pair<>(ReminderSortField.CREATED_AT, SortType.DESC));
+        sortingOptions.put(R.id.sort_updated_time_asc, new Pair<>(ReminderSortField.UPDATED_AT, SortType.ASC));
+        sortingOptions.put(R.id.sort_updated_time_desc, new Pair<>(ReminderSortField.UPDATED_AT, SortType.DESC));
 
         Map<Integer, Integer> iconOptions = new HashMap<>();
         iconOptions.put(R.id.sort_default, R.drawable.ic_sort);
         iconOptions.put(R.id.sort_title_asc, R.drawable.ic_sort_az);
         iconOptions.put(R.id.sort_title_desc, R.drawable.ic_sort_za);
-        iconOptions.put(R.id.sort_created_time_asc, R.drawable.ic_time);
-        iconOptions.put(R.id.sort_created_time_desc, R.drawable.ic_time_restore);
+        iconOptions.put(R.id.sort_updated_time_asc, R.drawable.ic_time);
+        iconOptions.put(R.id.sort_updated_time_desc, R.drawable.ic_time_restore);
 
         Pair<ReminderSortField, SortType> sortOption = sortingOptions.get(itemId);
         sortField = sortOption != null ? sortOption.first : ReminderSortField.NONE;
@@ -343,147 +486,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         sortingItem.setIcon(ContextCompat.getDrawable(this, iconResId));
     }
 
-    private void addDefaultCategories() {
-        List<Category> existingCategories = appDatabase.categoryDAO().getAll();
-        if (existingCategories.isEmpty()) {
-            String[] defaultCategories = getResources().getStringArray(R.array.default_categories);
-            for (String categoryName : defaultCategories) {
-                Category category = new Category();
-                category.setName(categoryName);
-                int colorInt = ContextCompat.getColor(this, R.color.lavender_medium);
-                String colorHexWithoutAlpha = String.format("#%08X", colorInt);
-                category.setColor(colorHexWithoutAlpha);
-                category.setActive(true);
-                appDatabase.categoryDAO().insert(category);
-            }
-        }
-    }
-
-    public void updateCategoriesMenu() {
-        new Thread(() -> {
-            categoryList = appDatabase.categoryDAO().getAll();
-            runOnUiThread(() -> {
-                Menu menu = navigationView.getMenu();
-                MenuItem categoriesMenuItem = menu.findItem(R.id.CategoriesMenu);
-                SubMenu subMenu = categoriesMenuItem.getSubMenu();
-                if (subMenu == null) return;
-
-                subMenu.clear();
-
-                MenuItem allCategoryItem = subMenu.add(R.id.categories_group, Menu.FIRST, Menu.NONE, R.string.category_name_all)
-                        .setIcon(R.drawable.ic_list)
-                        .setCheckable(true);
-
-                menu.setGroupCheckable(R.id.categories_group, true, true);
-
-                boolean hasActiveCategory = false;
-
-                for (Category category : categoryList) {
-                    if (category.isActive()) {
-                        MenuItem categoryItem = subMenu.add(R.id.categories_group, Menu.FIRST + 1 + category.getId(), Menu.NONE, category.getName())
-                                .setIcon(R.drawable.ic_list)
-                                .setCheckable(true);
-
-                        if (lastCategory != null && Objects.requireNonNull(lastCategory.getTitle()).toString().equals(category.getName())) {
-                            hasActiveCategory = true;
-                            lastCategory = categoryItem;
-                            selectedCategoryId = category.getId();
-                        }
-                    }
-                }
-
-                if (!hasActiveCategory) {
-                    lastCategory = allCategoryItem;
-                    selectedCategoryId = null;
-                }
-
-                if (lastCategory != null) {
-                    lastCategory.setChecked(true);
-                }
-
-                navigationView.invalidate();
-            });
-        }).start();
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        if (item.getGroupId() == R.id.categories_group) {
-            lastCategory.setChecked(false);
-
-            if (Objects.requireNonNull(item.getTitle()).toString().equals(this.getString(R.string.category_name_all))) {
-                selectedCategoryId = null;
-            } else {
-                selectedCategoryId = item.getItemId() - Menu.FIRST - 1;
-            }
-
-            filterAndSortReminders();
-
-            item.setChecked(true);
-            lastCategory = item;
-
-            drawerLayout.closeDrawer(GravityCompat.START);
-            return true;
-        }
-
-        int itemId = item.getItemId();
-        if (itemId == R.id.CategoriesManagement) {
-            startActivity(new Intent(MainActivity.this, CategoryManagementActivity.class));
-        }
-        else if (itemId == R.id.Settings) {
-            // TODO: implement Settings menu
-        }
-        else if (itemId == R.id.Info) {
-            new AlertDialog.Builder(this)
-                    .setTitle("About the Application")
-                    .setMessage("This application was developed as part of a course project.")
-                    .setPositiveButton("OK", null)
-                    .show();
-        }
-        else if (itemId == R.id.Exit) {
-            new AlertDialog.Builder(this)
-                    .setTitle("Exit")
-                    .setMessage("Are you sure you want to exit?")
-                    .setPositiveButton("Yes", (dialog, which) -> {
-                        finish();
-                        System.exit(0);
-                    })
-                    .setNegativeButton("No", null)
-                    .show();
-        }
-        drawerLayout.closeDrawer(GravityCompat.START);
-        return false;
-    }
-
-    private void filterAndSortReminders() {
-        // TODO: add completed reminders amount to text view
-        new Thread(() -> {
-            List<Reminder> filteredAndSortedList;
-            switch (sortField) {
-                case NONE:
-                    filteredAndSortedList = appDatabase.reminderDAO().getFiltered(selectedCategoryId, isCompleted);
-                    break;
-                case TITLE:
-                    if (sortType == SortType.ASC) {
-                        filteredAndSortedList = appDatabase.reminderDAO().getFilteredAndSortedByTitleAsc(selectedCategoryId, isCompleted);
-                    } else {
-                        filteredAndSortedList = appDatabase.reminderDAO().getFilteredAndSortedByTitleDesc(selectedCategoryId, isCompleted);
-                    }
-                    break;
-                case CREATED_AT:
-                    if (sortType == SortType.ASC) {
-                        filteredAndSortedList = appDatabase.reminderDAO().getFilteredAndSortedByCreatedTimeAsc(selectedCategoryId, isCompleted);
-                    } else {
-                        filteredAndSortedList = appDatabase.reminderDAO().getFilteredAndSortedByCreatedTimeDesc(selectedCategoryId, isCompleted);
-                    }
-                    break;
-                default:
-                    filteredAndSortedList = reminderList;
-            }
-            List<Reminder> finalFilteredAndSortedList = filteredAndSortedList;
-            runOnUiThread(() -> reminderListAdapter.setReminders(finalFilteredAndSortedList));
-        }).start();
+    private void updateReminderRecyclerView(int spanCount) {
+        reminderRecyclerView.setHasFixedSize(true);
+        reminderRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(spanCount, LinearLayoutManager.VERTICAL));
+        reminderRecyclerView.setAdapter(reminderListAdapter);
     }
 
     @SuppressLint("ObsoleteSdkInt")

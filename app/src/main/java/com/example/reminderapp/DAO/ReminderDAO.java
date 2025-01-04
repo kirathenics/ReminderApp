@@ -17,11 +17,6 @@ public interface ReminderDAO {
     @Query("SELECT * FROM reminders ORDER BY id ASC ")
     List<Reminder> getAll();
 
-
-    @Query("SELECT * FROM reminders WHERE category_id = :categoryId ORDER BY id ASC ")
-    List<Reminder> getByCategoryId(int categoryId);
-
-
     @Query("SELECT * FROM reminders " +
             "WHERE (:categoryId IS NULL OR category_id = :categoryId) " +
             "AND (:isCompleted IS NULL OR (:isCompleted = 0 AND is_completed = 0) OR :isCompleted) " +
@@ -45,14 +40,19 @@ public interface ReminderDAO {
     @Query("SELECT * FROM reminders " +
             "WHERE (:categoryId IS NULL OR category_id = :categoryId) " +
             "AND (:isCompleted IS NULL OR (:isCompleted = 0 AND is_completed = 0) OR :isCompleted) " +
-            "ORDER BY created_at ASC")
-    List<Reminder> getFilteredAndSortedByCreatedTimeAsc(Integer categoryId, Boolean isCompleted);
+            "ORDER BY updated_at ASC")
+    List<Reminder> getFilteredAndSortedByUpdatedTimeAsc(Integer categoryId, Boolean isCompleted);
 
     @Query("SELECT * FROM reminders " +
             "WHERE (:categoryId IS NULL OR category_id = :categoryId) " +
             "AND (:isCompleted IS NULL OR (:isCompleted = 0 AND is_completed = 0) OR :isCompleted) " +
-            "ORDER BY created_at DESC")
-    List<Reminder> getFilteredAndSortedByCreatedTimeDesc(Integer categoryId, Boolean isCompleted);
+            "ORDER BY updated_at DESC ")
+    List<Reminder> getFilteredAndSortedByUpdatedTimeDesc(Integer categoryId, Boolean isCompleted);
+
+    @Query("SELECT COUNT(*) FROM reminders " +
+            "WHERE is_completed = 1 " +
+            "AND (:categoryId IS NULL OR category_id = :categoryId) ")
+    int  getCompletedRemindersCountByCategoryId(Integer categoryId);
 
     @Query("SELECT * FROM reminders WHERE title = :title LIMIT 1 ")
     Reminder findByTitle(String title);
