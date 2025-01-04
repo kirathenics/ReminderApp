@@ -25,25 +25,30 @@
         app:showAsAction="ifRoom">
 
         <menu>
-            <item
-                android:id="@+id/sort_default"
-                android:icon="@drawable/ic_sort"
-                app:iconTint="@color/lavender_dark"
-                android:title="@string/title_default_order"
-                app:showAsAction="never" />
-            <item
-                android:id="@+id/sort_name_asc"
-                android:icon="@drawable/ic_sort_az"
-                app:iconTint="@color/lavender_dark"
-                android:title="@string/title_name_ascending"
-                app:showAsAction="never" />
-            <item
-                android:id="@+id/sort_name_desc"
-                android:icon="@drawable/ic_sort_za"
-                app:iconTint="@color/lavender_dark"
-                android:title="@string/title_name_descending"
-                app:showAsAction="never" />
+            <group android:id="@+id/sorting_group">
+
+                <item
+                    android:id="@+id/sort_default"
+                    android:icon="@drawable/ic_sort"
+                    app:iconTint="@color/lavender_dark"
+                    android:title="@string/title_default_order"
+                    app:showAsAction="never" />
+                <item
+                    android:id="@+id/sort_name_asc"
+                    android:icon="@drawable/ic_sort_az"
+                    app:iconTint="@color/lavender_dark"
+                    android:title="@string/title_name_ascending"
+                    app:showAsAction="never" />
+                <item
+                    android:id="@+id/sort_name_desc"
+                    android:icon="@drawable/ic_sort_za"
+                    app:iconTint="@color/lavender_dark"
+                    android:title="@string/title_name_descending"
+                    app:showAsAction="never" />
+
+            </group>
         </menu>
+
     </item>
 
 </menu>

@@ -23,7 +23,6 @@ public interface ReminderDAO {
             "ORDER BY id ASC ")
     List<Reminder> getFiltered(Integer categoryId, Boolean isCompleted);
 
-
     @Query("SELECT * FROM reminders " +
             "WHERE (:categoryId IS NULL OR category_id = :categoryId) " +
             "AND (:isCompleted IS NULL OR (:isCompleted = 0 AND is_completed = 0) OR :isCompleted) " +
@@ -31,7 +30,6 @@ public interface ReminderDAO {
             "CASE WHEN :isAsc THEN title END ASC, " +
             "CASE WHEN NOT :isAsc THEN title END DESC ")
     List<Reminder> getFilteredAndSortedByTitle(Integer categoryId, Boolean isCompleted, Boolean isAsc);
-
 
     @Query("SELECT * FROM reminders " +
             "WHERE (:categoryId IS NULL OR category_id = :categoryId) " +
@@ -44,7 +42,7 @@ public interface ReminderDAO {
     @Query("SELECT COUNT(*) FROM reminders " +
             "WHERE is_completed = 1 " +
             "AND (:categoryId IS NULL OR category_id = :categoryId) ")
-    int  getCompletedRemindersCountByCategoryId(Integer categoryId);
+    int getCompletedRemindersCountByCategoryId(Integer categoryId);
 
     @Query("SELECT * FROM reminders WHERE title = :title LIMIT 1 ")
     Reminder findByTitle(String title);

@@ -45,7 +45,6 @@
                     app:iconTint="@color/lavender_dark"
                     android:title="@string/title_title_descending"
                     app:showAsAction="never" />
-
                 <item
                     android:id="@+id/sort_updated_time_asc"
                     android:icon="@drawable/ic_time"

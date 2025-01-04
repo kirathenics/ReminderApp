@@ -1,5 +1,5 @@
 package com.example.reminderapp.Enums;
 
-public enum SortType {
+public enum SortOrder {
     ASC, DESC
 }

@@ -2,7 +2,7 @@ package com.example.reminderapp;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.util.Log;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,27 +21,33 @@ import com.example.reminderapp.Adapters.CategoryListAdapter;
 import com.example.reminderapp.Databases.AppDatabase;
 import com.example.reminderapp.Entities.Category;
 import com.example.reminderapp.Entities.CategoryWithReminderCount;
+import com.example.reminderapp.Enums.CategorySortField;
+import com.example.reminderapp.Enums.SortOrder;
 import com.example.reminderapp.Listeners.OnItemClickListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class CategoryManagementActivity extends AppCompatActivity {
 
-    private RecyclerView categoryRecyclerView;
+    private Menu toolbarMenu;
 
     private AppDatabase appDatabase;
     private List<CategoryWithReminderCount> categoryList = new ArrayList<>();
 
+    private RecyclerView categoryRecyclerView;
     private CategoryListAdapter categoryListAdapter;
 
     private final int ROW_SPAN_COUNT = 1;
     private final int GRID_SPAN_COUNT = 2;
     private boolean isGridView = true;
 
-    Menu toolbarMenu;
+    private CategorySortField sortField;
+    private SortOrder sortOrder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +68,6 @@ public class CategoryManagementActivity extends AppCompatActivity {
         appDatabase = AppDatabase.getInstance(this);
         new Thread(() -> {
             categoryList = appDatabase.categoryDAO().getAllWithReminderCount();
-            Log.i("categories", categoryList.toString());
             runOnUiThread(() -> {
                 categoryListAdapter = new CategoryListAdapter(CategoryManagementActivity.this, categoryList,
                         new OnItemClickListener<>() {
@@ -111,18 +116,6 @@ public class CategoryManagementActivity extends AppCompatActivity {
         });
     }
 
-    private void filterCategories(String query) {
-        List<CategoryWithReminderCount> filteredList = new ArrayList<>();
-        for (CategoryWithReminderCount category : categoryList) {
-            if (category.getCategory().getName().toLowerCase().contains(query.toLowerCase())
-                    || (Integer.toString(category.getNotCompletedReminders()).contains(query) && category.getNotCompletedReminders() != 0)
-                    || Integer.toString(category.getCompletedReminders()).contains(query) && category.getCompletedReminders() != 0) {
-                filteredList.add(category);
-            }
-        }
-        categoryListAdapter.filterList(filteredList);
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.category_management_toolbar_menu, menu);
@@ -136,13 +129,13 @@ public class CategoryManagementActivity extends AppCompatActivity {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                filterCategories(query);
+                searchCategories(query);
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                filterCategories(newText);
+                searchCategories(newText);
                 return true;
             }
         });
@@ -155,7 +148,7 @@ public class CategoryManagementActivity extends AppCompatActivity {
 
             @Override
             public boolean onMenuItemActionCollapse(@NonNull MenuItem item) {
-                filterCategories("");
+                searchCategories("");
                 return true;
             }
         });
@@ -163,73 +156,164 @@ public class CategoryManagementActivity extends AppCompatActivity {
         return true;
     }
 
+    private void searchCategories(String query) {
+        List<CategoryWithReminderCount> foundCategoryList = new ArrayList<>();
+        for (CategoryWithReminderCount category : categoryList) {
+            if (category.getCategory().getName().toLowerCase().contains(query.toLowerCase())
+                    || (Integer.toString(category.getNotCompletedReminders()).contains(query) && category.getNotCompletedReminders() != 0)
+                    || Integer.toString(category.getCompletedReminders()).contains(query) && category.getCompletedReminders() != 0) {
+                foundCategoryList.add(category);
+            }
+        }
+        categoryListAdapter.searchCategories(foundCategoryList);
+    }
+
+//    @Override
+//    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+//        int itemId = item.getItemId();
+//        if (itemId == android.R.id.home) {
+//            finish();
+//            return true;
+//        }
+//        else if (itemId == R.id.view_mode) {
+//            if (isGridView) {
+//                isGridView = false;
+//                updateCategoryRecyclerView(ROW_SPAN_COUNT);
+//                item.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_row_view));
+//
+//            } else {
+//                isGridView = true;
+//                updateCategoryRecyclerView(GRID_SPAN_COUNT);
+//                item.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_grid_view));
+//            }
+//            return true;
+//        } else if (itemId == R.id.sort_default || itemId == R.id.sort_name_asc || itemId == R.id.sort_name_desc) {
+//            String sortType = "default";
+//            int iconResId = R.drawable.ic_sort;
+//
+//            if (itemId == R.id.sort_name_asc) {
+//                sortType = "name_asc";
+//                iconResId = R.drawable.ic_sort_az;
+//            } else if (itemId == R.id.sort_name_desc) {
+//                sortType = "name_desc";
+//                iconResId = R.drawable.ic_sort_za;
+//            }
+//
+//            sortCategories(sortType);
+//
+//            MenuItem sortingItem = toolbarMenu.findItem(R.id.category_sorting);
+//            if (sortingItem != null) {
+//                updateSortingIcon(sortingItem, iconResId);
+//            }
+//            return true;
+//        }
+//        return false;
+//    }
+//
+//    private void updateSortingIcon(MenuItem sortingItem, int iconResId) {
+//        sortingItem.setIcon(ContextCompat.getDrawable(this, iconResId));
+//    }
+//
+//    @SuppressLint("NotifyDataSetChanged")
+//    private void sortCategories(String sortType) {
+//        new Thread(() -> {
+//            List<CategoryWithReminderCount> sortedList = new ArrayList<>();
+//            switch (sortType) {
+//                case "default":
+//                    sortedList = appDatabase.categoryDAO().getAllWithReminderCount();
+//                    break;
+//                case "name_asc":
+//                    sortedList = appDatabase.categoryDAO().getAllSortedByNameWithReminderCount(true);
+//                    break;
+//                case "name_desc":
+//                    sortedList = appDatabase.categoryDAO().getAllSortedByNameWithReminderCount(false);
+//                    break;
+//            }
+//            List<CategoryWithReminderCount> finalSortedList = sortedList;
+//            runOnUiThread(() -> {
+//                categoryList.clear();
+//                categoryList.addAll(finalSortedList);
+//                categoryListAdapter.notifyDataSetChanged();
+//            });
+//        }).start();
+//    }
+
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int itemId = item.getItemId();
+
         if (itemId == android.R.id.home) {
             finish();
             return true;
         }
-        else if (itemId == R.id.view_mode) {
-            if (isGridView) {
-                isGridView = false;
-                updateCategoryRecyclerView(ROW_SPAN_COUNT);
-                item.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_row_view));
 
-            } else {
-                isGridView = true;
-                updateCategoryRecyclerView(GRID_SPAN_COUNT);
-                item.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_grid_view));
-            }
-            return true;
-        } else if (itemId == R.id.sort_default || itemId == R.id.sort_name_asc || itemId == R.id.sort_name_desc) {
-            String sortType = "default";
-            int iconResId = R.drawable.ic_sort;
-
-            if (itemId == R.id.sort_name_asc) {
-                sortType = "name_asc";
-                iconResId = R.drawable.ic_sort_az;
-            } else if (itemId == R.id.sort_name_desc) {
-                sortType = "name_desc";
-                iconResId = R.drawable.ic_sort_za;
-            }
-
-            sortCategories(sortType);
-
-            MenuItem sortingItem = toolbarMenu.findItem(R.id.category_sorting);
-            if (sortingItem != null) {
-                updateSortingIcon(sortingItem, iconResId);
-            }
+        if (itemId == R.id.view_mode) {
+            toggleViewMode(item);
             return true;
         }
+
+        if (isSortingOption(itemId)) {
+            handleSortingOption(itemId);
+            return true;
+        }
+
         return false;
+    }
+
+    private void toggleViewMode(MenuItem item) {
+        isGridView = !isGridView;
+        int spanCount = isGridView ? GRID_SPAN_COUNT : ROW_SPAN_COUNT;
+        int iconResId = isGridView ? R.drawable.ic_grid_view : R.drawable.ic_row_view;
+
+        updateCategoryRecyclerView(spanCount);
+        item.setIcon(ContextCompat.getDrawable(this, iconResId));
+    }
+
+    private boolean isSortingOption(int itemId) {
+        MenuItem item = toolbarMenu.findItem(itemId);
+        return item != null && item.getGroupId() == R.id.sorting_group;
+    }
+
+    private void handleSortingOption(int itemId) {
+        Map<Integer, Pair<CategorySortField, SortOrder>> sortingOptions = new HashMap<>();
+        sortingOptions.put(R.id.sort_default, new Pair<>(CategorySortField.NONE, SortOrder.ASC));
+        sortingOptions.put(R.id.sort_name_asc, new Pair<>(CategorySortField.NAME, SortOrder.ASC));
+        sortingOptions.put(R.id.sort_name_desc, new Pair<>(CategorySortField.NAME, SortOrder.DESC));
+
+        Map<Integer, Integer> iconOptions = new HashMap<>();
+        iconOptions.put(R.id.sort_default, R.drawable.ic_sort);
+        iconOptions.put(R.id.sort_name_asc, R.drawable.ic_sort_az);
+        iconOptions.put(R.id.sort_name_desc, R.drawable.ic_sort_za);
+
+        Pair<CategorySortField, SortOrder> sortOption = sortingOptions.get(itemId);
+        sortField = sortOption != null ? sortOption.first : CategorySortField.NONE;
+        sortOrder = sortOption != null ? sortOption.second : SortOrder.ASC;
+        Integer iconResIdValue = iconOptions.get(itemId);
+        int iconResId = (iconResIdValue != null) ? iconResIdValue : R.drawable.ic_sort;
+
+        updateSortingIcon(toolbarMenu.findItem(R.id.category_sorting), iconResId);
+        sortCategories();
     }
 
     private void updateSortingIcon(MenuItem sortingItem, int iconResId) {
         sortingItem.setIcon(ContextCompat.getDrawable(this, iconResId));
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    private void sortCategories(String sortType) {
+    private void sortCategories() {
         new Thread(() -> {
-            List<CategoryWithReminderCount> sortedList = new ArrayList<>();
-            switch (sortType) {
-                case "default":
+            List<CategoryWithReminderCount> sortedList;
+            switch (sortField) {
+                case NONE:
                     sortedList = appDatabase.categoryDAO().getAllWithReminderCount();
                     break;
-                case "name_asc":
-                    sortedList = appDatabase.categoryDAO().getAllSortedByNameWithReminderCount(true);
+                case NAME:
+                    sortedList = appDatabase.categoryDAO().getAllSortedByNameWithReminderCount(sortOrder == SortOrder.ASC);
                     break;
-                case "name_desc":
-                    sortedList = appDatabase.categoryDAO().getAllSortedByNameWithReminderCount(false);
-                    break;
+                default:
+                    sortedList = categoryList;
             }
-            List<CategoryWithReminderCount> finalSortedList = sortedList;
-            runOnUiThread(() -> {
-                categoryList.clear();
-                categoryList.addAll(finalSortedList);
-                categoryListAdapter.notifyDataSetChanged();
-            });
+            List<CategoryWithReminderCount> finalFilteredAndSortedList = sortedList;
+            runOnUiThread(() -> categoryListAdapter.setCategories(finalFilteredAndSortedList));
         }).start();
     }
 

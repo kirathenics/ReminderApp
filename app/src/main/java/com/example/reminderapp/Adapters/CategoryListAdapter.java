@@ -109,11 +109,6 @@ public class CategoryListAdapter extends RecyclerView.Adapter<CategoryListAdapte
             holder.colorCircleView.setBackgroundTintList(ColorStateList.valueOf(Color.GRAY));
         }
 
-        if (holder.nameTextView.getText().equals(context.getString(R.string.category_name_by_default))) {
-            holder.is_activeSwitchCompat.setVisibility(View.GONE);
-            holder.optionsImageButton.setVisibility(View.GONE);
-        }
-
         holder.is_activeSwitchCompat.setOnCheckedChangeListener((buttonView, isChecked) -> {
             category.getCategory().setActive(isChecked);
             updateCardColor(holder.categoryCardView, isChecked);
@@ -143,7 +138,16 @@ public class CategoryListAdapter extends RecyclerView.Adapter<CategoryListAdapte
             popupMenu.show();
         });
 
-        holder.itemView.setOnClickListener(view -> createEditDialog(position, category));
+        if (isDefaultCategory(category)) {
+            holder.is_activeSwitchCompat.setVisibility(View.GONE);
+            holder.optionsImageButton.setVisibility(View.GONE);
+            holder.itemView.setOnClickListener(v -> {});
+        } else {
+            holder.is_activeSwitchCompat.setVisibility(View.VISIBLE);
+            holder.optionsImageButton.setVisibility(View.VISIBLE);
+            holder.itemView.setOnClickListener(view -> createEditDialog(position, category));
+        }
+
 
         holder.itemView.setOnLongClickListener(view -> {
             clickListener.onItemLongClick(category, holder.categoryCardView);
@@ -168,14 +172,25 @@ public class CategoryListAdapter extends RecyclerView.Adapter<CategoryListAdapte
         cardView.setCardBackgroundColor(color);
     }
 
+    private boolean isDefaultCategory(CategoryWithReminderCount category) {
+        return category.getCategory().getName().equals(context.getString(R.string.category_name_by_default));
+    }
+
     @Override
     public int getItemCount() {
         return categoryList.size();
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    public void filterList(List<CategoryWithReminderCount> filteredList) {
-        categoryList = filteredList;
+    public void setCategories(List<CategoryWithReminderCount> categories) {
+        categoryList.clear();
+        categoryList.addAll(categories);
+        notifyDataSetChanged();
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    public void searchCategories(List<CategoryWithReminderCount> foundCategoryList) {
+        categoryList = foundCategoryList;
         notifyDataSetChanged();
     }
 

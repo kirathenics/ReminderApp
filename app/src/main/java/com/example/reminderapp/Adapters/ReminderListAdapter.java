@@ -154,8 +154,8 @@ public class ReminderListAdapter extends RecyclerView.Adapter<ReminderListAdapte
 
     @SuppressLint("NotifyDataSetChanged")
     public void setReminders(List<Reminder> reminders) {
-        this.reminderList.clear();
-        this.reminderList.addAll(reminders);
+        reminderList.clear();
+        reminderList.addAll(reminders);
         notifyDataSetChanged();
     }
 

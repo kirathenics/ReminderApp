@@ -39,7 +39,7 @@ import com.example.reminderapp.Databases.AppDatabase;
 import com.example.reminderapp.Entities.Category;
 import com.example.reminderapp.Entities.Reminder;
 import com.example.reminderapp.Enums.ReminderSortField;
-import com.example.reminderapp.Enums.SortType;
+import com.example.reminderapp.Enums.SortOrder;
 import com.example.reminderapp.Listeners.OnItemClickListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
@@ -53,6 +53,7 @@ import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
+    private Menu toolbarMenu;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
 
@@ -63,20 +64,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private RecyclerView reminderRecyclerView;
     private ReminderListAdapter reminderListAdapter;
 
-    private MenuItem lastCategory;
-    private Menu toolbarMenu;
-
     TextView completedRemindersAmountTextView;
 
     private final int ROW_SPAN_COUNT = 1;
     private final int GRID_SPAN_COUNT = 2;
     private boolean isGridView = true;
 
+    private MenuItem lastCategory;
     private Integer selectedCategoryId = null;
     private Boolean isCompleted = true;
     private ReminderSortField sortField = ReminderSortField.NONE;
-//    private SortType sortType = SortType.NONE;
-    private SortType sortType = SortType.ASC;
+    private SortOrder sortOrder = SortOrder.ASC;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,12 +106,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
+        reminderRecyclerView = findViewById(R.id.reminder_recycler_view);
+
         appDatabase = AppDatabase.getInstance(this);
 
         lastCategory = null;
         addDefaultCategories();
-
-        reminderRecyclerView = findViewById(R.id.reminder_recycler_view);
 
         ActivityResultLauncher<Intent> changeReminderActivityLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -302,10 +300,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     filteredAndSortedList = appDatabase.reminderDAO().getFiltered(selectedCategoryId, isCompleted);
                     break;
                 case TITLE:
-                    filteredAndSortedList = appDatabase.reminderDAO().getFilteredAndSortedByTitle(selectedCategoryId, isCompleted, sortType == SortType.ASC);
+                    filteredAndSortedList = appDatabase.reminderDAO().getFilteredAndSortedByTitle(selectedCategoryId, isCompleted, sortOrder == SortOrder.ASC);
                     break;
                 case UPDATED_AT:
-                    filteredAndSortedList = appDatabase.reminderDAO().getFilteredAndSortedByUpdatedTime(selectedCategoryId, isCompleted, sortType == SortType.ASC);
+                    filteredAndSortedList = appDatabase.reminderDAO().getFilteredAndSortedByUpdatedTime(selectedCategoryId, isCompleted, sortOrder == SortOrder.ASC);
                     break;
                 default:
                     filteredAndSortedList = reminderList;
@@ -450,13 +448,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return item != null && item.getGroupId() == R.id.sorting_group;
     }
 
-    private void handleSortingOption(final int itemId) {
-        Map<Integer, Pair<ReminderSortField, SortType>> sortingOptions = new HashMap<>();
-        sortingOptions.put(R.id.sort_default, new Pair<>(ReminderSortField.NONE, SortType.ASC));
-        sortingOptions.put(R.id.sort_title_asc, new Pair<>(ReminderSortField.TITLE, SortType.ASC));
-        sortingOptions.put(R.id.sort_title_desc, new Pair<>(ReminderSortField.TITLE, SortType.DESC));
-        sortingOptions.put(R.id.sort_updated_time_asc, new Pair<>(ReminderSortField.UPDATED_AT, SortType.ASC));
-        sortingOptions.put(R.id.sort_updated_time_desc, new Pair<>(ReminderSortField.UPDATED_AT, SortType.DESC));
+    private void handleSortingOption(int itemId) {
+        Map<Integer, Pair<ReminderSortField, SortOrder>> sortingOptions = new HashMap<>();
+        sortingOptions.put(R.id.sort_default, new Pair<>(ReminderSortField.NONE, SortOrder.ASC));
+        sortingOptions.put(R.id.sort_title_asc, new Pair<>(ReminderSortField.TITLE, SortOrder.ASC));
+        sortingOptions.put(R.id.sort_title_desc, new Pair<>(ReminderSortField.TITLE, SortOrder.DESC));
+        sortingOptions.put(R.id.sort_updated_time_asc, new Pair<>(ReminderSortField.UPDATED_AT, SortOrder.ASC));
+        sortingOptions.put(R.id.sort_updated_time_desc, new Pair<>(ReminderSortField.UPDATED_AT, SortOrder.DESC));
 
         Map<Integer, Integer> iconOptions = new HashMap<>();
         iconOptions.put(R.id.sort_default, R.drawable.ic_sort);
@@ -465,14 +463,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         iconOptions.put(R.id.sort_updated_time_asc, R.drawable.ic_time);
         iconOptions.put(R.id.sort_updated_time_desc, R.drawable.ic_time_restore);
 
-        Pair<ReminderSortField, SortType> sortOption = sortingOptions.get(itemId);
+        Pair<ReminderSortField, SortOrder> sortOption = sortingOptions.get(itemId);
         sortField = sortOption != null ? sortOption.first : ReminderSortField.NONE;
-        sortType = sortOption != null ? sortOption.second : SortType.ASC;
+        sortOrder = sortOption != null ? sortOption.second : SortOrder.ASC;
         Integer iconResIdValue = iconOptions.get(itemId);
         int iconResId = (iconResIdValue != null) ? iconResIdValue : R.drawable.ic_sort;
 
         updateSortingIcon(toolbarMenu.findItem(R.id.reminder_sorting), iconResId);
-        runOnUiThread(this::filterAndSortReminders);
+        filterAndSortReminders();
     }
 
     private void updateSortingIcon(MenuItem sortingItem, int iconResId) {
