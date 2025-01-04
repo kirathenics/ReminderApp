@@ -45,13 +45,17 @@
             android:id="@+id/color_picker_linear_layout"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:baselineAligned="false"
             android:gravity="center"
             android:orientation="horizontal">
 
             <FrameLayout
-                android:layout_width="wrap_content"
+                android:layout_width="0sp"
                 android:layout_height="wrap_content"
-                android:layout_margin="8sp">
+                android:layout_weight="1"
+                android:layout_marginEnd="8sp"
+                android:layout_marginTop="8sp"
+                android:layout_marginBottom="8sp">
 
                 <View
                     android:id="@+id/circle_color_lavender_medium"
@@ -71,8 +75,9 @@
             </FrameLayout>
 
             <FrameLayout
-                android:layout_width="wrap_content"
+                android:layout_width="0sp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:layout_margin="8sp">
 
                 <View
@@ -93,8 +98,9 @@
             </FrameLayout>
 
             <FrameLayout
-                android:layout_width="wrap_content"
+                android:layout_width="0sp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:layout_margin="8sp">
 
                 <View
@@ -115,8 +121,9 @@
             </FrameLayout>
 
             <FrameLayout
-                android:layout_width="wrap_content"
+                android:layout_width="0sp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:layout_margin="8sp">
 
                 <View
@@ -137,8 +144,9 @@
             </FrameLayout>
 
             <FrameLayout
-                android:layout_width="wrap_content"
+                android:layout_width="0sp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:layout_margin="8sp">
 
                 <View
@@ -159,8 +167,9 @@
             </FrameLayout>
 
             <FrameLayout
-                android:layout_width="wrap_content"
+                android:layout_width="0sp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:layout_margin="8sp">
 
                 <View
@@ -181,9 +190,12 @@
             </FrameLayout>
 
             <FrameLayout
-                android:layout_width="wrap_content"
+                android:layout_width="0sp"
                 android:layout_height="wrap_content"
-                android:layout_margin="8sp">
+                android:layout_weight="1"
+                android:layout_marginStart="8sp"
+                android:layout_marginTop="8sp"
+                android:layout_marginBottom="8sp">
 
                 <View
                     android:id="@+id/circle_color_prismatic_red"
