@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -60,13 +61,12 @@ import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-    private Menu toolbarMenu;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
 
     private AppDatabase appDatabase;
     private List<Category> categoryList = new ArrayList<>();
-    private List<Reminder> reminderList = new ArrayList<>();
+    private final List<Reminder> reminderList = new ArrayList<>();
 
     private ActivityResultLauncher<Intent> createReminderActivityLauncher;
     private ActivityResultLauncher<Intent> changeReminderActivityLauncher;
@@ -75,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ReminderListAdapter reminderListAdapter;
 
     LinearLayout completedRemindersAmountLinearLayout;
+    SwitchCompat isCompletedRemindersVisibleSwitchCompat;
     TextView completedRemindersAmountTextView;
 
     LinearLayout noRemindersLinearLayout;
@@ -94,156 +95,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final int interval = 10000;
 
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_main);
-//        createNotificationChannel();
-//
-//        Toolbar toolbar = findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
-//
-//        drawerLayout = findViewById(R.id.drawer_layout);
-//        navigationView = findViewById(R.id.nav_view);
-//        navigationView.setNavigationItemSelectedListener(this);
-//
-//        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.Open, R.string.Close);
-//        int color = ContextCompat.getColor(this, R.color.lavender_dark);
-//        toggle.getDrawerArrowDrawable().setColor(color);
-//        drawerLayout.addDrawerListener(toggle);
-//        toggle.syncState();
-//
-//        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
-//            @Override
-//            public void handleOnBackPressed() {
-//                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-//                    drawerLayout.closeDrawer(GravityCompat.START);
-//                } else {
-//                    finish();
-//                }
-//            }
-//        });
-//
-//        reminderRecyclerView = findViewById(R.id.reminder_recycler_view);
-//
-//        completedRemindersAmountLinearLayout = findViewById(R.id.completed_reminders_amount_linear_layout);
-//        completedRemindersAmountTextView = findViewById(R.id.completed_reminders_amount_text_view);
-//
-//        noRemindersLinearLayout = findViewById(R.id.no_reminders_linear_layout);
-//        noRemindersCategoryNameTextView = findViewById(R.id.no_reminders_category_name_text_view);
-//
-//        appDatabase = AppDatabase.getInstance(this);
-//
-//        lastCategory = null;
-//        addDefaultCategories();
-//
-//        ActivityResultLauncher<Intent> changeReminderActivityLauncher = registerForActivityResult(
-//                new ActivityResultContracts.StartActivityForResult(),
-//                result -> {
-//                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
-//                        Reminder updatedReminder = (Reminder) result.getData().getSerializableExtra("new_reminder");
-//                        int position = result.getData().getIntExtra("position", -1);
-//
-//                        if (position != -1 && updatedReminder != null) {
-//                            appDatabase.reminderDAO().update(updatedReminder);
-//                            reminderList.set(position, updatedReminder);
-//                            reminderListAdapter.notifyItemChanged(position);
-//
-//                            if (selectedCategoryId != null) {
-//                                if (selectedCategoryId != updatedReminder.getCategoryId()) {
-//                                    selectedCategoryId = updatedReminder.getCategoryId();
-//                                }
-//                            }
-//                        }
-//
-//                        filterAndSortReminders();
-//                    }
-//                }
-//        );
-//
-//        new Thread(() -> {
-//            reminderList = appDatabase.reminderDAO().getAll();
-//            runOnUiThread(() -> {
-//                reminderListAdapter = new ReminderListAdapter(MainActivity.this, reminderList,
-//                        new OnItemClickListener<>() {
-//                            @Override
-//                            public void onItemClick(Reminder item) {}
-//
-//                            @Override
-//                            public void onItemLongClick(Reminder item, CardView cardView) {}
-//                        },
-//                        changeReminderActivityLauncher,
-//                        (position, updatedItem) -> {
-//                            appDatabase.reminderDAO().update(updatedItem);
-//                            reminderList.set(position, updatedItem);
-//                            reminderListAdapter.notifyItemChanged(position);
-//                            filterAndSortReminders();
-//                        },
-//                        (position, deletedItem) -> {
-//                            appDatabase.reminderDAO().delete(deletedItem);
-//                            reminderList.remove(position);
-////                            reminderListAdapter.notifyItemRemoved(position);
-////                            reminderListAdapter.notifyItemRangeChanged(position, reminderList.size());
-//                            filterAndSortReminders();
-//                        });
-//                updateReminderRecyclerView(GRID_SPAN_COUNT);
-//            });
-//        }).start();
-//
-//        @SuppressLint("NotifyDataSetChanged") ActivityResultLauncher<Intent> createReminderActivityLauncher = registerForActivityResult(
-//                new ActivityResultContracts.StartActivityForResult(),
-//                result -> {
-//                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
-//                        new Thread(() -> {
-//                            Reminder newReminder = (Reminder) result.getData().getSerializableExtra("new_reminder");
-//                            appDatabase.reminderDAO().insert(newReminder);
-//
-//                            Reminder addedReminder = appDatabase.reminderDAO().getLastInsertedReminder();
-//
-//                            runOnUiThread(() -> {
-//                                reminderList.add(addedReminder);
-//                                reminderListAdapter.notifyDataSetChanged();
-//
-//                                if (selectedCategoryId != null) {
-//                                    if (selectedCategoryId != addedReminder.getCategoryId()) {
-//                                        selectedCategoryId = addedReminder.getCategoryId();
-//                                    }
-//                                }
-//
-//                                filterAndSortReminders();
-//                            });
-//                        }).start();
-//                    }
-//                }
-//        );
-//
-//        addReminderButton = findViewById(R.id.add_reminder_button);
-//        addReminderButton.setOnClickListener(v -> {
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-//                if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
-//                        != PackageManager.PERMISSION_GRANTED) {
-//                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, 1);
-//                }
-//            }
-//
-//            Intent intent = new Intent(MainActivity.this, ReminderAddActivity.class);
-//
-//            if (selectedCategoryId != null) {
-//                Category selectedCategory = appDatabase.categoryDAO().findById(selectedCategoryId);
-//                intent.putExtra("selected_category", selectedCategory);
-//            }
-//
-//            createReminderActivityLauncher.launch(intent);
-//        });
-//
-//        SwitchCompat isCompletedRemindersVisibleSwitchCompat = findViewById(R.id.is_completed_reminders_visible_switch_compat);
-//        isCompletedRemindersVisibleSwitchCompat.setOnCheckedChangeListener((buttonView, isChecked) -> {
-//            isCompleted = isChecked;
-//            filterAndSortReminders();
-//        });
-//
-//        startPulseAnimation();
-//    }
+    private SharedPreferences sharedPreferences;
+
+    private Menu toolbarMenu;
+    private final Map<Pair<ReminderSortField, SortOrder>, Integer> iconMap = new HashMap<>();
+    private final Map<Integer, Pair<ReminderSortField, SortOrder>> sortingOptions = new HashMap<>();
+    private final Map<Integer, Integer> iconOptions = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -251,16 +108,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_main);
         createNotificationChannel();
 
-        initToolbar();
-        initDrawer();
+        initIconMaps();
+
+        sharedPreferences = getSharedPreferences("AppPreferences", MODE_PRIVATE);
+
+        initToolbarAndDrawer();
         initViews();
         initDatabase();
         initResultLaunchers();
+        setupReminderAdapter();
 
         addReminderButton = findViewById(R.id.add_reminder_button);
         addReminderButton.setOnClickListener(v -> onAddReminderButtonClicked());
 
-        SwitchCompat isCompletedRemindersVisibleSwitchCompat = findViewById(R.id.is_completed_reminders_visible_switch_compat);
+        isCompletedRemindersVisibleSwitchCompat = findViewById(R.id.is_completed_reminders_visible_switch_compat);
         isCompletedRemindersVisibleSwitchCompat.setOnCheckedChangeListener((buttonView, isChecked) -> {
             isCompleted = isChecked;
             filterAndSortReminders();
@@ -269,17 +130,53 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         startPulseAnimation();
     }
 
-    private void initToolbar() {
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+    private void initIconMaps() {
+        iconMap.put(new Pair<>(ReminderSortField.NONE, SortOrder.ASC), R.drawable.ic_sort);
+        iconMap.put(new Pair<>(ReminderSortField.TITLE, SortOrder.ASC), R.drawable.ic_sort_az);
+        iconMap.put(new Pair<>(ReminderSortField.TITLE, SortOrder.DESC), R.drawable.ic_sort_za);
+        iconMap.put(new Pair<>(ReminderSortField.UPDATED_AT, SortOrder.ASC), R.drawable.ic_time);
+        iconMap.put(new Pair<>(ReminderSortField.UPDATED_AT, SortOrder.DESC), R.drawable.ic_time_restore);
+
+        sortingOptions.put(R.id.sort_default, new Pair<>(ReminderSortField.NONE, SortOrder.ASC));
+        sortingOptions.put(R.id.sort_title_asc, new Pair<>(ReminderSortField.TITLE, SortOrder.ASC));
+        sortingOptions.put(R.id.sort_title_desc, new Pair<>(ReminderSortField.TITLE, SortOrder.DESC));
+        sortingOptions.put(R.id.sort_updated_time_asc, new Pair<>(ReminderSortField.UPDATED_AT, SortOrder.ASC));
+        sortingOptions.put(R.id.sort_updated_time_desc, new Pair<>(ReminderSortField.UPDATED_AT, SortOrder.DESC));
+
+        iconOptions.put(R.id.sort_default, R.drawable.ic_sort);
+        iconOptions.put(R.id.sort_title_asc, R.drawable.ic_sort_az);
+        iconOptions.put(R.id.sort_title_desc, R.drawable.ic_sort_za);
+        iconOptions.put(R.id.sort_updated_time_asc, R.drawable.ic_time);
+        iconOptions.put(R.id.sort_updated_time_desc, R.drawable.ic_time_restore);
     }
 
-    private void initDrawer() {
+    private void loadPreferences() {
+        selectedCategoryId = sharedPreferences.getInt("selectedCategoryId", -1);
+        selectedCategoryId = selectedCategoryId == -1 ? null : selectedCategoryId;
+        isCompleted = sharedPreferences.getBoolean("isCompleted", true);
+        isCompletedRemindersVisibleSwitchCompat.setChecked(isCompleted);
+        sortField = ReminderSortField.valueOf(sharedPreferences.getString("reminderSortField", ReminderSortField.NONE.toString()));
+        sortOrder = SortOrder.valueOf(sharedPreferences.getString("reminderSortOrder", SortOrder.ASC.toString()));
+    }
+
+    private void savePreferences() {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt("selectedCategoryId", selectedCategoryId != null ? selectedCategoryId : -1);
+        editor.putBoolean("isCompleted", isCompleted);
+        editor.putString("reminderSortField", sortField.toString());
+        editor.putString("reminderSortOrder", sortOrder.toString());
+        editor.apply();
+    }
+
+    private void initToolbarAndDrawer() {
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, findViewById(R.id.toolbar), R.string.Open, R.string.Close);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.Open, R.string.Close);
         toggle.getDrawerArrowDrawable().setColor(ContextCompat.getColor(this, R.color.lavender_dark));
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
@@ -309,10 +206,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void initDatabase() {
         appDatabase = AppDatabase.getInstance(this);
         addDefaultCategories();
-        new Thread(() -> {
-            reminderList = appDatabase.reminderDAO().getAll();
-            runOnUiThread(this::setupReminderAdapter);
-        }).start();
     }
 
     private void initResultLaunchers() {
@@ -430,17 +323,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        handler.removeCallbacksAndMessages(null);
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
 
+        loadPreferences();
+
         updateCategoriesMenu();
-        runOnUiThread(this::filterAndSortReminders);
+        filterAndSortReminders();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        savePreferences();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        handler.removeCallbacksAndMessages(null);
     }
 
     private void addDefaultCategories() {
@@ -460,50 +362,47 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public void updateCategoriesMenu() {
-        new Thread(() -> {
-            categoryList = appDatabase.categoryDAO().getAll();
-            runOnUiThread(() -> {
-                Menu menu = navigationView.getMenu();
-                MenuItem categoriesMenuItem = menu.findItem(R.id.CategoriesMenu);
-                SubMenu subMenu = categoriesMenuItem.getSubMenu();
-                if (subMenu == null) return;
+        categoryList = appDatabase.categoryDAO().getAll();
+        runOnUiThread(() -> {
+            Menu menu = navigationView.getMenu();
+            MenuItem categoriesMenuItem = menu.findItem(R.id.CategoriesMenu);
+            SubMenu subMenu = categoriesMenuItem.getSubMenu();
+            if (subMenu == null) return;
 
-                subMenu.clear();
+            subMenu.clear();
 
-                MenuItem allCategoryItem = subMenu.add(R.id.categories_group, Menu.FIRST, Menu.NONE, R.string.category_name_all)
-                        .setIcon(R.drawable.ic_list)
-                        .setCheckable(true);
+            MenuItem allCategoryItem = subMenu.add(R.id.categories_group, Menu.FIRST, Menu.NONE, R.string.category_name_all)
+                    .setIcon(R.drawable.ic_list)
+                    .setCheckable(true);
 
-                menu.setGroupCheckable(R.id.categories_group, true, true);
+            menu.setGroupCheckable(R.id.categories_group, true, true);
 
-                boolean hasActiveCategory = false;
+            boolean hasActiveCategory = false;
 
-                for (Category category : categoryList) {
-                    if (category.isActive()) {
-                        MenuItem categoryItem = subMenu.add(R.id.categories_group, Menu.FIRST + 1 + category.getId(), Menu.NONE, category.getName())
-                                .setIcon(R.drawable.ic_list)
-                                .setCheckable(true);
+            for (Category category : categoryList) {
+                if (category.isActive()) {
+                    MenuItem categoryItem = subMenu.add(R.id.categories_group, Menu.FIRST + 1 + category.getId(), Menu.NONE, category.getName())
+                            .setIcon(R.drawable.ic_list)
+                            .setCheckable(true);
 
-                        if (lastCategory != null && Objects.requireNonNull(lastCategory.getTitle()).toString().equals(category.getName())) {
-                            hasActiveCategory = true;
-                            lastCategory = categoryItem;
-                            selectedCategoryId = category.getId();
-                        }
+                    if (selectedCategoryId != null && category.getId() == selectedCategoryId) {
+                        hasActiveCategory = true;
+                        lastCategory = categoryItem;
                     }
                 }
+            }
 
-                if (!hasActiveCategory) {
-                    lastCategory = allCategoryItem;
-                    selectedCategoryId = null;
-                }
+            if (!hasActiveCategory) {
+                lastCategory = allCategoryItem;
+                selectedCategoryId = null;
+            }
 
-                if (lastCategory != null) {
-                    lastCategory.setChecked(true);
-                }
+            if (lastCategory != null) {
+                lastCategory.setChecked(true);
+            }
 
-                navigationView.invalidate();
-            });
-        }).start();
+            navigationView.invalidate();
+        });
     }
 
     private void filterAndSortReminders() {
@@ -598,6 +497,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         getMenuInflater().inflate(R.menu.reminder_toolbar_menu, menu);
 
         toolbarMenu = menu;
+        updateIconBasedOnSortFieldAndOrder();
 
         MenuItem searchItem = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) searchItem.getActionView();
@@ -677,20 +577,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void handleSortingOption(int itemId) {
-        Map<Integer, Pair<ReminderSortField, SortOrder>> sortingOptions = new HashMap<>();
-        sortingOptions.put(R.id.sort_default, new Pair<>(ReminderSortField.NONE, SortOrder.ASC));
-        sortingOptions.put(R.id.sort_title_asc, new Pair<>(ReminderSortField.TITLE, SortOrder.ASC));
-        sortingOptions.put(R.id.sort_title_desc, new Pair<>(ReminderSortField.TITLE, SortOrder.DESC));
-        sortingOptions.put(R.id.sort_updated_time_asc, new Pair<>(ReminderSortField.UPDATED_AT, SortOrder.ASC));
-        sortingOptions.put(R.id.sort_updated_time_desc, new Pair<>(ReminderSortField.UPDATED_AT, SortOrder.DESC));
-
-        Map<Integer, Integer> iconOptions = new HashMap<>();
-        iconOptions.put(R.id.sort_default, R.drawable.ic_sort);
-        iconOptions.put(R.id.sort_title_asc, R.drawable.ic_sort_az);
-        iconOptions.put(R.id.sort_title_desc, R.drawable.ic_sort_za);
-        iconOptions.put(R.id.sort_updated_time_asc, R.drawable.ic_time);
-        iconOptions.put(R.id.sort_updated_time_desc, R.drawable.ic_time_restore);
-
         Pair<ReminderSortField, SortOrder> sortOption = sortingOptions.get(itemId);
         sortField = sortOption != null ? sortOption.first : ReminderSortField.NONE;
         sortOrder = sortOption != null ? sortOption.second : SortOrder.ASC;
@@ -699,6 +585,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         updateSortingIcon(toolbarMenu.findItem(R.id.reminder_sorting), iconResId);
         filterAndSortReminders();
+    }
+
+    private void updateIconBasedOnSortFieldAndOrder() {
+        Integer iconResId = iconMap.get(new Pair<>(sortField, sortOrder));
+        if (iconResId == null) {
+            iconResId = R.drawable.ic_sort;
+        }
+
+        MenuItem sortingItem = toolbarMenu.findItem(R.id.reminder_sorting);
+        updateSortingIcon(sortingItem, iconResId);
     }
 
     private void updateSortingIcon(MenuItem sortingItem, int iconResId) {
