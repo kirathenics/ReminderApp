@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,22 +22,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 
+import com.example.reminderapp.Converters.TimeConverter;
 import com.example.reminderapp.Databases.AppDatabase;
 import com.example.reminderapp.Entities.Category;
 import com.example.reminderapp.Entities.Reminder;
+import com.example.reminderapp.Enums.ReminderRepeatType;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 
 
@@ -218,10 +214,10 @@ public class ReminderAddActivity extends AppCompatActivity {
                 newReminder.setRepeatValue(0);
                 newReminder.setRepeatDays(null);
             }
-            else if (newReminder.getRepeatType().equals("weekly")) {
+            else if (newReminder.getRepeatType() == ReminderRepeatType.WEEKLY) {
                 newReminder.setRepeatPattern(null);
                 newReminder.setRepeatValue(0);
-            } else if (newReminder.getRepeatType().equals("periodic")) {
+            } else if (newReminder.getRepeatType() == ReminderRepeatType.PERIODIC) {
                 newReminder.setRepeatPattern(selectedRepeatPattern);
                 newReminder.setRepeatValue(selectedRepeatValue);
                 newReminder.setRepeatDays(null);
@@ -435,7 +431,7 @@ public class ReminderAddActivity extends AppCompatActivity {
 
     private void onDaySelected(int dayIndex) {
         if (!newReminder.getRepeatDays().contains(dayIndex)) {
-            newReminder.setRepeatType("weekly");
+            newReminder.setRepeatType(ReminderRepeatType.WEEKLY);
             newReminder.getRepeatDays().add(dayIndex);
             Collections.sort(newReminder.getRepeatDays());
             toggleRepeatWeekVisibility(true);
@@ -475,37 +471,28 @@ public class ReminderAddActivity extends AppCompatActivity {
         selectedDate = reminder.getDate();
 
         if (selectedDate > 0) {
-            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
-            timeTextView.setText(timeFormat.format(new Date(selectedTime)));
-            timeTextView.setVisibility(View.VISIBLE);
-
-            SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, d MMM yyyy", Locale.getDefault());
-            dateTextView.setText(dateFormat.format(new Date(selectedDate)));
-            dateTextView.setVisibility(View.VISIBLE);
+            timeTextView.setText(TimeConverter.formatTime(selectedTime));
+            dateTextView.setText(TimeConverter.formatDate(selectedDate));
 
             setTextHowManyTimeDifference();
-
             toggleTimeDateVisibility(true);
         } else {
             toggleTimeDateVisibility(false);
         }
 
         if (newReminder.getRepeatType() != null) {
-            if (newReminder.getRepeatType().equals("weekly")) {
+            if (newReminder.getRepeatType() == ReminderRepeatType.WEEKLY) {
                 loadSelectedWeekdays();
+
                 setTextNextTimeRepeatInfoRepeatDays();
                 toggleRepeatWeekVisibility(true);
-            }
-            else if (newReminder.getRepeatType().equals("periodic")) {
+            } else if (newReminder.getRepeatType() == ReminderRepeatType.PERIODIC) {
                 selectedRepeatValue = newReminder.getRepeatValue();
                 selectedRepeatPattern = newReminder.getRepeatPattern();
 
                 setTextSelectedRepeatPattern();
                 setTextNextTimeRepeatInfoRepeatValue();
-
                 toggleRepeatPatternTimeVisibility(true);
-
-//                onRepeatTimeSelectedListener.onRepeatTimeSelected(newReminder.getRepeatValue(), newReminder.getRepeatPattern());
             }
         }
 
@@ -514,16 +501,16 @@ public class ReminderAddActivity extends AppCompatActivity {
             Calendar calendar = Calendar.getInstance();
 
             calendar.setTimeInMillis(selectedTimeDate);
-            calendar.set(Calendar.YEAR, 0);
-            calendar.set(Calendar.DAY_OF_YEAR, 1);
-            selectedStopRepeatTime = calendar.getTimeInMillis();
-
-            calendar.setTimeInMillis(selectedTimeDate);
             calendar.set(Calendar.HOUR_OF_DAY, 0);
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
             calendar.set(Calendar.MILLISECOND, 0);
+
             selectedStopRepeatDate = calendar.getTimeInMillis();
+            selectedStopRepeatTime = selectedTimeDate - selectedStopRepeatDate;
+
+            stopRepeatTimeTextView.setText(TimeConverter.formatTime(selectedStopRepeatTime));
+            stopRepeatDateTextView.setText(TimeConverter.formatDate(selectedStopRepeatDate));
 
             setTextStopRepeatTimeDifference();
             setTextNextTimeRepeatInfo();
@@ -559,31 +546,17 @@ public class ReminderAddActivity extends AppCompatActivity {
     private final ChooseTimeDateDialogFragment.OnDateTimeSelectedListener onDateTimeSelectedListener = new ChooseTimeDateDialogFragment.OnDateTimeSelectedListener() {
         @Override
         public void onDateTimeSelected(String time, String date) {
-            try {
-                DateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
-                Date parsedTime = timeFormat.parse(time);
-                if (parsedTime != null) {
-                    selectedTime = parsedTime.getTime();
-                }
-                timeTextView.setText(time);
+            selectedTime = TimeConverter.parseTime(time);
+            timeTextView.setText(time);
 
-                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-                Date parsedDate = dateFormat.parse(date);
-                if (parsedDate != null) {
-                    selectedDate = parsedDate.getTime();
-                }
+            selectedDate = TimeConverter.parseDate(date);
+            dateTextView.setText(TimeConverter.formatDate(selectedStopRepeatDate));
 
-                DateFormat dateFormatView = new SimpleDateFormat("EEE, d MMM yyyy", Locale.getDefault());
-                dateTextView.setText(dateFormatView.format(parsedDate));
+            setTextHowManyTimeDifference();
+            setTextStopRepeatTimeDifference();
+            setTextNextTimeRepeatInfo();
 
-                setTextHowManyTimeDifference();
-                setTextStopRepeatTimeDifference();
-                setTextNextTimeRepeatInfo();
-
-                toggleTimeDateVisibility(true);
-            } catch (ParseException e) {
-                Log.e("ChooseTimeDateDialog", "Error parsing date or time", e);
-            }
+            toggleTimeDateVisibility(true);
         }
     };
 
@@ -601,7 +574,7 @@ public class ReminderAddActivity extends AppCompatActivity {
         selectedRepeatValue = repeatValue;
         selectedRepeatPattern = repeatPattern;
 
-        newReminder.setRepeatType("periodic");
+        newReminder.setRepeatType(ReminderRepeatType.PERIODIC);
 
         setTextSelectedRepeatPattern();
         setTextNextTimeRepeatInfoRepeatValue();
@@ -633,30 +606,16 @@ public class ReminderAddActivity extends AppCompatActivity {
     private final ChooseTimeDateDialogFragment.OnDateTimeSelectedListener onStopRepeatDateTimeSelectedListener = new ChooseTimeDateDialogFragment.OnDateTimeSelectedListener() {
         @Override
         public void onDateTimeSelected(String time, String date) {
-            try {
-                DateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
-                Date parsedTime = timeFormat.parse(time);
-                if (parsedTime != null) {
-                    selectedStopRepeatTime = parsedTime.getTime();
-                }
-                stopRepeatTimeTextView.setText(time);
+            selectedStopRepeatTime = TimeConverter.parseTime(time);
+            stopRepeatTimeTextView.setText(time);
 
-                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-                Date parsedDate = dateFormat.parse(date);
-                if (parsedDate != null) {
-                    selectedStopRepeatDate = parsedDate.getTime();
-                }
+            selectedStopRepeatDate = TimeConverter.parseDate(date);
+            stopRepeatDateTextView.setText(TimeConverter.formatDate(selectedStopRepeatDate));
 
-                DateFormat dateFormatView = new SimpleDateFormat("d MMM yyyy", Locale.getDefault());
-                stopRepeatDateTextView.setText(dateFormatView.format(parsedDate));
+            setTextStopRepeatTimeDifference();
+            setTextNextTimeRepeatInfo();
 
-                setTextStopRepeatTimeDifference();
-                setTextNextTimeRepeatInfo();
-
-                toggleStopRepeatTimeVisibility(true);
-            } catch (ParseException e) {
-                Log.e("ChooseTimeDateDialog", "Error parsing date or time", e);
-            }
+            toggleStopRepeatTimeVisibility(true);
         }
     };
 
@@ -686,10 +645,10 @@ public class ReminderAddActivity extends AppCompatActivity {
 
     private void setTextNextTimeRepeatInfo() {
         if (newReminder.getRepeatType() != null) {
-            if (newReminder.getRepeatType().equals("periodic")) {
+            if (newReminder.getRepeatType() == ReminderRepeatType.PERIODIC) {
                 setTextNextTimeRepeatInfoRepeatValue();
             }
-            else if (newReminder.getRepeatType().equals("weekly")) {
+            else if (newReminder.getRepeatType() == ReminderRepeatType.WEEKLY) {
                 setTextNextTimeRepeatInfoRepeatDays();
             }
         }

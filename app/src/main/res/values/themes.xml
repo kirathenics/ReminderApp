@@ -53,26 +53,11 @@
     <style name="CustomDateTimePickerTheme" parent="Base.Theme.ReminderApp">
         <item name="colorAccent">@color/lavender_dark</item>
         <item name="android:colorAccent">@color/lavender_dark</item>
-<!--        <item name="android:buttonBarPositiveButtonStyle">@style/DialogButtonStyled</item>-->
-<!--        <item name="android:buttonBarNegativeButtonStyle">@style/DialogButtonStyled</item>-->
-<!--        <item name="android:buttonBarNeutralButtonStyle">@style/DialogButtonStyled</item>-->
     </style>
 
     <style name="DialogButtonStyled" parent="Widget.AppCompat.Button.Borderless">
         <item name="android:textColor">@color/lavender_dark</item>
     </style>
-
-<!--    <style name="DayOfWeekCheckBox">-->
-<!--        <item name="android:layout_width">0dp</item>-->
-<!--        <item name="android:layout_height">35sp</item>-->
-<!--        <item name="android:layout_weight">1</item>-->
-<!--        <item name="android:gravity">center</item>-->
-<!--        <item name="android:layout_margin">2sp</item>-->
-<!--        <item name="android:background">@drawable/day_selector</item>-->
-<!--        <item name="android:button">@android:color/transparent</item>-->
-<!--        <item name="android:textColor">@color/lavender_dark</item>-->
-<!--        <item name="android:textSize">14sp</item>-->
-<!--    </style>-->
 
     <style name="DayOfWeekCheckBox">
         <item name="android:layout_width">0dp</item>
