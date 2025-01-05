@@ -46,6 +46,7 @@ import com.example.reminderapp.Adapters.ReminderListAdapter;
 import com.example.reminderapp.Databases.AppDatabase;
 import com.example.reminderapp.Entities.Category;
 import com.example.reminderapp.Entities.Reminder;
+import com.example.reminderapp.Enums.GridViewSpanCount;
 import com.example.reminderapp.Enums.ReminderSortField;
 import com.example.reminderapp.Enums.SortOrder;
 import com.example.reminderapp.Listeners.OnItemClickListener;
@@ -81,9 +82,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     LinearLayout noRemindersLinearLayout;
     TextView noRemindersCategoryNameTextView;
 
-    private final int ROW_SPAN_COUNT = 1;
-    private final int GRID_SPAN_COUNT = 2;
-    private boolean isGridView = true;
+//    private final int ROW_SPAN_COUNT = 1;
+//    private final int GRID_SPAN_COUNT = 2;
+//    private boolean isGridView = true;
+
+    private GridViewSpanCount spanCount = GridViewSpanCount.TWO_CARDS;
 
     private MenuItem lastCategory = null;
     private Integer selectedCategoryId = null;
@@ -154,7 +157,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         selectedCategoryId = sharedPreferences.getInt("selectedCategoryId", -1);
         selectedCategoryId = selectedCategoryId == -1 ? null : selectedCategoryId;
         isCompleted = sharedPreferences.getBoolean("isCompleted", true);
-        isCompletedRemindersVisibleSwitchCompat.setChecked(isCompleted);
+        isCompletedRemindersVisibleSwitchCompat.setChecked(sharedPreferences.getBoolean("isCompleted", true));
+        spanCount = GridViewSpanCount.valueOf(sharedPreferences.getString("reminderSpanCount", GridViewSpanCount.TWO_CARDS.toString()));
         sortField = ReminderSortField.valueOf(sharedPreferences.getString("reminderSortField", ReminderSortField.NONE.toString()));
         sortOrder = SortOrder.valueOf(sharedPreferences.getString("reminderSortOrder", SortOrder.ASC.toString()));
     }
@@ -163,6 +167,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putInt("selectedCategoryId", selectedCategoryId != null ? selectedCategoryId : -1);
         editor.putBoolean("isCompleted", isCompleted);
+        editor.putString("reminderSpanCount", spanCount.toString());
         editor.putString("reminderSortField", sortField.toString());
         editor.putString("reminderSortOrder", sortOrder.toString());
         editor.apply();
@@ -253,7 +258,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 this::updateReminder,
                 this::deleteReminder
         );
-        updateReminderRecyclerView(GRID_SPAN_COUNT);
+        updateReminderRecyclerView(spanCount.getValue());
     }
 
     private void handleCreateReminderResult(ActivityResult result) {
@@ -497,6 +502,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         getMenuInflater().inflate(R.menu.reminder_toolbar_menu, menu);
 
         toolbarMenu = menu;
+        toggleViewMode();
         updateIconBasedOnSortFieldAndOrder();
 
         MenuItem searchItem = menu.findItem(R.id.action_search);
@@ -550,7 +556,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int itemId = item.getItemId();
 
         if (itemId == R.id.view_mode) {
-            toggleViewMode(item);
+            spanCount = getNextSpanCount(spanCount);
+            toggleViewMode();
             return true;
         }
 
@@ -562,12 +569,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return false;
     }
 
-    private void toggleViewMode(MenuItem item) {
-        isGridView = !isGridView;
-        int spanCount = isGridView ? GRID_SPAN_COUNT : ROW_SPAN_COUNT;
-        int iconResId = isGridView ? R.drawable.ic_grid_view : R.drawable.ic_row_view;
+    private GridViewSpanCount getNextSpanCount(GridViewSpanCount current) {
+        GridViewSpanCount[] values = GridViewSpanCount.values();
+        int currentIndex = current.ordinal();
+        int nextIndex = (currentIndex + 1) % values.length;
+        return values[nextIndex];
+    }
 
-        updateReminderRecyclerView(spanCount);
+    private void toggleViewMode() {
+        int iconResId;
+        switch (spanCount) {
+            case ROW:
+                iconResId = R.drawable.ic_row_view;
+                break;
+            case TWO_CARDS:
+                iconResId = R.drawable.ic_grid_view;
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + spanCount);
+        }
+
+        updateReminderRecyclerView(spanCount.getValue());
+        MenuItem item = toolbarMenu.findItem(R.id.view_mode);
         item.setIcon(ContextCompat.getDrawable(this, iconResId));
     }
 

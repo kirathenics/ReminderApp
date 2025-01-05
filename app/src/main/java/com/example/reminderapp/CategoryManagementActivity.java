@@ -21,6 +21,7 @@ import com.example.reminderapp.Databases.AppDatabase;
 import com.example.reminderapp.Entities.Category;
 import com.example.reminderapp.Entities.CategoryWithReminderCount;
 import com.example.reminderapp.Enums.CategorySortField;
+import com.example.reminderapp.Enums.GridViewSpanCount;
 import com.example.reminderapp.Enums.SortOrder;
 import com.example.reminderapp.Listeners.OnItemClickListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -39,9 +40,7 @@ public class CategoryManagementActivity extends AppCompatActivity {
     private RecyclerView categoryRecyclerView;
     private CategoryListAdapter categoryListAdapter;
 
-    private final int ROW_SPAN_COUNT = 1;
-    private final int GRID_SPAN_COUNT = 2;
-    private boolean isGridView = true;
+    private GridViewSpanCount spanCount = GridViewSpanCount.TWO_CARDS;
 
     private CategorySortField sortField;
     private SortOrder sortOrder;
@@ -82,7 +81,6 @@ public class CategoryManagementActivity extends AppCompatActivity {
 
                 runOnUiThread(() -> {
                     categoryList.add(newCategoryWithReminderCount);
-//                        categoryListAdapter.notifyDataSetChanged();
                     sortCategories();
                 });
             }).start());
@@ -105,12 +103,14 @@ public class CategoryManagementActivity extends AppCompatActivity {
     }
 
     private void loadPreferences() {
+        spanCount = GridViewSpanCount.valueOf(sharedPreferences.getString("categorySpanCount", GridViewSpanCount.TWO_CARDS.toString()));
         sortField = CategorySortField.valueOf(sharedPreferences.getString("categorySortField", CategorySortField.NONE.toString()));
         sortOrder = SortOrder.valueOf(sharedPreferences.getString("categorySortOrder", SortOrder.ASC.toString()));
     }
 
     private void savePreferences() {
         SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("categorySpanCount", spanCount.toString());
         editor.putString("categorySortField", sortField.toString());
         editor.putString("categorySortOrder", sortOrder.toString());
         editor.apply();
@@ -143,7 +143,7 @@ public class CategoryManagementActivity extends AppCompatActivity {
                 this::updateCategory,
                 this::deleteCategory
         );
-        updateCategoryRecyclerView(GRID_SPAN_COUNT);
+        updateCategoryRecyclerView(spanCount.getValue());
     }
 
     private void updateCategory(int position, CategoryWithReminderCount updatedItem) {
@@ -179,6 +179,7 @@ public class CategoryManagementActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.category_management_toolbar_menu, menu);
 
         toolbarMenu = menu;
+        toggleViewMode();
         updateIconBasedOnSortFieldAndOrder();
 
         MenuItem searchItem = menu.findItem(R.id.action_search);
@@ -237,7 +238,8 @@ public class CategoryManagementActivity extends AppCompatActivity {
         }
 
         if (itemId == R.id.view_mode) {
-            toggleViewMode(item);
+            spanCount = getNextSpanCount(spanCount);
+            toggleViewMode();
             return true;
         }
 
@@ -249,12 +251,28 @@ public class CategoryManagementActivity extends AppCompatActivity {
         return false;
     }
 
-    private void toggleViewMode(MenuItem item) {
-        isGridView = !isGridView;
-        int spanCount = isGridView ? GRID_SPAN_COUNT : ROW_SPAN_COUNT;
-        int iconResId = isGridView ? R.drawable.ic_grid_view : R.drawable.ic_row_view;
+    private GridViewSpanCount getNextSpanCount(GridViewSpanCount current) {
+        GridViewSpanCount[] values = GridViewSpanCount.values();
+        int currentIndex = current.ordinal();
+        int nextIndex = (currentIndex + 1) % values.length;
+        return values[nextIndex];
+    }
 
-        updateCategoryRecyclerView(spanCount);
+    private void toggleViewMode() {
+        int iconResId;
+        switch (spanCount) {
+            case ROW:
+                iconResId = R.drawable.ic_row_view;
+                break;
+            case TWO_CARDS:
+                iconResId = R.drawable.ic_grid_view;
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + spanCount);
+        }
+
+        updateCategoryRecyclerView(spanCount.getValue());
+        MenuItem item = toolbarMenu.findItem(R.id.view_mode);
         item.setIcon(ContextCompat.getDrawable(this, iconResId));
     }
 
