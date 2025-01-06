@@ -28,7 +28,7 @@ import com.example.reminderapp.Listeners.OnItemDeletedListener;
 import com.example.reminderapp.Listeners.OnItemUpdatedListener;
 import com.example.reminderapp.R;
 import com.example.reminderapp.ReminderAddActivity;
-import com.example.reminderapp.Utils;
+import com.example.reminderapp.TimeUtils;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.checkbox.MaterialCheckBox;
 
@@ -71,13 +71,16 @@ public class ReminderListAdapter extends RecyclerView.Adapter<ReminderListAdapte
         holder.titleTextView.setText(reminder.getTitle());
         holder.titleTextView.setSelected(true);
 
-        long time = reminder.getTime();
-        long date = reminder.getDate();
-        if (date > 0) {
-            holder.notificationTimeLayout.setVisibility(View.VISIBLE);
+        long selectedTime = reminder.getSelectedTime();
+        long lastTimeNotified = reminder.getLastTimeNotified();
+        if (selectedTime > 0) {
+            if (lastTimeNotified == 0) {
+                holder.timeDifferenceTextView.setText(TimeUtils.calculateTimeDifferenceWithCurrentTime(selectedTime));
+            } else {
+                holder.timeDifferenceTextView.setText(TimeUtils.calculateTimeDifferenceWithCurrentTime(TimeUtils.calculateNextTimeNotification(reminder, lastTimeNotified)));
+            }
 
-            holder.timeDifferenceTextView.setText(Utils.calculateTimeDifference(time, date, context));
-            holder.timeDifferenceTextView.setSelected(true);
+            holder.notificationTimeLayout.setVisibility(View.VISIBLE);
         } else {
             holder.notificationTimeLayout.setVisibility(View.GONE);
         }

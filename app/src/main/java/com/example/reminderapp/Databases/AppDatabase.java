@@ -11,7 +11,7 @@ import com.example.reminderapp.DAO.ReminderDAO;
 import com.example.reminderapp.Entities.Category;
 import com.example.reminderapp.Entities.Reminder;
 
-@Database(entities = {Category.class, Reminder.class}, version = 4, exportSchema = false)
+@Database(entities = {Category.class, Reminder.class}, version = 5, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
     private static AppDatabase database;
     private static final String DATABASE_NAME = "ReminderApp";

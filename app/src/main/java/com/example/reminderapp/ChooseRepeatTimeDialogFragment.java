@@ -85,13 +85,13 @@ public class ChooseRepeatTimeDialogFragment extends DialogFragment {
 
         chooseRepeatValueNumberPicker.setOnValueChangedListener((picker, oldVal, newVal) -> {
             chosenRepeatValue = newVal;
-            chosenRepeatTimeTextView.setText(Utils.updateRepeatTime(chosenRepeatValue, chosenRepeatPattern));
+            chosenRepeatTimeTextView.setText(TimeUtils.updateRepeatTime(chosenRepeatValue, chosenRepeatPattern));
         });
 
         chooseRepeatPatternNumberPicker.setOnValueChangedListener((picker, oldVal, newVal) -> {
             chosenRepeatPattern = repeatPatterns[newVal];
             chooseRepeatValueNumberPicker.setMaxValue(maxValuesForPatterns[newVal]);
-            chosenRepeatTimeTextView.setText(Utils.updateRepeatTime(chosenRepeatValue, chosenRepeatPattern));
+            chosenRepeatTimeTextView.setText(TimeUtils.updateRepeatTime(chosenRepeatValue, chosenRepeatPattern));
         });
 
         MaterialButton cancelButton = view.findViewById(R.id.cancel_date_time_button);

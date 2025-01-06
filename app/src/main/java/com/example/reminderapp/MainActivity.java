@@ -271,7 +271,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     filterAndSortReminders();
                 });
 
-//                 createNotification(Objects.requireNonNull(newReminder));
                 assert newReminder != null;
                 ScheduleNotificationManager.createNotification(MainActivity.this, newReminder);
             }).start();
@@ -290,7 +289,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 updateSelectedCategory(updatedReminder.getCategoryId());
                 filterAndSortReminders();
 
-//                updateNotification(updatedReminder);
                 ScheduleNotificationManager.updateNotification(MainActivity.this, updatedReminder);
             }
         }
@@ -307,7 +305,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         reminderList.set(position, updatedItem);
         reminderListAdapter.notifyItemChanged(position);
         filterAndSortReminders();
-//        updateNotification(updatedItem);
         ScheduleNotificationManager.updateNotification(MainActivity.this, updatedItem);
     }
 
@@ -315,7 +312,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         appDatabase.reminderDAO().delete(deletedItem);
         reminderList.remove(position);
         filterAndSortReminders();
-//        cancelNotification(deletedItem.getId());
         ScheduleNotificationManager.cancelNotification(MainActivity.this, deletedItem.getId());
     }
 
@@ -654,85 +650,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             notificationManager.createNotificationChannel(channel);
         }
     }
-
-//    private void createNotification(Reminder reminder) {
-//        if (reminder.isCompleted()) {
-//            return;
-//        }
-//
-//        long triggerTime = reminder.getDate() + reminder.getTime();
-//
-//        if (triggerTime <= System.currentTimeMillis()) {
-//            return;
-//        }
-//
-//        Intent intent = new Intent(MainActivity.this, ReminderNotificationReceiver.class);
-//        intent.putExtra("title", R.string.app_name);
-//        intent.putExtra("message", reminder.getTitle());
-//        intent.putExtra("reminderId", reminder.getId());
-//        if (reminder.getRepeatType() != null) {
-//            intent.putExtra("reminder", reminder);
-//        }
-//
-//        PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this,
-//                reminder.getId(),
-//                intent,
-//                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-//
-//        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-//        alarmManager.set(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent);
-//    }
-
-//    private void createNotification(Reminder reminder) {
-//        long triggerTime = reminder.getDate() + reminder.getTime();
-//
-//        if (triggerTime <= System.currentTimeMillis() || reminder.isCompleted() || (reminder.getEndDate() != 0 && triggerTime >= reminder.getEndDate())) {
-//            return;
-//        }
-//
-////        if (reminder.isCompleted()) {
-////            return;
-////        }
-////
-////        long triggerTime = reminder.getDate() + reminder.getTime();
-////
-////        if (triggerTime <= System.currentTimeMillis()) {
-////            return;
-////        }
-//
-//        Intent intent = new Intent(MainActivity.this, ReminderNotificationReceiver.class);
-//        intent.putExtra("title", R.string.app_name);
-//        intent.putExtra("message", reminder.getTitle());
-//        intent.putExtra("reminder", reminder);
-//
-//        PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this,
-//                reminder.getId(),
-//                intent,
-//                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-//
-//        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-//        alarmManager.set(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent);
-//    }
-//
-//    private void updateNotification(Reminder reminder) {
-//        cancelNotification(reminder.getId());
-//        createNotification(reminder);
-//    }
-//
-//    private void cancelNotification(int reminderId) {
-//        Intent intent = new Intent(this, ReminderNotificationReceiver.class);
-//
-//        PendingIntent pendingIntent = PendingIntent.getBroadcast(
-//                this,
-//                reminderId,
-//                intent,
-//                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-//
-//        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-//        if (alarmManager != null) {
-//            alarmManager.cancel(pendingIntent);
-//        }
-//    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {

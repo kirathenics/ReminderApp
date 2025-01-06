@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,7 +33,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -56,6 +56,7 @@ public class ReminderAddActivity extends AppCompatActivity {
 
     private TextView timeTextView;
     private TextView dateTextView;
+
     private long selectedTime = 0;
     private long selectedDate = 0;
 
@@ -204,8 +205,7 @@ public class ReminderAddActivity extends AppCompatActivity {
             newReminder.setTitle(title);
             newReminder.setDescription(Objects.requireNonNull(reminderDescriptionEditText.getText()).toString());
 
-            newReminder.setTime(selectedTime);
-            newReminder.setDate(selectedDate);
+            newReminder.setSelectedTime(selectedTime + selectedDate);
 
             newReminder.setCompleted(false);
 
@@ -224,7 +224,7 @@ public class ReminderAddActivity extends AppCompatActivity {
             }
 
             newReminder.setLastTimeNotified(0);
-            newReminder.setEndDate(selectedStopRepeatTime + selectedStopRepeatDate);
+            newReminder.setEndTime(selectedStopRepeatTime + selectedStopRepeatDate);
 
             newReminder.setCategoryId(appDatabase.categoryDAO().findByName(chooseCategoryTextView.getText().toString()).getId());
 
@@ -373,6 +373,9 @@ public class ReminderAddActivity extends AppCompatActivity {
         deleteRepeatPatternButton = findViewById(R.id.delete_repeat_pattern_button);
         deleteRepeatPatternButton.setVisibility(View.GONE);
         deleteRepeatPatternButton.setOnClickListener(v -> {
+            selectedStopRepeatTime = 0;
+            selectedStopRepeatDate = 0;
+
             nextTimeRepeatInfoTextView.setPaintFlags(nextTimeRepeatInfoTextView.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
             newReminder.setRepeatType(null);
 
@@ -437,12 +440,12 @@ public class ReminderAddActivity extends AppCompatActivity {
             Collections.sort(newReminder.getRepeatDays());
             toggleRepeatWeekVisibility(true);
         }
-        setTextNextTimeRepeatInfoRepeatDays();
+        setTextNextTimeRepeatSchedule();
     }
 
     private void onDayUnselected(int dayIndex) {
         newReminder.getRepeatDays().remove(Integer.valueOf(dayIndex));
-        setTextNextTimeRepeatInfoRepeatDays();
+        setTextNextTimeRepeatSchedule();
     }
 
     private void loadSelectedWeekdays() {
@@ -468,10 +471,13 @@ public class ReminderAddActivity extends AppCompatActivity {
         }
         toggleDescriptionVisibility();
 
-        selectedTime = reminder.getTime();
-        selectedDate = reminder.getDate();
+        long selectedTimeDate = reminder.getSelectedTime();
+        if (selectedTimeDate > 0) {
+            Pair<Long, Long> splitTime = TimeUtils.splitTimeDate(selectedTimeDate);
+            selectedTime = splitTime.first;
+            selectedTime = TimeUtils.addDefaultTimeZoneOffset(selectedTime);
+            selectedDate = splitTime.second;
 
-        if (selectedDate > 0) {
             timeTextView.setText(TimeConverter.formatTime(selectedTime));
             dateTextView.setText(TimeConverter.formatDate(selectedDate));
 
@@ -485,30 +491,24 @@ public class ReminderAddActivity extends AppCompatActivity {
             if (newReminder.getRepeatType() == ReminderRepeatType.SCHEDULE) {
                 loadSelectedWeekdays();
 
-                setTextNextTimeRepeatInfoRepeatDays();
+                setTextNextTimeRepeatSchedule();
                 toggleRepeatWeekVisibility(true);
             } else if (newReminder.getRepeatType() == ReminderRepeatType.PERIODIC) {
                 selectedRepeatValue = newReminder.getRepeatValue();
                 selectedRepeatPattern = newReminder.getRepeatPattern();
 
                 setTextSelectedRepeatPattern();
-                setTextNextTimeRepeatInfoRepeatValue();
+                setTextNextTimePeriodic();
                 toggleRepeatPatternTimeVisibility(true);
             }
         }
 
-        long selectedTimeDate = reminder.getEndDate();
-        if (selectedTimeDate > 0) {
-            Calendar calendar = Calendar.getInstance();
-
-            calendar.setTimeInMillis(selectedTimeDate);
-            calendar.set(Calendar.HOUR_OF_DAY, 0);
-            calendar.set(Calendar.MINUTE, 0);
-            calendar.set(Calendar.SECOND, 0);
-            calendar.set(Calendar.MILLISECOND, 0);
-
-            selectedStopRepeatDate = calendar.getTimeInMillis();
-            selectedStopRepeatTime = selectedTimeDate - selectedStopRepeatDate;
+        long endTime = reminder.getEndTime();
+        if (endTime > 0) {
+            Pair<Long, Long> splitTime = TimeUtils.splitTimeDate(endTime);
+            selectedStopRepeatTime = splitTime.first;
+            selectedStopRepeatTime = TimeUtils.addDefaultTimeZoneOffset(selectedStopRepeatTime);
+            selectedStopRepeatDate = splitTime.second;
 
             stopRepeatTimeTextView.setText(TimeConverter.formatTime(selectedStopRepeatTime));
             stopRepeatDateTextView.setText(TimeConverter.formatDate(selectedStopRepeatDate));
@@ -578,7 +578,7 @@ public class ReminderAddActivity extends AppCompatActivity {
         newReminder.setRepeatType(ReminderRepeatType.PERIODIC);
 
         setTextSelectedRepeatPattern();
-        setTextNextTimeRepeatInfoRepeatValue();
+        setTextNextTimePeriodic();
 
         toggleRepeatPatternTimeVisibility(true);
     };
@@ -631,38 +631,39 @@ public class ReminderAddActivity extends AppCompatActivity {
     }
 
     private void setTextHowManyTimeDifference() {
-        howManyTimeDifferenceTextView.setText(Utils.calculateTimeDifference(selectedTime, selectedDate, ReminderAddActivity.this));
+        howManyTimeDifferenceTextView.setText(TimeUtils.calculateTimeDifferenceWithCurrentTime(selectedTime + selectedDate));
+        // TODO: add lastNotified check
     }
 
     private void setTextStopRepeatTimeDifference() {
         if (selectedStopRepeatDate != 0) {
-            stopRepeatTimeDifferenceTextView.setText(Utils.calculateTimeDifference(selectedStopRepeatTime, selectedStopRepeatDate, selectedTime + selectedDate, ReminderAddActivity.this));
+            stopRepeatTimeDifferenceTextView.setText(TimeUtils.calculateTimeDifference(selectedStopRepeatTime + selectedStopRepeatDate, selectedTime + selectedDate));
         }
     }
 
     private void setTextSelectedRepeatPattern() {
-        selectedRepeatPatternTextView.setText(Utils.updateRepeatTime(selectedRepeatValue, selectedRepeatPattern));
+        selectedRepeatPatternTextView.setText(TimeUtils.updateRepeatTime(selectedRepeatValue, selectedRepeatPattern));
     }
 
     private void setTextNextTimeRepeatInfo() {
         if (newReminder.getRepeatType() != null) {
             if (newReminder.getRepeatType() == ReminderRepeatType.PERIODIC) {
-                setTextNextTimeRepeatInfoRepeatValue();
+                setTextNextTimePeriodic();
             }
             else if (newReminder.getRepeatType() == ReminderRepeatType.SCHEDULE) {
-                setTextNextTimeRepeatInfoRepeatDays();
+                setTextNextTimeRepeatSchedule();
             }
         }
     }
 
-    private void setTextNextTimeRepeatInfoRepeatValue() {
-        nextTimeRepeatInfoTextView.setText(Utils.getNextTimeInfoText(selectedTime, selectedDate, selectedRepeatValue, selectedRepeatPattern, ReminderAddActivity.this));
-        checkIfWillRepeatValue();
+    private void setTextNextTimePeriodic() {
+        nextTimeRepeatInfoTextView.setText(TimeUtils.getNextTimeInfoText(selectedTime + selectedDate, selectedRepeatValue, selectedRepeatPattern));
+        checkIfWillRepeatPeriodic();
     }
 
-    private void checkIfWillRepeatValue() {
+    private void checkIfWillRepeatPeriodic() {
         if (selectedStopRepeatDate > 0) {
-            if ((selectedTime + selectedDate + Utils.getRepeatIntervalMillis(selectedRepeatValue, selectedRepeatPattern)) < (selectedStopRepeatTime + selectedStopRepeatDate)) {
+            if (TimeUtils.getNextTimePeriodic(selectedTime + selectedDate, selectedRepeatValue, selectedRepeatPattern) < (selectedStopRepeatTime + selectedStopRepeatDate)) {
                 nextTimeRepeatInfoTextView.setPaintFlags(nextTimeRepeatInfoTextView.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
             }
             else {
@@ -671,7 +672,7 @@ public class ReminderAddActivity extends AppCompatActivity {
         }
     }
 
-    private void setTextNextTimeRepeatInfoRepeatDays() {
+    private void setTextNextTimeRepeatSchedule() {
         List<Integer> repeatDays = newReminder.getRepeatDays();
         if (repeatDays == null || repeatDays.isEmpty()) {
             newReminder.setRepeatType(null);
@@ -684,63 +685,17 @@ public class ReminderAddActivity extends AppCompatActivity {
             currentTimeMillis = selectedTime + selectedDate;
         }
 
-        Calendar currentCalendar = Calendar.getInstance();
-        currentCalendar.setTimeInMillis(currentTimeMillis);
-        int currentDayOfWeek = currentCalendar.get(Calendar.DAY_OF_WEEK);
-        int adjustedDayOfWeek = (currentDayOfWeek == Calendar.SUNDAY) ? 7 : currentDayOfWeek - 1;
-        int currentHour = currentCalendar.get(Calendar.HOUR_OF_DAY);
-        int currentMinute = currentCalendar.get(Calendar.MINUTE);
+        long nextTime = TimeUtils.getNextTimeSchedule(currentTimeMillis, repeatDays);
+        String nextTimeInfo = TimeUtils.getNextTimeInfoText(nextTime, 0, "week");
 
-        Calendar reminderTimeCalendar = Calendar.getInstance();
-        reminderTimeCalendar.setTimeInMillis(selectedTime);
-        int reminderHour = reminderTimeCalendar.get(Calendar.HOUR_OF_DAY);
-        int reminderMinute = reminderTimeCalendar.get(Calendar.MINUTE);
-
-        Integer nextDay = null;
-        int minDayOffset = Integer.MAX_VALUE;
-
-        for (int day : repeatDays) {
-            int dayOffset = (day - adjustedDayOfWeek + 7) % 7;
-
-            if (dayOffset == 0) {
-                if (reminderHour > currentHour || (reminderHour == currentHour && reminderMinute > currentMinute)) {
-                    nextDay = day;
-                    minDayOffset = 0;
-                    break;
-                } else {
-                    dayOffset = 7;
-                }
-            }
-
-            if (dayOffset < minDayOffset) {
-                minDayOffset = dayOffset;
-                nextDay = day;
-            }
-        }
-
-        if (nextDay != null) {
-            Calendar nextReminderCalendar = Calendar.getInstance();
-            nextReminderCalendar.setTimeInMillis(currentTimeMillis);
-            nextReminderCalendar.add(Calendar.DAY_OF_YEAR, minDayOffset);
-            nextReminderCalendar.set(Calendar.HOUR_OF_DAY, reminderHour);
-            nextReminderCalendar.set(Calendar.MINUTE, reminderMinute);
-            nextReminderCalendar.set(Calendar.SECOND, 0);
-            nextReminderCalendar.set(Calendar.MILLISECOND, 0);
-
-            long nextTime = nextReminderCalendar.getTimeInMillis() % (24 * 60 * 60 * 1000);
-            long nextDate = nextReminderCalendar.getTimeInMillis() - nextTime;
-
-            String nextTimeInfo = Utils.getNextTimeInfoText(nextTime, nextDate, 0, "week", this);
-
-            nextTimeRepeatInfoTextView.setText(nextTimeInfo);
-            checkIfWillRepeatDays(nextTime, nextDate);
-            toggleRepeatWeekVisibility(true);
-        }
+        nextTimeRepeatInfoTextView.setText(nextTimeInfo);
+        checkIfWillRepeatSchedule(nextTime);
+        toggleRepeatWeekVisibility(true);
     }
 
-    private void checkIfWillRepeatDays(long nextTime, long nextDate) {
+    private void checkIfWillRepeatSchedule(long nextTime) {
         if (selectedStopRepeatDate > 0) {
-            if ((nextTime + nextDate) < (selectedStopRepeatTime + selectedStopRepeatDate)) {
+            if (nextTime < (selectedStopRepeatTime + selectedStopRepeatDate)) {
                 nextTimeRepeatInfoTextView.setPaintFlags(nextTimeRepeatInfoTextView.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
             } else {
                 nextTimeRepeatInfoTextView.setPaintFlags(nextTimeRepeatInfoTextView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);

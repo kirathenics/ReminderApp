@@ -34,11 +34,8 @@ public class Reminder implements Serializable {
     @ColumnInfo(name = "description")
     private String description;
 
-    @ColumnInfo(name = "time")
-    private long time;
-
-    @ColumnInfo(name = "date")
-    private long date;
+    @ColumnInfo(name = "selected_time")
+    private long selectedTime;
 
     @ColumnInfo(name = "is_completed")
     private boolean isCompleted;
@@ -57,8 +54,8 @@ public class Reminder implements Serializable {
     @ColumnInfo(name = "repeat_days")
     private List<Integer> repeatDays = new ArrayList<>();
 
-    @ColumnInfo(name = "end_date")
-    private long endDate;
+    @ColumnInfo(name = "end_time")
+    private long endTime;
 
     @ColumnInfo(name = "last_time_notified")
     private long lastTimeNotified;
@@ -96,20 +93,12 @@ public class Reminder implements Serializable {
         this.description = description;
     }
 
-    public long getTime() {
-        return time;
+    public long getSelectedTime() {
+        return selectedTime;
     }
 
-    public void setTime(long time) {
-        this.time = time;
-    }
-
-    public long getDate() {
-        return date;
-    }
-
-    public void setDate(long date) {
-        this.date = date;
+    public void setSelectedTime(long selectedTime) {
+        this.selectedTime = selectedTime;
     }
 
     public boolean isCompleted() {
@@ -152,12 +141,12 @@ public class Reminder implements Serializable {
         this.repeatDays = repeatDays;
     }
 
-    public long getEndDate() {
-        return endDate;
+    public long getEndTime() {
+        return endTime;
     }
 
-    public void setEndDate(long endDate) {
-        this.endDate = endDate;
+    public void setEndTime(long endTime) {
+        this.endTime = endTime;
     }
 
     public long getLastTimeNotified() {
@@ -196,8 +185,9 @@ public class Reminder implements Serializable {
     @Override
     public String toString() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
-        String formattedTime = dateFormat.format(new Date(time + date));
-        String formattedEndDate = dateFormat.format(new Date(endDate));
+        String formattedSelectedTime = dateFormat.format(new Date(selectedTime));
+        String formattedEndTime = dateFormat.format(new Date(endTime));
+        String formattedLastTimeNotified = dateFormat.format(new Date(lastTimeNotified));
         String formattedCreatedAt = dateFormat.format(new Date(createdAt));
         String formattedUpdatedAt = dateFormat.format(new Date(updatedAt));
 
@@ -205,13 +195,14 @@ public class Reminder implements Serializable {
                 "id=" + id +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
-                ", date,time=" + formattedTime +
+                ", selectedTime=" + formattedSelectedTime +
                 ", isCompleted=" + isCompleted +
-                ", repeatType='" + repeatType + '\'' +
+                ", repeatType=" + repeatType +
                 ", repeatPattern='" + repeatPattern + '\'' +
                 ", repeatValue=" + repeatValue +
-                ", repeatDays='" + repeatDays + '\'' +
-                ", endDate=" + formattedEndDate +
+                ", repeatDays=" + repeatDays +
+                ", endTime=" + formattedEndTime +
+                ", lastTimeNotified=" + formattedLastTimeNotified +
                 ", categoryId=" + categoryId +
                 ", createdAt=" + formattedCreatedAt +
                 ", updatedAt=" + formattedUpdatedAt +
