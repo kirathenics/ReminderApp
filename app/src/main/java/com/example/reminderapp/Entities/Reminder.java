@@ -43,9 +43,6 @@ public class Reminder implements Serializable {
     @ColumnInfo(name = "is_completed")
     private boolean isCompleted;
 
-//    @ColumnInfo(name = "repeat_type") // "periodic" or "weekly"
-//    private String repeatType;
-
     @TypeConverters(Converters.class)
     @ColumnInfo(name = "repeat_type")
     private ReminderRepeatType repeatType;
@@ -62,6 +59,9 @@ public class Reminder implements Serializable {
 
     @ColumnInfo(name = "end_date")
     private long endDate;
+
+    @ColumnInfo(name = "last_time_notified")
+    private long lastTimeNotified;
 
     @ColumnInfo(name = "category_id")
     private int categoryId;
@@ -120,14 +120,6 @@ public class Reminder implements Serializable {
         isCompleted = completed;
     }
 
-//    public String getRepeatType() {
-//        return repeatType;
-//    }
-//
-//    public void setRepeatType(String repeatType) {
-//        this.repeatType = repeatType;
-//    }
-
     public ReminderRepeatType getRepeatType() {
         return repeatType;
     }
@@ -166,6 +158,14 @@ public class Reminder implements Serializable {
 
     public void setEndDate(long endDate) {
         this.endDate = endDate;
+    }
+
+    public long getLastTimeNotified() {
+        return lastTimeNotified;
+    }
+
+    public void setLastTimeNotified(long lastTimeNotified) {
+        this.lastTimeNotified = lastTimeNotified;
     }
 
     public int getCategoryId() {
@@ -220,75 +220,4 @@ public class Reminder implements Serializable {
 }
 
 
-/*
 
-@Entity(tableName = "reminders",
-        foreignKeys = @ForeignKey(entity = Category.class, parentColumns = "id", childColumns = "category_id", onDelete = CASCADE),
-        indices = {@Index(value = {"title"}, unique = true), @Index(value = {"category_id"})})
-public class Reminder implements Serializable {
-
-    @PrimaryKey(autoGenerate = true)
-    private int id;
-
-    @ColumnInfo(name = "title")
-    private String title;
-
-    @ColumnInfo(name = "description")
-    private String description;
-
-    @ColumnInfo(name = "time")
-    private long time;
-
-    @ColumnInfo(name = "date")
-    private long date;
-
-    @ColumnInfo(name = "is_completed")
-    private boolean isCompleted;
-
-    @ColumnInfo(name = "repeat_type") // "periodic" or "weekly"
-    private String repeatType;
-
-    @ColumnInfo(name = "repeat_pattern")
-    private String repeatPattern;
-
-    @ColumnInfo(name = "repeat_value")
-    private int repeatValue;
-
-    @TypeConverters(Converters.class)
-    @ColumnInfo(name = "repeat_days")
-    private List<Integer> repeatDays = new ArrayList<>();
-
-    @ColumnInfo(name = "end_date")
-    private long endDate;
-
-    @ColumnInfo(name = "category_id")
-    private int categoryId;
-
-    @ColumnInfo(name = "created_at")
-    private long createdAt;
-
-    @ColumnInfo(name = "updated_at")
-    private long updatedAt;
-}
-
-public class Converters {
-    @TypeConverter
-    public static List<Integer> fromString(String value) {
-        if (value == null || value.isEmpty()) {
-            return new ArrayList<>();
-        }
-        return Arrays.stream(value.split(","))
-                .map(Integer::parseInt)
-                .collect(Collectors.toList());
-    }
-
-    @TypeConverter
-    public static String fromList(List<Integer> list) {
-        return list == null || list.isEmpty() ? "" : list.stream()
-                .map(String::valueOf)
-                .collect(Collectors.joining(","));
-    }
-}
-у reminder есть возможность опционально задавать повторение этого напоминания (если repeatType не null, то либо если repeatType = weekly, тогда пользователь в repeatDays указал дни недели, в которые нужно его повторить (repeatDays хранит строку формата "1,3,4",  где каждое число ассоциировано по порядку с днем недели, начиная с понедельника - 1), либо если repeatType = )
-
- */

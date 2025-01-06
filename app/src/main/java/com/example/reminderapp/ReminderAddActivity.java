@@ -214,7 +214,7 @@ public class ReminderAddActivity extends AppCompatActivity {
                 newReminder.setRepeatValue(0);
                 newReminder.setRepeatDays(null);
             }
-            else if (newReminder.getRepeatType() == ReminderRepeatType.WEEKLY) {
+            else if (newReminder.getRepeatType() == ReminderRepeatType.SCHEDULE) {
                 newReminder.setRepeatPattern(null);
                 newReminder.setRepeatValue(0);
             } else if (newReminder.getRepeatType() == ReminderRepeatType.PERIODIC) {
@@ -223,6 +223,7 @@ public class ReminderAddActivity extends AppCompatActivity {
                 newReminder.setRepeatDays(null);
             }
 
+            newReminder.setLastTimeNotified(0);
             newReminder.setEndDate(selectedStopRepeatTime + selectedStopRepeatDate);
 
             newReminder.setCategoryId(appDatabase.categoryDAO().findByName(chooseCategoryTextView.getText().toString()).getId());
@@ -431,7 +432,7 @@ public class ReminderAddActivity extends AppCompatActivity {
 
     private void onDaySelected(int dayIndex) {
         if (!newReminder.getRepeatDays().contains(dayIndex)) {
-            newReminder.setRepeatType(ReminderRepeatType.WEEKLY);
+            newReminder.setRepeatType(ReminderRepeatType.SCHEDULE);
             newReminder.getRepeatDays().add(dayIndex);
             Collections.sort(newReminder.getRepeatDays());
             toggleRepeatWeekVisibility(true);
@@ -481,7 +482,7 @@ public class ReminderAddActivity extends AppCompatActivity {
         }
 
         if (newReminder.getRepeatType() != null) {
-            if (newReminder.getRepeatType() == ReminderRepeatType.WEEKLY) {
+            if (newReminder.getRepeatType() == ReminderRepeatType.SCHEDULE) {
                 loadSelectedWeekdays();
 
                 setTextNextTimeRepeatInfoRepeatDays();
@@ -550,7 +551,7 @@ public class ReminderAddActivity extends AppCompatActivity {
             timeTextView.setText(time);
 
             selectedDate = TimeConverter.parseDate(date);
-            dateTextView.setText(TimeConverter.formatDate(selectedStopRepeatDate));
+            dateTextView.setText(TimeConverter.formatDate(selectedDate));
 
             setTextHowManyTimeDifference();
             setTextStopRepeatTimeDifference();
@@ -648,7 +649,7 @@ public class ReminderAddActivity extends AppCompatActivity {
             if (newReminder.getRepeatType() == ReminderRepeatType.PERIODIC) {
                 setTextNextTimeRepeatInfoRepeatValue();
             }
-            else if (newReminder.getRepeatType() == ReminderRepeatType.WEEKLY) {
+            else if (newReminder.getRepeatType() == ReminderRepeatType.SCHEDULE) {
                 setTextNextTimeRepeatInfoRepeatDays();
             }
         }

@@ -44,6 +44,9 @@ public interface ReminderDAO {
             "AND (:categoryId IS NULL OR category_id = :categoryId) ")
     int getCompletedRemindersCountByCategoryId(Integer categoryId);
 
+    @Query("SELECT * FROM reminders WHERE id = :id LIMIT 1 ")
+    Reminder getReminderById(int id);
+
     @Query("SELECT * FROM reminders WHERE title = :title LIMIT 1 ")
     Reminder findByTitle(String title);
 
