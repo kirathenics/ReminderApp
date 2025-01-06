@@ -95,6 +95,7 @@
     <string name="title_title_descending">Title Descending</string>
     <string name="title_most_recently_updated">Most Recently Updated</string>
     <string name="title_least_recently_updated">Least Recently Updated</string>
+    <string name="description_help_button">Help button</string>
 
     <string-array name="repeat_types">
         <item>periodic</item>

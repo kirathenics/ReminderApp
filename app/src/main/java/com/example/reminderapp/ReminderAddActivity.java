@@ -413,6 +413,13 @@ public class ReminderAddActivity extends AppCompatActivity {
             dialogFragment.setOnDateTimeSelectedListener(onStopRepeatDateTimeSelectedListener);
             dialogFragment.show(getSupportFragmentManager(), ChooseTimeDateDialogFragment.TAG);
         });
+
+        ImageButton helpButton = findViewById(R.id.help_button);
+        helpButton.setOnClickListener(v -> new AlertDialog.Builder( ReminderAddActivity.this)
+                .setTitle("Time and date help")
+                .setMessage("You can set a reminder to repeat on specific days of the week or at regular intervals with a defined pattern.\nAdditionally, you can specify an end time for the reminder.")
+                .setPositiveButton("Got it", (dialog, which) -> dialog.dismiss())
+                .show());
     }
 
     private void setupWeekdayCheckBoxListeners() {
