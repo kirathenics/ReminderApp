@@ -47,6 +47,9 @@ public interface ReminderDAO {
     @Query("SELECT * FROM reminders WHERE id = :id LIMIT 1 ")
     Reminder getReminderById(int id);
 
+    @Query("SELECT * FROM reminders WHERE category_id = :id ")
+    List<Reminder> getRemindersByCategoryId(int id);
+
     @Query("SELECT * FROM reminders WHERE title = :title LIMIT 1 ")
     Reminder findByTitle(String title);
 

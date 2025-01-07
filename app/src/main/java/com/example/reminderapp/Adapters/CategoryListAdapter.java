@@ -98,7 +98,7 @@ public class CategoryListAdapter extends RecyclerView.Adapter<CategoryListAdapte
             holder.remindersNumberTextView.setText(spannable);
         }
 
-        holder.is_activeSwitchCompat.setChecked(category.getCategory().isActive());
+        holder.isActiveSwitchCompat.setChecked(category.getCategory().isActive());
         updateCardColor(holder.categoryCardView, category.getCategory().isActive());
 
         String hexColor = category.getCategory().getColor();
@@ -109,7 +109,7 @@ public class CategoryListAdapter extends RecyclerView.Adapter<CategoryListAdapte
             holder.colorCircleView.setBackgroundTintList(ColorStateList.valueOf(Color.GRAY));
         }
 
-        holder.is_activeSwitchCompat.setOnCheckedChangeListener((buttonView, isChecked) -> {
+        holder.isActiveSwitchCompat.setOnCheckedChangeListener((buttonView, isChecked) -> {
             category.getCategory().setActive(isChecked);
             updateCardColor(holder.categoryCardView, isChecked);
 
@@ -139,11 +139,11 @@ public class CategoryListAdapter extends RecyclerView.Adapter<CategoryListAdapte
         });
 
         if (isDefaultCategory(category)) {
-            holder.is_activeSwitchCompat.setVisibility(View.GONE);
+            holder.isActiveSwitchCompat.setVisibility(View.GONE);
             holder.optionsImageButton.setVisibility(View.GONE);
             holder.itemView.setOnClickListener(v -> {});
         } else {
-            holder.is_activeSwitchCompat.setVisibility(View.VISIBLE);
+            holder.isActiveSwitchCompat.setVisibility(View.VISIBLE);
             holder.optionsImageButton.setVisibility(View.VISIBLE);
             holder.itemView.setOnClickListener(view -> createEditDialog(position, category));
         }
@@ -197,7 +197,7 @@ public class CategoryListAdapter extends RecyclerView.Adapter<CategoryListAdapte
     public static class CategoryViewHolder extends RecyclerView.ViewHolder {
         final MaterialCardView categoryCardView;
         final TextView nameTextView, remindersNumberTextView;
-        final SwitchCompat is_activeSwitchCompat;
+        final SwitchCompat isActiveSwitchCompat;
         final ImageButton optionsImageButton;
         final View colorCircleView;
 
@@ -206,7 +206,7 @@ public class CategoryListAdapter extends RecyclerView.Adapter<CategoryListAdapte
             categoryCardView = itemView.findViewById(R.id.category_card_view);
             nameTextView = itemView.findViewById(R.id.category_card_view_name);
             remindersNumberTextView = itemView.findViewById(R.id.category_card_view_reminder_number);
-            is_activeSwitchCompat = itemView.findViewById(R.id.category_card_view_is_active);
+            isActiveSwitchCompat = itemView.findViewById(R.id.category_card_view_is_active);
             optionsImageButton = itemView.findViewById(R.id.category_card_view_options);
             colorCircleView = itemView.findViewById(R.id.category_card_view_color_circle);
         }

@@ -475,9 +475,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (itemId == R.id.CategoriesManagement) {
             startActivity(new Intent(MainActivity.this, CategoryManagementActivity.class));
         }
-        else if (itemId == R.id.Settings) {
-            // TODO: implement Settings menu
-        }
+//        else if (itemId == R.id.Settings) {
+//            // TODO: implement Settings menu
+//        }
         else if (itemId == R.id.Info) {
             new AlertDialog.Builder(this)
                     .setTitle("About the Application")

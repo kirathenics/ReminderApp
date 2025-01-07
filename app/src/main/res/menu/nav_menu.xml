@@ -25,10 +25,10 @@
             android:icon="@drawable/ic_categories_management"
             android:title="@string/title_categories_management"/>
 
-        <item
-            android:id="@+id/Settings"
-            android:icon="@drawable/ic_settings"
-            android:title="@string/title_settings"/>
+<!--        <item-->
+<!--            android:id="@+id/Settings"-->
+<!--            android:icon="@drawable/ic_settings"-->
+<!--            android:title="@string/title_settings"/>-->
 
         <item
             android:id="@+id/Info"
