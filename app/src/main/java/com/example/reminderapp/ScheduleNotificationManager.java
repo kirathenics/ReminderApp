@@ -75,7 +75,6 @@ public class ScheduleNotificationManager {
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
         if (alarmManager != null) {
-//            alarmManager.set(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent);
             alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent);
         }
     }

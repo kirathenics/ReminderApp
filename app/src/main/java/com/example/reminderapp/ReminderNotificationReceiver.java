@@ -38,7 +38,6 @@ public class ReminderNotificationReceiver extends BroadcastReceiver {
                 .setSmallIcon(R.drawable.ic_notification)
                 .setContentTitle(title)
                 .setContentText(message)
-//                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setAutoCancel(true)
                 .setContentIntent(pendingIntent);
